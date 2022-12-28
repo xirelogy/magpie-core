@@ -1,0 +1,5 @@
+{
+  "Failed preparing PDO statement": "無法創建PDO語句",
+  "Failed preparing PDO statement: {{0}}": "無法創建PDO語句：{{0}}",
+  "": ""
+}

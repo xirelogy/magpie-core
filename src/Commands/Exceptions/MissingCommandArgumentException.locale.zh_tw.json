@@ -1,0 +1,5 @@
+{
+  "Missing argument '{{0}}' in command: {{1}}": "{{1}} 命令參數'{{0}}'缺失",
+  "Missing argument in command": "命令參數缺失",
+  "": ""
+}

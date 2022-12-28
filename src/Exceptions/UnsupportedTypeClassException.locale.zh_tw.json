@@ -1,0 +1,5 @@
+{
+  "'{{1}}' cannot create instance of the '{{0}}' type class": "'{{1}}'無法創建'{{0}}'子類型的實例",
+  "Cannot create instance of given type class": "無法創建該子類型的實例",
+  "": ""
+}

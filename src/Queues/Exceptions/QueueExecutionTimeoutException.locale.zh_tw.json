@@ -1,0 +1,5 @@
+{
+  "Exceeded timeout of {{0}} second(s) to execute on queue": "隊列上執行超出所允許的{{0}}秒",
+  "Exceeded timeout to execute on queue": "隊列上執行超時",
+  "": ""
+}

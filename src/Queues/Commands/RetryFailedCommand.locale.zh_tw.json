@@ -1,0 +1,5 @@
+{
+  "Failed job with ID = {{0}} not found": "未找到ID={{0}}的失敗任務",
+  "Job with ID = {{0}} placed back on queue": "ID={{0}}的失敗任務已重新加入隊列",
+  "": ""
+}

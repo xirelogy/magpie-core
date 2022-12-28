@@ -1,0 +1,7 @@
+{
+  "Invalid argument": "參數錯誤",
+  "Invalid argument: {{0}}": "參數錯誤：{{0}}",
+  "Invalid argument '{{0}}'": "參數'{{0}}'錯誤",
+  "Invalid argument '{{0}}': {{1}}": "參數'{{0}}'錯誤：{{1}}",
+  "": ""
+}

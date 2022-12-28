@@ -1,0 +1,11 @@
+{
+  "{{0}} running...": "{{0}} 執行中…",
+  "Job running...": "任務執行中…",
+  "{{0}} completed": "{{0}} 完成",
+  "Job completed": "任務完成",
+  "{{0}} crashed with exception": "{{0}} 出錯了",
+  "Job crashed with exception": "任務出錯了",
+  "{{0}} failed": "{{0}} 失敗",
+  "Job failed": "任務失敗",
+  "": ""
+}

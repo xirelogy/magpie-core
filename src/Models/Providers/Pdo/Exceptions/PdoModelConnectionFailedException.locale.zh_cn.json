@@ -1,0 +1,5 @@
+{
+  "Failed connecting to PDO model provider": "无法连接到PDO模型提供者",
+  "Failed connecting to PDO model provider: {{0}}": "无法连接到PDO模型提供者：{{0}}",
+  "": ""
+}

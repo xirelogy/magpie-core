@@ -1,0 +1,5 @@
+{
+  "": "",
+  "Cannot create instance of '{{2}}' for the feature '{{0}}' under the subject '{{1}}'": "'{{2}}'无法创建'{{1}}'主题子类型对应'{{0}}'功能子类型的实例",
+  "Cannot create instance of given subject-feature pair": "无法创建主题子类型对应功能子类型的实例"
+}

@@ -1,0 +1,5 @@
+{
+  "Command option '{{0}}' does not allow payload in command: {{1}}": "{{1}} 命令中'{{0}}'命令选项不允许载荷",
+  "Command option does not allow payload in command": "命令选项不允许载荷",
+  "": ""
+}

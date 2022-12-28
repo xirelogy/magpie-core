@@ -1,0 +1,6 @@
+{
+  "Redis {{1}} error: {{0}}": "Redis {{1}}出錯：{{0}}",
+  "Redis error: {{0}}": "Redis出錯：{{0}}",
+  "Redis error": "Redis出錯",
+  "": ""
+}

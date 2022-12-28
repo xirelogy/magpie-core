@@ -1,0 +1,8 @@
+{
+  "Missing command": "命令缺失",
+  "Unexpected character '{{0}}' in command signature": "命令签名中未预期的字符'{{0}}'",
+  "Unexpected character in command signature": "命令签名中未预期的字符",
+  "option": "选项",
+  "argument": "参数",
+  "": ""
+}

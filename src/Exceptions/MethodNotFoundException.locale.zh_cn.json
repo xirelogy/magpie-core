@@ -1,0 +1,5 @@
+{
+  "Method '{{1}}' not found in object of class '{{0}}'": "方法'{{1}}'在'{{0}}'类的实例中找不到",
+  "Method not found in object": "方法在实例中找不到",
+  "": ""
+}

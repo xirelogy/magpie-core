@@ -1,0 +1,5 @@
+{
+  "Missing payload for command option '{{0}}' in command: {{1}}": "{{1}} 命令中'{{0}}'命令选项所需载荷缺失",
+  "Missing payload for command option in command": "命令选项所需载荷缺失",
+  "": ""
+}

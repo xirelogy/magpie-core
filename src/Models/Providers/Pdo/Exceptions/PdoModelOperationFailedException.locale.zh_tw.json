@@ -1,0 +1,5 @@
+{
+  "PDO model operation failed": "PDO模型操作失敗",
+  "PDO model operation failed: {{0}}": "PDO模型操作失敗：{{0}}",
+  "": ""
+}

@@ -1,0 +1,5 @@
+{
+  "HTTP/{{0}} returned from HTTP request": "HTTP请求返回HTTP/{{0}}",
+  "Failure HTTP status code returned from HTTP request": "HTTP请求返回失败的HTTP状态码",
+  "": ""
+}
