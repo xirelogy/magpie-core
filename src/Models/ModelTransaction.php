@@ -2,6 +2,8 @@
 
 namespace Magpie\Models;
 
+use Magpie\Exceptions\GeneralPersistenceException;
+use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Contexts\Scoped;
 use Magpie\General\Traits\StaticClass;
@@ -67,9 +69,12 @@ abstract class ModelTransaction
      * @param callable():mixed $fn
      * @return mixed
      * @throws SafetyCommonException
+     * @throws PersistenceException
      */
     public static function execute(callable $fn) : mixed
     {
+        _throwable() ?? throw new GeneralPersistenceException();
+
         return Transaction::execute(static::createConnection(), $fn);
     }
 
