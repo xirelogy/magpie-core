@@ -18,9 +18,9 @@ class ClosureTransactionCompletedListener implements TransactionCompletedListena
 
     /**
      * Constructor
-     * @param Closure $fn
+     * @param callable(bool):void $fn
      */
-    protected function __construct(Closure $fn)
+    protected function __construct(callable $fn)
     {
         $this->fn = $fn;
     }
