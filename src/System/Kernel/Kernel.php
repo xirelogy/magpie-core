@@ -2,11 +2,13 @@
 
 namespace Magpie\System\Kernel;
 
+use Closure;
 use Exception;
 use Magpie\Configurations\AppConfig;
 use Magpie\Configurations\Env;
 use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
 use Magpie\General\Concepts\TypeClassable;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Logs\Concepts\Loggable;
 use Magpie\Logs\Loggers\DefaultLogger;
 use Magpie\Objects\NumericVersion;
@@ -57,6 +59,10 @@ final class Kernel
      * @var array<string, TypeClassable> Global current providers
      */
     protected array $globalProviders = [];
+    /**
+     * @var array<Closure> Listeners to react to termination
+     */
+    protected array $onTerminateListeners = [];
 
 
     /**
@@ -149,6 +155,30 @@ final class Kernel
     public function getVersion() : Version
     {
         return NumericVersion::fromNumbers(static::VER_MAJOR, static::VER_MINOR, static::VER_RELEASE);
+    }
+
+
+    /**
+     * Subscribe to termination
+     * @param callable():void $fn
+     * @return void
+     */
+    public function onTerminating(callable $fn) : void
+    {
+        $this->onTerminateListeners[] = $fn;
+    }
+
+
+    /**
+     * Notify that context is destructing
+     * @return void
+     * @internal
+     */
+    public function _notifyContextDestructing() : void
+    {
+        foreach ($this->onTerminateListeners as $onTerminateListener) {
+            Excepts::noThrow(fn () => $onTerminateListener());
+        }
     }
 
 

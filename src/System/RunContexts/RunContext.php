@@ -6,6 +6,7 @@ use Exception;
 use Magpie\General\Concepts\Runnable;
 use Magpie\System\Concepts\Capturable;
 use Magpie\System\Kernel\ExceptionHandler;
+use Magpie\System\Kernel\Kernel;
 use Magpie\System\Traits\SafeRunnable;
 
 /**
@@ -22,6 +23,15 @@ abstract class RunContext implements Runnable, Capturable
     protected function __construct()
     {
 
+    }
+
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        if (Kernel::hasCurrent()) Kernel::current()->_notifyContextDestructing();
     }
 
 
