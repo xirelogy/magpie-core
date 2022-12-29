@@ -3,8 +3,12 @@
 namespace Magpie\Models;
 
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\General\Contexts\Scoped;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Models\Concepts\TransactionCompletedListenable;
+use Magpie\Models\Impls\ModelTransactionScoped;
+use Magpie\System\Kernel\ExceptionHandler;
+use Throwable;
 
 /**
  * Database transaction associated to a specific model's connection
@@ -22,13 +26,27 @@ abstract class ModelTransaction
 
 
     /**
-     * Create a new transaction
+     * Create a new transaction that gets accepted manually
      * @return Transaction
      * @throws SafetyCommonException
      */
-    public static function create() : Transaction
+    public static function createManual() : Transaction
     {
         return new Transaction(static::createConnection());
+    }
+
+
+    /**
+     * Create a scoped object with the relevant transaction
+     * @return Scoped
+     */
+    public static function createScoped() : Scoped
+    {
+        try {
+            return new ModelTransactionScoped(static::createConnection());
+        } catch (Throwable $ex) {
+            ExceptionHandler::systemCritical($ex);
+        }
     }
 
 
