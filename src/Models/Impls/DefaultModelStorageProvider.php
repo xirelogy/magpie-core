@@ -5,7 +5,9 @@ namespace Magpie\Models\Impls;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnexpectedException;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Models\Concepts\AttributeCastable;
+use Magpie\Models\Concepts\AttributeInitializable;
 use Magpie\Models\Concepts\ModelStorageProvidable;
 use Magpie\Models\Model;
 use Magpie\Models\Schemas\TableSchema;
@@ -136,6 +138,31 @@ class DefaultModelStorageProvider implements ModelStorageProvidable
      */
     public function getChangedAttributes() : iterable
     {
+        // Initialize attributes as required
+        if ($this->isNew) {
+            foreach ($this->getTableSchema()->getColumns() as $column) {
+                $primaryInitClass = $column->getPrimaryInitClass();
+                if ($primaryInitClass === null) continue;
+                if (!is_subclass_of($primaryInitClass, AttributeInitializable::class)) continue;
+
+                $columnName = $column->getName();
+                if (!array_key_exists($columnName, $this->attributes)) continue;
+                if ($this->attributes[$columnName] !== null) continue;
+
+                // Generate manually
+                $generated = $primaryInitClass::generate();
+
+                // Cast the value if required
+                $castClass = $column->getEffectiveCastClass();
+                if ($castClass !== null && is_subclass_of($castClass, AttributeCastable::class)) {
+                    $generated = $castClass::fromDb($columnName, $generated);
+                }
+
+                // Save to attribute
+                $this->attributes[$columnName] = $generated;
+            }
+        }
+
         foreach ($this->attributes as $key => $value) {
             if ($this->isNew) {
                 // New model, ignore null values

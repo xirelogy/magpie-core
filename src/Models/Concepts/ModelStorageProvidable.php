@@ -69,6 +69,7 @@ interface ModelStorageProvidable
     /**
      * All changed attributes
      * @return iterable<string, mixed>
+     * @throws SafetyCommonException
      */
     public function getChangedAttributes() : iterable;
 

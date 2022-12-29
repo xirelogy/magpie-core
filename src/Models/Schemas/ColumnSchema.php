@@ -290,6 +290,16 @@ abstract class ColumnSchema implements Packable
 
 
     /**
+     * Primary initialization class, if any
+     * @return class-string<AttributeInitializable>|null
+     */
+    public function getPrimaryInitClass() : ?string
+    {
+        return $this->dataType->primaryInitClass;
+    }
+
+
+    /**
      * @inheritDoc
      */
     protected function onPack(object $ret, PackContext $context) : void
