@@ -49,9 +49,9 @@ class SyncSchemaCommand extends Command
         $paths = iter_flatten(Kernel::current()->getConfig()->getModelSourceSyncDirectories());
 
         foreach (AutoloadReflection::instance()->expandDiscoverySourcesReflection($paths) as $class) {
-            $model = new $class->name;
-            if (!$model instanceof Model) continue;
+            if (!$class->isSubclassOf(Model::class)) continue;
 
+            $model = new $class->name;
             TableSchemaSynchronizer::apply($model, $listener);
         }
     }
