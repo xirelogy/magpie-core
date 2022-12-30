@@ -182,9 +182,16 @@ class DefaultModelStorageProvider implements ModelStorageProvidable
      */
     public function resetChanges(array $savedAttributes) : void
     {
+        $tableSchema = $this->getTableSchema();
+
         // Absorb the saved attributes
         foreach ($savedAttributes as $savedKey => $savedValue) {
             $this->attributes[$savedKey] = $savedValue;
+
+            // Update primary key value if relevant
+            if ($tableSchema->getColumn($savedKey)?->isPrimaryKey() ?? false) {
+                $this->primaryKeyAttributes[$savedKey] = $savedValue;
+            }
         }
 
         $this->isNew = false;   // Any new model is no longer new upon reset

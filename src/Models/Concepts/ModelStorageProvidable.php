@@ -78,6 +78,7 @@ interface ModelStorageProvidable
      * Reset changes tracked
      * @param array<string, mixed> $savedAttributes
      * @return void
+     * @throws SafetyCommonException
      */
     public function resetChanges(array $savedAttributes) : void;
 
