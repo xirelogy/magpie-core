@@ -44,11 +44,11 @@ trait CommonApiCrudController
     {
         $contextAndState = $this->onGetContextAndState($request, ApiCrudPurpose::READ);
 
-        $intercepted = $this->onInterceptGetRoot($request, $contextAndState->crudState);
+        $intercepted = $this->onInterceptGetRoot($request, $contextAndState->context, $contextAndState->crudState);
         if ($intercepted !== null) return $intercepted;
 
         $paginator = static::crudGetPaginatorFromRequest($request);
-        $objects = $this->onListObjects($request, $contextAndState->crudState, $paginator);
+        $objects = $this->onListObjects($request, $contextAndState->context, $contextAndState->crudState, $paginator);
 
         return $this->onResponseGetRoot($request, $contextAndState->crudState, $paginator, $objects);
     }
@@ -57,11 +57,12 @@ trait CommonApiCrudController
     /**
      * Intercept getRoot()
      * @param Request $request
+     * @param ApiCrudContext $context
      * @param ApiCrudState $crudState
      * @return object|null
      * @throws Exception
      */
-    protected function onInterceptGetRoot(Request $request, ApiCrudState $crudState) : ?object
+    protected function onInterceptGetRoot(Request $request, ApiCrudContext $context, ApiCrudState $crudState) : ?object
     {
         _used($request, $crudState);
 
@@ -242,12 +243,13 @@ trait CommonApiCrudController
     /**
      * List all objects of this kind
      * @param Request $request
+     * @param ApiCrudContext $context
      * @param ApiCrudState $crudState
      * @param Paginator|null $paginator
      * @return iterable<CommonObject>
      * @throws Exception
      */
-    protected abstract function onListObjects(Request $request, ApiCrudState $crudState, ?Paginator $paginator) : iterable;
+    protected abstract function onListObjects(Request $request, ApiCrudContext $context, ApiCrudState $crudState, ?Paginator $paginator) : iterable;
 
 
     /**
