@@ -194,4 +194,27 @@ abstract class BaseQueryConditionable implements QueryConditionable
     {
         return null;
     }
+
+
+    /**
+     * Escape a like string for query condition
+     * @param string $value
+     * @return string
+     */
+    public static function escapeLikeString(string $value) : string
+    {
+        $ret = '';
+        $length = strlen($value);
+
+        for ($i = 0; $i < $length; ++$i) {
+            $c = substr($value, $i, 1);
+            $ret .= match ($c) {
+                '_' => '\\_',
+                '%' => '\\%',
+                default => $c,
+            };
+        }
+
+        return $ret;
+    }
 }
