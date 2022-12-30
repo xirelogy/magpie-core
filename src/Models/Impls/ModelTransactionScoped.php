@@ -19,10 +19,6 @@ class ModelTransactionScoped extends Scoped
      * @var Transaction Associated transaction
      */
     protected readonly Transaction $transaction;
-    /**
-     * @var bool If any crash is recorded
-     */
-    protected bool $isCrashed = false;
 
 
     /**
@@ -41,18 +37,7 @@ class ModelTransactionScoped extends Scoped
      */
     protected function onRelease() : void
     {
-        if (!$this->isCrashed) $this->transaction->accept();
+        if ($this->isSuccessful) $this->transaction->accept();
         $this->transaction->release();
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    protected function onCrash(Throwable $ex) : void
-    {
-        parent::onCrash($ex);
-
-        $this->isCrashed = true;
     }
 }

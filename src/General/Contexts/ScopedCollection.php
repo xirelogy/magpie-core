@@ -39,6 +39,17 @@ class ScopedCollection extends Scoped
     /**
      * @inheritDoc
      */
+    protected function onSucceeded() : void
+    {
+        foreach ($this->items as $item) {
+            $item->succeeded();
+        }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     protected function onCrash(Throwable $ex) : void
     {
         foreach ($this->items as $item) {

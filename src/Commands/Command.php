@@ -41,6 +41,7 @@ abstract class Command implements CommandRunnable
 
         try {
             $this->onRun($request);
+            $scoped->succeeded();
             return $this->exitCode;
         } catch (Exception $ex) {
             $scoped->crash($ex);

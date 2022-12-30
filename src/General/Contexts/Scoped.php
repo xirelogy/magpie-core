@@ -15,6 +15,10 @@ abstract class Scoped implements Releasable
 
 
     /**
+     * @var bool Success state
+     */
+    protected bool $isSuccessful = false;
+    /**
      * @var Throwable|null The exception/error that was caught in scope
      */
     protected ?Throwable $ex = null;
@@ -42,6 +46,27 @@ abstract class Scoped implements Releasable
      * @return void
      */
     protected abstract function onRelease() : void;
+
+
+    /**
+     * Notify that the execution within scope is successful
+     * @return void
+     */
+    public final function succeeded() : void
+    {
+        $this->isSuccessful = true;
+        $this->onSucceeded();
+    }
+
+
+    /**
+     * Any additional action when execution within scope is successful
+     * @return void
+     */
+    protected function onSucceeded() : void
+    {
+        // Default NOP
+    }
 
 
     /**
