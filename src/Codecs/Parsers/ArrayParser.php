@@ -31,6 +31,10 @@ class ArrayParser extends CreatableParser implements ChainableParser
      * @var bool If empty array treated as null
      */
     protected bool $isEmptyAsNull = false;
+    /**
+     * @var bool If null values are dropped
+     */
+    protected bool $isNullValueDropped = false;
 
 
     /**
@@ -85,6 +89,18 @@ class ArrayParser extends CreatableParser implements ChainableParser
 
 
     /**
+     * Specify if null value should be dropped
+     * @param bool $isNullValueDropped
+     * @return $this
+     */
+    public function withNullValueDropped(bool $isNullValueDropped = true) : static
+    {
+        $this->isNullValueDropped = $isNullValueDropped;
+        return $this;
+    }
+
+
+    /**
      * @inheritDoc
      */
     protected function onParse(mixed $value, ?string $hintName) : ?array
@@ -122,7 +138,9 @@ class ArrayParser extends CreatableParser implements ChainableParser
             $ret = [];
             foreach ($value as $index => $subValue) {
                 $nextHintName = static::makeNextHintName($hintName, $index);
-                $ret[] = $this->chainParser->parse($subValue, $nextHintName);
+                $subRet = $this->chainParser->parse($subValue, $nextHintName);
+                if ($this->isNullValueDropped && $subRet === null) continue;
+                $ret[] = $subRet;
             }
 
             return $ret;
