@@ -7,6 +7,7 @@ use Magpie\Exceptions\FileNotFoundException;
 use Magpie\Exceptions\FileOperationFailedException;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\OperationFailedException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\FileSystem\FileSystem;
 use Magpie\Facades\FileSystem\FileSystemConfig;
 use Magpie\General\Concepts\BinaryDataProvidable;
@@ -229,6 +230,21 @@ class LocalFileSystem extends FileSystem
         if (!$config instanceof LocalFileSystemConfig) throw new NotOfTypeException($config, LocalFileSystemConfig::class);
 
         return new static($config);
+    }
+
+
+    /**
+     * Initialize an instance from current work directory
+     * @return static
+     * @throws SafetyCommonException
+     */
+    public static function initializeFromWorkDir() : static
+    {
+        $cwd = @getcwd();
+        if ($cwd === false) throw new OperationFailedException();
+
+        $config = new LocalFileSystemConfig($cwd);
+        return static::specificInitialize($config);
     }
 
 
