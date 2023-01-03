@@ -295,6 +295,8 @@ abstract class ColumnSchema implements Packable
      */
     public function getPrimaryInitClass() : ?string
     {
+        if (!$this->isPrimaryKey()) return null;
+
         return $this->dataType->primaryInitClass;
     }
 
