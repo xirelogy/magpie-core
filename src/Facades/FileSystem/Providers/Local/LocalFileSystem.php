@@ -67,7 +67,7 @@ class LocalFileSystem extends FileSystem
         $checkedPath = $this->checkPath($path);
         if ($checkedPath === null) throw new FileNotFoundException($path);
 
-        if (!$this->isFileExist($checkedPath)) throw new FileNotFoundException($path);
+        if (!$this->isFileExist($path)) throw new FileNotFoundException($path);
 
         try {
             $ret = file_get_contents($checkedPath);
