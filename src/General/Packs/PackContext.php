@@ -79,4 +79,14 @@ abstract class PackContext implements PackSelectConditionable
     {
         return $this->isNoneSelected(...$selectors);
     }
+
+
+    /**
+     * Forward selection from current context
+     * @return PackSelectEnumerable|null
+     */
+    public function forward() : ?PackSelectEnumerable
+    {
+        return $this->effectiveSelectors;
+    }
 }
