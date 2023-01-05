@@ -5,8 +5,8 @@ namespace Magpie\Events\Traits;
 use Exception;
 use Magpie\Events\EventDelivery;
 use Magpie\Events\EventQueueRunnable;
-use Magpie\Facades\Log;
 use Magpie\Queues\Concepts\Queueable;
+use Magpie\System\Kernel\ExceptionHandler;
 
 /**
  * May run for event
@@ -34,7 +34,7 @@ trait EventRunnable
         try {
             $this->run();
         } catch (Exception $ex) {
-            Log::warning($ex->getMessage());
+            ExceptionHandler::ignoredAndWarn(static::class, 'run()', $ex);
         }
     }
 

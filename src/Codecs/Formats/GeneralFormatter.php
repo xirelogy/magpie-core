@@ -7,10 +7,10 @@ use Exception;
 use Iterator;
 use Magpie\Codecs\Concepts\CustomFormattable;
 use Magpie\Codecs\Concepts\PreferStringable;
-use Magpie\Facades\Log;
 use Magpie\General\Concepts\Packable;
 use Magpie\General\Concepts\PackSelectEnumerable;
 use Magpie\General\Traits\StaticCreatable;
+use Magpie\System\Kernel\ExceptionHandler;
 use Traversable;
 
 /**
@@ -96,7 +96,7 @@ abstract class GeneralFormatter implements Formatter
     {
         _used($value);
 
-        Log::warning($ex->getMessage());
+        ExceptionHandler::ignoredAndWarn(static::class, 'pack()', $ex);
         return obj();
     }
 

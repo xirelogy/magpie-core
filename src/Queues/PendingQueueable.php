@@ -7,7 +7,6 @@ use Exception;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\Facades\Log;
 use Magpie\General\DateTimes\Duration;
 use Magpie\Queues\Concepts\Queueable;
 use Magpie\Queues\Concepts\QueueIdentityProvidable;
@@ -93,7 +92,7 @@ class PendingQueueable implements Queueable
         try {
             $this->post();
         } catch (Exception $ex) {
-            Log::warning($ex->getMessage());
+            ExceptionHandler::ignoredAndWarn(static::class, 'post()', $ex);
         }
     }
 

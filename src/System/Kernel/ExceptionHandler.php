@@ -104,6 +104,25 @@ class ExceptionHandler
 
 
     /**
+     * Ignore exception but leave a warning
+     * @param string $sourceClassName
+     * @param string $source
+     * @param Throwable $ex
+     * @param bool $isShowTrace
+     * @return void
+     */
+    public static function ignoredAndWarn(string $sourceClassName, string $source, Throwable $ex, bool $isShowTrace = true) : void
+    {
+        if (!Kernel::hasCurrent()) return;
+
+        $logger = Kernel::current()->getLogger();
+
+        $logger->warning("In $sourceClassName::$source, ignored exception: " . $ex->getMessage());
+        if ($isShowTrace) $logger->warning("Exception trace:\n" . $ex->getTraceAsString());
+    }
+
+
+    /**
      * Handle exception
      * @param Exception $ex
      * @return void
