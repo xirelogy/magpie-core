@@ -117,7 +117,7 @@ class SimpleBinaryContent implements BinaryContentable, Packable
         if (!str_starts_with($text, 'data:')) throw new InvalidDataException();
 
         $data = substr($text, 5);
-        $commaPos = strpos($text, ',');
+        $commaPos = strpos($data, ',');
         if ($commaPos === false) throw new InvalidDataException();
 
         $meta = substr($data, 0, $commaPos);
