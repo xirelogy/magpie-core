@@ -7,6 +7,7 @@ use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Concepts\Releasable;
 use Magpie\General\Sugars\Excepts;
 use Magpie\General\Traits\ReleaseOnDestruct;
+use Magpie\Logs\Concepts\Loggable;
 use Magpie\Models\Concepts\TransactionCompletedListenable;
 use Magpie\Models\Exceptions\ModelSafetyException;
 use Magpie\Models\Impls\TransactionStack;
@@ -107,5 +108,16 @@ class Transaction implements Releasable
         $instance->accept();
 
         return $ret;
+    }
+
+
+    /**
+     * Specify a logger to receive transaction debugging logs
+     * @param Loggable|null $logger
+     * @return void
+     */
+    public static function setLogger(?Loggable $logger) : void
+    {
+        TransactionStack::setLogger($logger);
     }
 }

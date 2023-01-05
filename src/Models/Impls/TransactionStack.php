@@ -4,10 +4,12 @@ namespace Magpie\Models\Impls;
 
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Sugars\Excepts;
+use Magpie\Logs\Concepts\Loggable;
 use Magpie\Models\Concepts\DirectTransactionable;
 use Magpie\Models\Concepts\TransactionCompletedListenable;
 use Magpie\Models\Connection;
 use Magpie\Models\Exceptions\ModelSafetyException;
+use Magpie\Models\Identifier;
 
 /**
  * Support for stacked database transaction
@@ -19,6 +21,10 @@ class TransactionStack
      * @var array<string, static> Initialized instances
      */
     protected static array $instances = [];
+    /**
+     * @var Loggable|null Track logger
+     */
+    protected static ?Loggable $logger = null;
     /**
      * @var Connection Associated connection
      */
@@ -76,7 +82,7 @@ class TransactionStack
         $this->lastIsAccepted = null;
 
         ++$this->lastIndex;
-        static::track('acquired', $this->lastIndex);
+        static::track($this->connection, 'acquired', $this->lastIndex);
 
         return $this->lastIndex;
     }
@@ -90,7 +96,7 @@ class TransactionStack
     public function accept(int $index) : void
     {
         if ($index !== $this->lastIndex) return;
-        static::track('accepted', $index);
+        static::track($this->connection, 'accepted', $index);
         $this->lastIsAccepted = true;
     }
 
@@ -104,7 +110,7 @@ class TransactionStack
      */
     public function release(int $index) : void
     {
-        static::track('releasing', $index);
+        static::track($this->connection, 'releasing', $index);
         if ($index === $this->lastIndex) {
             if (!$this->lastIsAccepted) {
                 $this->isBlockAccept = true;
@@ -118,11 +124,11 @@ class TransactionStack
         if ($this->lastIndex === 0) {
             // Transaction operation when all released
             if (!$this->isBlockAccept) {
-                static::track('commit');
+                static::track($this->connection, 'commit');
                 $this->service->commit();
                 $this->notifyCompleted(true);
             } else {
-                static::track('rollback');
+                static::track($this->connection, 'rollback');
                 $this->service->rollback();
                 $this->notifyCompleted(false);
             }
@@ -151,7 +157,7 @@ class TransactionStack
      */
     private function notifyCompleted(bool $isCommitted) : void
     {
-        static::track('notifyingCompleted (' . ($isCommitted ? 'T' : 'F') . ')');
+        static::track($this->connection, 'notifyingCompleted (' . ($isCommitted ? 'T' : 'F') . ')');
 
         // Transfer to localized list of notification target
         $completedListeners = $this->completedListeners;
@@ -183,11 +189,32 @@ class TransactionStack
 
     /**
      * Track the transaction stack status
+     * @param Connection $connection
      * @param string $message
      * @param int|null $index
      * @return void
      */
-    protected static function track(string $message, ?int $index = null) : void
+    protected static function track(Connection $connection, string $message, ?int $index = null) : void
     {
+        if (static::$logger === null) return;
+
+        $connectionId = Identifier::toString($connection->getId());
+
+        if ($index !== null) {
+            static::$logger->debug("[$connectionId] $message: $index");
+        } else {
+            static::$logger->debug("[$connectionId] $message");
+        }
+    }
+
+
+    /**
+     * Specify a logger to receive transaction debugging logs
+     * @param Loggable|null $logger
+     * @return void
+     */
+    public static function setLogger(?Loggable $logger) : void
+    {
+        static::$logger = $logger;
     }
 }
