@@ -28,7 +28,7 @@ class EventQueueRunnable extends BaseQueueRunnable
     /**
      * @inheritDoc
      */
-    public function run() : void
+    protected function onRun() : void
     {
         $this->event->run();
     }
