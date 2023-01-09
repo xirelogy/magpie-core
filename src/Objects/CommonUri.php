@@ -115,6 +115,16 @@ abstract class CommonUri implements PreferStringable
      */
     public static function parse(string $uri) : static
     {
+        // Patch for supporting URIs
+        $isUriEmptyHost = false;
+        if (str_contains($uri, ':///')) {
+            $newUri = str_replace(':///', '://./', $uri, $replaced);
+            if ($replaced === 1) {
+                $uri = $newUri;
+                $isUriEmptyHost = true;
+            }
+        }
+
         $components = parse_url($uri);
         if ($components === false) throw new InvalidDataException();
 
@@ -126,6 +136,12 @@ abstract class CommonUri implements PreferStringable
         $ret->password = $components['pass'] ?? null;
         $ret->host = $components['host'] ?? null;
         $ret->port = array_key_exists('port', $components) ? intval($components['port']) : null;
+
+        // Handle empty host
+        if ($isUriEmptyHost) {
+            if ($ret->host !== '.') throw new InvalidDataException();
+            $ret->host = null;
+        }
 
         $ret->setQueryString($components['query'] ?? null);
         $ret->fragment = $components['fragment'] ?? null;
