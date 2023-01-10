@@ -11,7 +11,6 @@ use Magpie\HttpServer\Response;
 use Magpie\Routes\Concepts\RouteHandleable;
 use Magpie\Routes\Constants\RouteMiddlewarePurposePriority;
 use Magpie\Routes\RouteMiddleware;
-use Stringable;
 
 /**
  * Middleware to support CORS preflight
@@ -53,7 +52,7 @@ class CorsMiddleware extends RouteMiddleware
 
         // Get the response from next level and try to cast
         $response = $next->route($request);
-        $response = static::tryCastResponse($response);
+        $response = static::tryCastResponseAsHeaderSpecifiable($response);
 
         // And add CORS headers when able to
         if ($response instanceof WithHeaderSpecifiable) {
@@ -99,25 +98,6 @@ class CorsMiddleware extends RouteMiddleware
         if ($maxAge !== null) {
             $response->withHeader(CommonHttpHeader::ACCESS_CONTROL_MAX_AGE, $maxAge);
         }
-    }
-
-
-    /**
-     * Try to cast a response to something that can specify header
-     * @param mixed $response
-     * @return mixed
-     */
-    private static function tryCastResponse(mixed $response) : mixed
-    {
-        if ($response instanceof WithHeaderSpecifiable) return $response;
-        if ($response === null) return new Response('', CommonHttpStatusCode::NO_CONTENT);
-
-        // Support for string as HTML content
-        if (is_string($response)) return new Response($response);
-        if ($response instanceof Stringable) return new Response($response->__toString());
-
-        // Otherwise, 'as-is'
-        return $response;
     }
 
 
