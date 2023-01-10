@@ -33,6 +33,9 @@ trait CommonTypedModeledObject
      */
     protected static final function createBaseQuery() : Query
     {
+        $totalModelClasses = count(iter_flatten(static::getModelClassNames(), false));
+        if ($totalModelClasses > 1) return static::createJointDefinition()->query();
+
         $baseModelClassName = static::getBaseModelClassName();
         if (!is_subclass_of($baseModelClassName, Model::class)) throw new ClassNotOfTypeException($baseModelClassName, Model::class);
 
