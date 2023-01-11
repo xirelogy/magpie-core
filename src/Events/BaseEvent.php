@@ -3,14 +3,20 @@
 namespace Magpie\Events;
 
 use Magpie\Events\Concepts\Eventable;
-use Magpie\Events\Traits\EventRunnable;
+use Magpie\Queues\BaseQueueRunnable;
 
 /**
  * Basic implementation of event
  */
-abstract class BaseEvent implements Eventable
+abstract class BaseEvent extends BaseQueueRunnable implements Eventable
 {
-    use EventRunnable;
+    /**
+     * @inheritDoc
+     */
+    protected final function onRun() : void
+    {
+        EventDelivery::deliver($this);
+    }
 
 
     /**
