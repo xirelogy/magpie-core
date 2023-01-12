@@ -41,6 +41,24 @@ class BinaryContent
 
 
     /**
+     * Encode the given content in base64
+     * @param BinaryDataProvidable $content
+     * @return string
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     * @throws StreamException
+     */
+    public static function asDataUrl(BinaryDataProvidable $content) : string
+    {
+        $content = static::asBinaryContentable($content);
+        $mimeType = $content->getMimeType() ?? CommonMimeType::BINARY;
+
+        $header = "data:$mimeType;base64,";
+        return $header . base64_encode($content->getData());
+    }
+
+
+    /**
      * Enforce that the content must be file system accessible
      * @param BinaryDataProvidable $content Content to be inspected
      * @param bool|null $isTemporary If a temporary had been created
