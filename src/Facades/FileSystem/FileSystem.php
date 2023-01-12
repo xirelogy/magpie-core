@@ -6,6 +6,7 @@ use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
+use Magpie\Facades\Mime\Mime;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Contents\SimpleBinaryContent;
@@ -145,11 +146,21 @@ abstract class FileSystem implements TypeClassable, SystemBootable
     /**
      * Wrap binary data into a simple binary data
      * @param string $data
+     * @param string|null $filename
      * @return BinaryDataProvidable
      */
-    protected static function wrapData(string $data) : BinaryDataProvidable
+    protected static function wrapData(string $data, ?string $filename) : BinaryDataProvidable
     {
-        return SimpleBinaryContent::create($data);
+        $mimeType = null;
+        if ($filename !== null) {
+            $dotPos = strrpos($filename, '.');
+            if ($dotPos !== false && $dotPos !== 0) {
+                $extension = substr($filename, $dotPos + 1);
+                $mimeType = Mime::getMimeType($extension);
+            }
+        }
+
+        return SimpleBinaryContent::create($data, $mimeType, $filename);
     }
 
 

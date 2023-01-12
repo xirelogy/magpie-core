@@ -73,7 +73,7 @@ class LocalFileSystem extends FileSystem
         try {
             $ret = file_get_contents($checkedPath);
             if ($ret === false) throw new OperationFailedException();
-            return static::wrapData($ret);
+            return static::wrapData($ret, basename($checkedPath));
         } catch (Exception $ex) {
             throw new FileOperationFailedException($path, _l('read'), previous: $ex);
         }
