@@ -7,5 +7,6 @@
   "Job crashed with exception": "任务出错了",
   "{{0}} failed": "{{0}} 失败",
   "Job failed": "任务失败",
+  "Worker started": "任务进程已启动",
   "": ""
 }

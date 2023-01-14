@@ -118,6 +118,8 @@ class RunWorkerCommand extends Command
      */
     protected function loopOnQueue(Queue $queue, Duration $timeout) : void
     {
+        Console::info(_l('Worker started'));
+
         $started = Carbon::now();
         $this->isRunning = true;
 
