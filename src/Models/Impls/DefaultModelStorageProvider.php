@@ -5,7 +5,6 @@ namespace Magpie\Models\Impls;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnexpectedException;
-use Magpie\General\Sugars\Excepts;
 use Magpie\Models\Concepts\AttributeCastable;
 use Magpie\Models\Concepts\AttributeInitializable;
 use Magpie\Models\Concepts\ModelStorageProvidable;
