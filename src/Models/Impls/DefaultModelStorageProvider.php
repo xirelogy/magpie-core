@@ -2,6 +2,7 @@
 
 namespace Magpie\Models\Impls;
 
+use BackedEnum;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnexpectedException;
@@ -113,6 +114,9 @@ class DefaultModelStorageProvider implements ModelStorageProvidable
      */
     public function setAttribute(string $key, mixed $value) : void
     {
+        // Values are automatically down-casted
+        if ($value instanceof BackedEnum) $value = $value->value;
+
         // Check changes for non-new models
         if (!$this->isNew && array_key_exists($key, $this->attributes)) {
             if ($this->attributes[$key] === $value) return;
