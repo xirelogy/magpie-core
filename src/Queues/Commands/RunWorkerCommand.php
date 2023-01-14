@@ -22,7 +22,6 @@ use Magpie\Queues\Events\QueuedItemExceptionEvent;
 use Magpie\Queues\Events\QueuedItemFailedEvent;
 use Magpie\Queues\Events\QueuedItemRunningEvent;
 use Magpie\Queues\Events\WorkerKillEvent;
-use Magpie\Queues\Impls\Caches\WorkersRestartedAt;
 use Magpie\Queues\Providers\Queue;
 use Magpie\Queues\Providers\QueueCreator;
 
@@ -123,7 +122,7 @@ class RunWorkerCommand extends Command
         $this->isRunning = true;
 
         for (;;) {
-            if (!$this->isLoop($started)) break;
+            if (!$this->isLoop($queue, $started)) break;
             $this->waitOnQueue($queue, $timeout);
         }
     }
@@ -154,15 +153,16 @@ class RunWorkerCommand extends Command
 
     /**
      * If current worker needs to be in the loop
+     * @param Queue $queue
      * @param CarbonInterface $started
      * @return bool
      * @throws Exception
      */
-    protected function isLoop(CarbonInterface $started) : bool
+    protected function isLoop(Queue $queue, CarbonInterface $started) : bool
     {
         if (!$this->isRunning) return false;
 
-        if (WorkersRestartedAt::shallRestart($started)) return false;
+        if ($queue->shallWorkerRestart($started)) return false;
 
         return true;
     }

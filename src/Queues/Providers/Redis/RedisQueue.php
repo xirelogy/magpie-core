@@ -33,6 +33,10 @@ class RedisQueue extends Queue
      */
     protected const NAME_DEFAULT = 'default';
     /**
+     * Queue sub-tag: restart signal
+     */
+    protected const TAG_RESTART = 'restart';
+    /**
      * Queue sub-tag: notify
      */
     protected const TAG_NOTIFY = 'notify';
@@ -79,6 +83,34 @@ class RedisQueue extends Queue
     public function getName() : string
     {
         return $this->name;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function shallWorkerRestart(CarbonInterface $workerStarted) : bool
+    {
+        $restartQueue = $this->makeRedisName(static::TAG_RESTART);
+        $content = $this->redis->get($restartQueue);
+
+        if ($content === null) return false;
+
+        $timestamp = SimpleJSON::decode($content);
+        return $workerStarted->getTimestamp() < $timestamp;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function signalWorkerRestart(?Duration $timeout = null) : void
+    {
+        $timestamp = Carbon::now()->getTimestamp();
+        $timeout = $timeout ?? Duration::inSeconds(1800);
+
+        $restartQueue = $this->makeRedisName(static::TAG_RESTART);
+        $this->redis->set($restartQueue, SimpleJSON::encode($timestamp), $timeout);
     }
 
 

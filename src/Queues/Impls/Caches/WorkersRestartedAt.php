@@ -11,6 +11,7 @@ use Magpie\General\DateTimes\Duration;
 /**
  * When workers are restarted at
  * @internal
+ * @deprecated
  */
 class WorkersRestartedAt extends BaseCacheable
 {

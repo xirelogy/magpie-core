@@ -23,6 +23,7 @@ abstract class QueueCreator implements DefaultProviderRegistrable, SystemBootabl
     /**
      * Get cache provider interface (for global data exchange)
      * @return CacheProvidable
+     * @deprecated
      */
     public abstract function getCacheProvider() : CacheProvidable;
 

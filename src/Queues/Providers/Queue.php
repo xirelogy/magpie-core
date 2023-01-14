@@ -24,6 +24,26 @@ abstract class Queue implements Enqueueable, Dequeueable
 
 
     /**
+     * Check against provided timestamp where worker is started, and decide if the worker shall be restarted
+     * @param CarbonInterface $workerStarted
+     * @return bool
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    public abstract function shallWorkerRestart(CarbonInterface $workerStarted) : bool;
+
+
+    /**
+     * Send a signal to workers to restart
+     * @param Duration|null $timeout
+     * @return void
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    public abstract function signalWorkerRestart(?Duration $timeout = null) : void;
+
+
+    /**
      * Re-enqueue a failed job to the queue
      * @param FailedExecutableEncoded $failed
      * @return void

@@ -10,6 +10,7 @@ use Magpie\Queues\Providers\QueueCreator;
 /**
  * Cacheable items for queue implementation
  * @internal
+ * @deprecated
  */
 abstract class BaseCacheable implements Cacheable
 {
