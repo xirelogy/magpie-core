@@ -255,7 +255,7 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     /**
      * @inheritDoc
      */
-    public function sum(ColumnName|string $columnName) : int|float
+    public function sum(ColumnName|string $columnName) : int|float|null
     {
         return $this->aggregate(ColumnExpression::sum($columnName));
     }
@@ -264,7 +264,7 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     /**
      * @inheritDoc
      */
-    public function avg(ColumnName|string $columnName) : int|float
+    public function avg(ColumnName|string $columnName) : int|float|null
     {
         return $this->aggregate(ColumnExpression::avg($columnName));
     }
@@ -273,7 +273,7 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     /**
      * @inheritDoc
      */
-    public function min(ColumnName|string $columnName) : int|float
+    public function min(ColumnName|string $columnName) : int|float|null
     {
         return $this->aggregate(ColumnExpression::min($columnName));
     }
@@ -282,7 +282,7 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     /**
      * @inheritDoc
      */
-    public function max(ColumnName|string $columnName) : int|float
+    public function max(ColumnName|string $columnName) : int|float|null
     {
         return $this->aggregate(ColumnExpression::max($columnName));
     }

@@ -26,43 +26,43 @@ interface QueryCommonAggregatable extends QueryAggregatable
     /**
      * Aggregate query using sum(): Sum up all values of given column
      * @param ColumnName|string $columnName
-     * @return int|float
+     * @return int|float|null
      * @throws SafetyCommonException
      * @throws ModelReadException
      * @throws ModelWriteException
      */
-    public function sum(ColumnName|string $columnName) : int|float;
+    public function sum(ColumnName|string $columnName) : int|float|null;
 
 
     /**
      * Aggregate query using avg(): Take average of the values of given column
      * @param ColumnName|string $columnName
-     * @return int|float
+     * @return int|float|null
      * @throws SafetyCommonException
      * @throws ModelReadException
      * @throws ModelWriteException
      */
-    public function avg(ColumnName|string $columnName) : int|float;
+    public function avg(ColumnName|string $columnName) : int|float|null;
 
 
     /**
      * Aggregate query using min(): Minimum of all values of given column
      * @param ColumnName|string $columnName
-     * @return int|float
+     * @return int|float|null
      * @throws SafetyCommonException
      * @throws ModelReadException
      * @throws ModelWriteException
      */
-    public function min(ColumnName|string $columnName) : int|float;
+    public function min(ColumnName|string $columnName) : int|float|null;
 
 
     /**
      * Aggregate query using max(): Maximum of all values of given column
      * @param ColumnName|string $columnName
-     * @return int|float
+     * @return int|float|null
      * @throws SafetyCommonException
      * @throws ModelReadException
      * @throws ModelWriteException
      */
-    public function max(ColumnName|string $columnName) : int|float;
+    public function max(ColumnName|string $columnName) : int|float|null;
 }
