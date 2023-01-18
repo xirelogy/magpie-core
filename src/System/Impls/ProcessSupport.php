@@ -48,8 +48,8 @@ final class ProcessSupport
      */
     public static function getConsoleCommandScriptPath() : string
     {
-        // FIXME
-        return 'mp';
+        $command = 'mp';
+        return project_path("/$command");
     }
 
 
