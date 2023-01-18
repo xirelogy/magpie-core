@@ -64,7 +64,7 @@ trait CommonApiCrudController
      */
     protected function onInterceptGetRoot(Request $request, ApiCrudContext $context, ApiCrudState $crudState) : ?object
     {
-        _used($request, $crudState);
+        _used($request, $context, $crudState);
 
         return null;
     }
