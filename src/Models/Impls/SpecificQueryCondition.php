@@ -104,7 +104,7 @@ class SpecificQueryCondition extends QueryCondition
                 // Expecting array of values
                 $values = static::finalizeValues($this->value, $columnSchema);
                 $placeholders = str_repeat('?, ', count($values));
-                $sql = ' ' . Quote::square(substr($placeholders, 0, -2));
+                $sql = ' ' . Quote::bracket(substr($placeholders, 0, -2));
                 return $ret->append(new QueryStatement($sql, $values));
             } else {
                 // Not supported
