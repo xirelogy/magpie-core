@@ -3,6 +3,7 @@
 use Magpie\Codecs\Formats\PrettyGeneralFormatter;
 use Magpie\Configurations\Env;
 use Magpie\Exceptions\StringFormatterException;
+use Magpie\Facades\Log;
 use Magpie\General\Str;
 use Magpie\General\Sugars\StringFormatter;
 use Magpie\General\Sugars\StringOf;
@@ -101,6 +102,102 @@ function obj(iterable $values = []) : object
     }
 
     return $ret;
+}
+
+
+/**
+ * Log an emergency message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_emergency(string|Stringable $message, array $context = []) : void
+{
+    Log::emergency($message, $context);
+}
+
+
+/**
+ * Log an alert message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_alert(string|Stringable $message, array $context = []) : void
+{
+    Log::alert($message, $context);
+}
+
+
+/**
+ * Log a critical message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_critical(string|Stringable $message, array $context = []) : void
+{
+    Log::critical($message, $context);
+}
+
+
+/**
+ * Log a error message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_error(string|Stringable $message, array $context = []) : void
+{
+    Log::error($message, $context);
+}
+
+
+/**
+ * Log a warning message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_warning(string|Stringable $message, array $context = []) : void
+{
+    Log::warning($message, $context);
+}
+
+
+/**
+ * Log a notice message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_notice(string|Stringable $message, array $context = []) : void
+{
+    Log::notice($message, $context);
+}
+
+
+/**
+ * Log an info message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_info(string|Stringable $message, array $context = []) : void
+{
+    Log::info($message, $context);
+}
+
+
+/**
+ * Log a debug message
+ * @param string|Stringable $message
+ * @param array $context
+ * @return void
+ */
+function log_debug(string|Stringable $message, array $context = []) : void
+{
+    Log::debug($message, $context);
 }
 
 
