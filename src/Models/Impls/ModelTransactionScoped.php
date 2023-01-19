@@ -3,11 +3,9 @@
 namespace Magpie\Models\Impls;
 
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\Facades\Log;
 use Magpie\General\Contexts\Scoped;
 use Magpie\Models\Connection;
 use Magpie\Models\Transaction;
-use Throwable;
 
 /**
  * A scoped ModelTransaction
