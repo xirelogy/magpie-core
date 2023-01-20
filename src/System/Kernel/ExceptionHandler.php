@@ -7,6 +7,8 @@ use Exception;
 use Magpie\General\Concepts\Releasable;
 use Magpie\General\Traits\ReleaseOnDestruct;
 use Magpie\General\Traits\StaticClass;
+use Magpie\System\Concepts\AbnormalExitHandleable;
+use Magpie\System\Impls\DefaultAbnormalExitHandle;
 use Throwable;
 
 /**
@@ -20,6 +22,10 @@ class ExceptionHandler
      * @var bool If booted up
      */
     protected static bool $isBoot = false;
+    /**
+     * @var AbnormalExitHandleable|null Specific abnormal handle
+     */
+    protected static ?AbnormalExitHandleable $abnormalHandle = null;
 
 
     /**
@@ -144,14 +150,20 @@ class ExceptionHandler
             http_response_code(500);
         }
 
-        // FIXME
-        if ($ex) dd($ex);
-
-
-        $message = $ex?->getMessage() ?? 'Server error';
-
-        echo "$message\n";
+        $handle = static::$abnormalHandle ?? new DefaultAbnormalExitHandle();
+        $handle->handleAbnormalExit($ex, static::isDebug());
 
         exit();
+    }
+
+
+    /**
+     * If currently in debug mode
+     * @return bool
+     */
+    public static function isDebug() : bool
+    {
+        $ret = env('APP_DEBUG', false);
+        return ($ret === true); // Only 'true' when 'true'
     }
 }
