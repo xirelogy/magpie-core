@@ -8,7 +8,6 @@ use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
 use Magpie\Facades\Console;
-use Magpie\Queues\Impls\Caches\WorkersRestartedAt;
 use Magpie\Queues\Providers\QueueCreator;
 
 #[CommandSignature('queue:restart-workers {--queue=}')]
@@ -24,9 +23,6 @@ class RestartWorkersCommand extends Command
 
         $queue = QueueCreator::instance()->getQueue($queueName);
         $queue->signalWorkerRestart();
-
-        // Following is left just for compatible reason for a few builds
-        WorkersRestartedAt::create();
 
         Console::info(_l('Restart signal sent to queue workers'));
     }

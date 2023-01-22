@@ -2,8 +2,6 @@
 
 namespace Magpie\Queues\Providers\Redis;
 
-use Magpie\Caches\Concepts\CacheProvidable;
-use Magpie\Caches\Providers\RedisCacheProvider;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Facades\Redis\RedisClient;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
@@ -51,15 +49,6 @@ class RedisQueueCreator extends QueueCreator
     public static function getTypeClass() : string
     {
         return static::TYPECLASS;
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getCacheProvider() : CacheProvidable
-    {
-        return new RedisCacheProvider($this->redis);
     }
 
 

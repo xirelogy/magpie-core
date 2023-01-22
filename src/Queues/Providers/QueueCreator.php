@@ -3,7 +3,6 @@
 namespace Magpie\Queues\Providers;
 
 use Exception;
-use Magpie\Caches\Concepts\CacheProvidable;
 use Magpie\Commands\CommandRegistry;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\NotOfTypeException;
@@ -20,14 +19,6 @@ use Magpie\System\Kernel\Kernel;
  */
 abstract class QueueCreator implements DefaultProviderRegistrable, SystemBootable
 {
-    /**
-     * Get cache provider interface (for global data exchange)
-     * @return CacheProvidable
-     * @deprecated
-     */
-    public abstract function getCacheProvider() : CacheProvidable;
-
-
     /**
      * Get queue with given name
      * @param string|null $name
