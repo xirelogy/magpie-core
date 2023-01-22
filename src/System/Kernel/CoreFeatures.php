@@ -3,6 +3,7 @@
 namespace Magpie\System\Kernel;
 
 use Magpie\Commands\CommandRegistry;
+use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Traits\StaticClass;
 use Magpie\System\Concepts\SystemBootable;
 
@@ -30,5 +31,7 @@ class CoreFeatures implements SystemBootable
     {
         CommandRegistry::includeDirectory(__DIR__ . '/../../Commands/Systems');
         CommandRegistry::includeDirectory(__DIR__ . '/../../Routes/Commands');
+
+        ClassFactory::includeDirectory(__DIR__ . '/../../Logs/Relays');
     }
 }

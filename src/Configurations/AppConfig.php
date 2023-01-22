@@ -20,7 +20,9 @@ use Magpie\HttpServer\Request;
 use Magpie\HttpServer\Response;
 use Magpie\Logs\Concepts\LogRelayable;
 use Magpie\Logs\LogConfig;
-use Magpie\Logs\Relays\FileLogRelay;
+use Magpie\Logs\Loggers\DefaultLogger;
+use Magpie\Logs\Relays\ConfigurableLogRelay;
+use Magpie\Logs\Relays\SimpleFileLogRelay;
 use Magpie\Models\Configs\ConnectionConfig;
 use Magpie\Models\Schemas\Configs\SchemaPreference;
 use Magpie\Routes\Concepts\RouteHandleable;
@@ -93,7 +95,10 @@ abstract class AppConfig
      */
     protected function onInitialize(Kernel $kernel) : void
     {
-        // Default NOP
+        $config = $this->createDefaultLogConfig();
+        $logRelay = ConfigurableLogRelay::fromEnv($config);
+
+        Kernel::current()->setLogger(new DefaultLogger($logRelay));
     }
 
 
@@ -104,7 +109,7 @@ abstract class AppConfig
     public function createDefaultLogRelay() : LogRelayable
     {
         $config = $this->createDefaultLogConfig();
-        return new FileLogRelay($config);
+        return new SimpleFileLogRelay($config);
     }
 
 

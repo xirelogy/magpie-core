@@ -126,6 +126,18 @@ final class Kernel
 
 
     /**
+     * Set the logger interface
+     * @param Loggable $logger
+     * @return $this
+     */
+    public function setLogger(Loggable $logger) : static
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+
+    /**
      * Find registered global providers
      * @param string $interfaceClassName
      * @return TypeClassable|null
