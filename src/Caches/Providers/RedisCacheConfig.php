@@ -62,7 +62,7 @@ class RedisCacheConfig extends CacheConfig
     /**
      * @inheritDoc
      */
-    protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey) : static
+    protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload) : static
     {
         $redisConfigParser = RedisClientConfig::createEnvParser();
         $redisConfig = $parserHost->optional($envKey->key('REDIS'), $redisConfigParser, '-');

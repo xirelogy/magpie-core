@@ -19,10 +19,11 @@ trait EnvTypeConfigurable
      * Create specific typed configuration from environment variables
      * @param EnvParserHost $parserHost
      * @param EnvKeySchema $envKey
+     * @param array $payload
      * @return static
      * @throws ArgumentException
      */
-    protected static final function fromEnvType(EnvParserHost $parserHost, EnvKeySchema $envKey) : static
+    protected static final function fromEnvType(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload = []) : static
     {
         $typeParser = ClosureParser::create(function (mixed $value, ?string $hintName) : string {
             $value = StringParser::create()->parse($value, $hintName);
@@ -35,7 +36,7 @@ trait EnvTypeConfigurable
         /** @var static $typeClassName */
         $typeClassName = $parserHost->requires($envKey->key('TYPE'), $typeParser);
 
-        return $typeClassName::specificFromEnv($parserHost, $envKey);
+        return $typeClassName::specificFromEnv($parserHost, $envKey, $payload);
     }
 
 
@@ -43,8 +44,9 @@ trait EnvTypeConfigurable
      * Create specific configuration from environment variables
      * @param EnvParserHost $parserHost
      * @param EnvKeySchema $envKey
+     * @param array $payload
      * @return static
      * @throws ArgumentException
      */
-    protected static abstract function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey) : static;
+    protected static abstract function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload) : static;
 }

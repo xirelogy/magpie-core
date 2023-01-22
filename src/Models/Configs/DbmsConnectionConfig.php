@@ -67,7 +67,7 @@ abstract class DbmsConnectionConfig extends ConnectionConfig
     /**
      * @inheritDoc
      */
-    protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey) : static
+    protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload) : static
     {
         $host = $parserHost->requires($envKey->key('HOST'), StringParser::create());
         $port = $parserHost->optional($envKey->key('PORT'), IntegerParser::create()->withMin(1)->withMax(65535), static::envDefaultPort());

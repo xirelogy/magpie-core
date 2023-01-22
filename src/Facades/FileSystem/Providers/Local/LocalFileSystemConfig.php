@@ -42,7 +42,7 @@ class LocalFileSystemConfig extends FileSystemConfig
     /**
      * @inheritDoc
      */
-    protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey) : static
+    protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload) : static
     {
         $root = $parserHost->requires($envKey->key('ROOT'), StringParser::create());
 
