@@ -2,8 +2,6 @@
 
 namespace Magpie\Logs\Relays;
 
-use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
-use Magpie\General\Sugars\Excepts;
 use Magpie\Logs\Concepts\LogStringFormattable;
 use Magpie\Logs\Formats\SimpleLogStringFormat;
 use Magpie\Logs\LogConfig;
