@@ -165,7 +165,7 @@ trait CommonTypedModeledObject
      */
     protected static final function createJointQuery(?QueryOptions &$options = null) : Query
     {
-        $options = QueryOptions::default();
+        $options = $options ?? QueryOptions::default();
 
         $def = static::createJointDefinition();
         $query = $def->query();
