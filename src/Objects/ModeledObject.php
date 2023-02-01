@@ -187,7 +187,7 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
     {
         $options = $options ?? QueryOptions::default();
 
-        $query = static::createBaseQuery();
+        $query = static::createModelQuery();
 
         if (isset(static::$_traitEnabled_DeleteTimestamp)) {
             $deleteColumn = ColumnName::fromModel(static::getBaseModelClassName(), static::$_traitNameOf_DeletedAt);
@@ -223,6 +223,17 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
     protected static function onDefaultQueryOrderCondition() : ?QueryOrderCondition
     {
         return null;
+    }
+
+
+    /**
+     * Create a database query for the model
+     * @return Query<MT>
+     * @throws SafetyCommonException
+     */
+    protected static function createModelQuery() : Query
+    {
+        return static::createBaseQuery();
     }
 
 

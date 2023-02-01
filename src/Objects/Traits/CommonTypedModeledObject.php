@@ -27,15 +27,26 @@ use Magpie\System\HardCore\ClassReflection;
 trait CommonTypedModeledObject
 {
     /**
+     * Create a database query for the model
+     * @return Query<MT>
+     * @throws SafetyCommonException
+     */
+    protected static function createModelQuery() : Query
+    {
+        $totalModelClasses = count(iter_flatten(static::getModelClassNames(), false));
+        if ($totalModelClasses > 1) return static::createJointDefinition()->query();
+
+        return static::createBaseQuery();
+    }
+
+
+    /**
      * Create a database query for the base model
      * @return Query<MT>
      * @throws SafetyCommonException
      */
     protected static final function createBaseQuery() : Query
     {
-        $totalModelClasses = count(iter_flatten(static::getModelClassNames(), false));
-        if ($totalModelClasses > 1) return static::createJointDefinition()->query();
-
         $baseModelClassName = static::getBaseModelClassName();
         if (!is_subclass_of($baseModelClassName, Model::class)) throw new ClassNotOfTypeException($baseModelClassName, Model::class);
 
