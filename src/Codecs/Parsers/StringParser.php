@@ -102,4 +102,14 @@ class StringParser extends CreatableParser
 
         throw new CannotBeHandledAsStringParseFailedException();
     }
+
+
+    /**
+     * Create an instance (with trimming / empty as null)
+     * @return static
+     */
+    public static function createTrimEmptyAsNull() : static
+    {
+        return static::create()->withTrimming()->withEmptyAsNull();
+    }
 }
