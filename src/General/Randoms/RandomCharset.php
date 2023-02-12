@@ -28,4 +28,12 @@ class RandomCharset
      * Uppercase/lowercase alphabets and numbers
      */
     public const FULL_ALPHANUM = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    /**
+     * Lowercase hexadecimal numbers only
+     */
+    public const LOWER_HEX = '0123456789abcdef';
+    /**
+     * Uppercase hexadecimal numbers only
+     */
+    public const UPPER_HEX = '0123456789ABCDEF';
 }
