@@ -39,8 +39,9 @@ abstract class JsonApiController extends Controller
         } catch (HttpResponseException $ex) {
             return $this->onHandleHttpResponseException($ex);
         } catch (Exception $ex) {
+            $httpStatusCode = $this->getExceptionHttpStatusCode($ex);
             $payload = $this->createExceptionPayload($ex);
-            return $this->createExceptionResponse($payload);
+            return $this->createExceptionResponse($payload, $httpStatusCode);
         }
     }
 
@@ -130,6 +131,21 @@ abstract class JsonApiController extends Controller
     protected static function isMergeFormContentIntoBody() : bool
     {
         return true;
+    }
+
+
+    /**
+     * Get corresponding HTTP status code for given exception
+     * @param Exception $ex
+     * @return int|null
+     */
+    protected function getExceptionHttpStatusCode(Exception $ex) : ?int
+    {
+        $code = $ex->getCode();
+        if (!is_int($code)) return null;
+        if ($code <= 0) return null;
+
+        return $code;
     }
 
 
