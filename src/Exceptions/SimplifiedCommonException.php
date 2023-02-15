@@ -13,9 +13,10 @@ abstract class SimplifiedCommonException extends CommonException
      * Constructor
      * @param string $message
      * @param Throwable|null $previous
+     * @param int $code
      */
-    public function __construct(string $message, ?Throwable $previous = null)
+    public function __construct(string $message, ?Throwable $previous = null, int $code = 0)
     {
-        parent::__construct($message, previous: $previous);
+        parent::__construct($message, $code, $previous);
     }
 }
