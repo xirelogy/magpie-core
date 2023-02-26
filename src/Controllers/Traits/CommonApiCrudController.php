@@ -71,6 +71,20 @@ trait CommonApiCrudController
 
 
     /**
+     * Add additional selections to response
+     * @param Request $request
+     * @param ApiCrudState $crudState
+     * @return iterable<string>
+     */
+    protected function onResponseAddSelections(Request $request, ApiCrudState $crudState) : iterable
+    {
+        _used($request, $crudState);
+
+        return [];
+    }
+
+
+    /**
      * Provide response for getRoot()
      * @param Request $request
      * @param ApiCrudState $crudState
@@ -81,13 +95,17 @@ trait CommonApiCrudController
      */
     protected function onResponseGetRoot(Request $request, ApiCrudState $crudState, ?Paginator $paginator, iterable $objects) : ?object
     {
-        _used($request, $crudState);
-
         $ret = obj();
         if ($paginator !== null) $ret->pages = $paginator;
 
+        $retObjects = $objects;
+        $retSelections = iter_flatten($this->onResponseAddSelections($request, $crudState), false);
+        if (count($retSelections) > 0) {
+            $retObjects = PackTag::for($retObjects)->select(...$retSelections);
+        }
+
         $pluralName = static::crudGetNames()->pluralName;
-        $ret->{$pluralName} = $objects;
+        $ret->{$pluralName} = $retObjects;
 
         return $ret;
     }
@@ -125,8 +143,12 @@ trait CommonApiCrudController
 
         $ret = obj();
 
+        $retObject = PackTag::full($object);
+        $retSelections = iter_flatten($this->onResponseAddSelections($request, $crudState), false);
+        if (count($retSelections) > 0) $retObject = $retObject->select(...$retSelections);
+
         $singularName = static::crudGetNames()->singularName;
-        $ret->{$singularName} = PackTag::full($object);
+        $ret->{$singularName} = $retObject;
 
         return $ret;
     }
