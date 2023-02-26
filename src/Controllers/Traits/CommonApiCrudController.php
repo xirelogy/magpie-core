@@ -139,8 +139,6 @@ trait CommonApiCrudController
      */
     protected function onResponseGetItem(Request $request, ApiCrudState $crudState, CommonObject $object) : ?object
     {
-        _used($request, $crudState);
-
         $ret = obj();
 
         $retObject = PackTag::full($object);
