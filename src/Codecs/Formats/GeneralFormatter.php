@@ -3,14 +3,13 @@
 namespace Magpie\Codecs\Formats;
 
 use BackedEnum;
-use Exception;
 use Iterator;
 use Magpie\Codecs\Concepts\CustomFormattable;
 use Magpie\Codecs\Concepts\PreferStringable;
 use Magpie\General\Concepts\Packable;
 use Magpie\General\Concepts\PackSelectEnumerable;
+use Magpie\General\Packs\PackableFormatter;
 use Magpie\General\Traits\StaticCreatable;
-use Magpie\System\Kernel\ExceptionHandler;
 use Traversable;
 
 /**
@@ -78,26 +77,7 @@ abstract class GeneralFormatter implements Formatter
      */
     private function packPackable(Packable $value, ?PackSelectEnumerable $globalSelectors) : object
     {
-        try {
-            return $value->pack($globalSelectors);
-        } catch (Exception $ex) {
-            return $this->onPackableException($value, $ex);
-        }
-    }
-
-
-    /**
-     * Handle packable exception
-     * @param Packable $value
-     * @param Exception $ex
-     * @return object
-     */
-    protected function onPackableException(Packable $value, Exception $ex) : object
-    {
-        _used($value);
-
-        ExceptionHandler::ignoredAndWarn(static::class, 'pack()', $ex);
-        return obj();
+        return PackableFormatter::safePack($value, $globalSelectors);
     }
 
 

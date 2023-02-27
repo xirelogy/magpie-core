@@ -8,7 +8,6 @@ use Magpie\General\Concepts\Packable;
 use Magpie\General\Concepts\PackSelectConditionable;
 use Magpie\General\Concepts\PackSelectEnumerable;
 use Magpie\General\Concepts\PackSelectModifiable;
-use Magpie\General\Sugars\Excepts;
 
 /**
  * Tag a pack target with specific selections
@@ -78,7 +77,7 @@ class PackTaggedFormatter implements CustomFormattable, PackSelectModifiable
 
         // Handle Packable directly
         if ($this->target instanceof Packable) {
-            return Excepts::noThrow(fn () => $this->target->pack($packSelectors, ...$this->flattenSelectors()), obj());
+            return PackableFormatter::safePack($this->target, $packSelectors, ...$this->flattenSelectors());
         }
 
         // Handle any arrays by expanding it
