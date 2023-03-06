@@ -46,7 +46,11 @@ class MysqlColumnDatabaseSpecifier extends ColumnDatabaseSpecifier
     public function _compile(MysqlConnection $connection) : string
     {
         $ret = SqlFormat::backTick($this->name) . ' ' . static::exportDefinitionType($this->defType);
-        if ($this->isNonNull) $ret .= ' NOT NULL';
+        if ($this->isNonNull) {
+            $ret .= ' NOT NULL';
+        } else {
+            $ret .= ' NULL';
+        }
         if ($this->isAutoIncrement) $ret .= ' AUTO_INCREMENT';
         if ($this->defaultValue !== null) {
             $ret .= ' DEFAULT ' . static::exportDefaultValue($connection, $this->defaultValue);
