@@ -58,6 +58,8 @@ class MysqlColumnDatabaseSpecifier extends ColumnDatabaseSpecifier
             $ret .= ' DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
         } else if ($this->isCreateTimestamp) {
             $ret .= ' DEFAULT CURRENT_TIMESTAMP';
+        } else if ($this->isNonNull && $this->defType === 'timestamp') {
+            $ret .= ' DEFAULT CURRENT_TIMESTAMP';
         }
         if ($this->comments !== null) $ret .= ' COMMENT ' . $connection->quoteString($this->comments);
 
