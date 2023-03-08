@@ -196,6 +196,18 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
 
 
     /**
+     * All key-values
+     * @return iterable<string, mixed>
+     */
+    public final function getValues() : iterable
+    {
+        foreach ($this->_storage->getAttributes() as $key => $value) {
+            yield $key => $value;
+        }
+    }
+
+
+    /**
      * @inheritDoc
      */
     public final function save() : void
