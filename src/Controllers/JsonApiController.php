@@ -12,6 +12,8 @@ use Magpie\Exceptions\InvalidJsonDataFormatException;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
+use Magpie\General\Contexts\Scoped;
+use Magpie\General\Contexts\ScopedCollection;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\General\Names\CommonMimeType;
@@ -31,18 +33,36 @@ abstract class JsonApiController extends Controller
      */
     protected final function onCall(ControllerCallable $callable, Request $request, array $routeArguments) : Response
     {
+        $scopes = new ScopedCollection($this->onSetupContextScopes());
+
         try {
             $this->onBeforeCall($request, $routeArguments);
             $response = $callable->call($request, $routeArguments);
             $response = $this->onAfterCall($request, $routeArguments, $response);
-            return static::_createResponse($this->createResponseFormatter(), $response);
+            $response = static::_createResponse($this->createResponseFormatter(), $response);
+            $scopes->succeeded();
+            return $response;
         } catch (HttpResponseException $ex) {
+            $scopes->crash($ex);
             return $this->onHandleHttpResponseException($ex);
         } catch (Exception $ex) {
+            $scopes->crash($ex);
             $httpStatusCode = $this->getExceptionHttpStatusCode($ex);
             $payload = $this->createExceptionPayload($ex);
             return $this->createExceptionResponse($payload, $httpStatusCode);
+        } finally {
+            $scopes->release();
         }
+    }
+
+
+    /**
+     * Setup all the scopes
+     * @return iterable<Scoped>
+     */
+    protected function onSetupContextScopes() : iterable
+    {
+        return [];
     }
 
 
