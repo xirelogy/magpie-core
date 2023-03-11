@@ -189,7 +189,7 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
 
         $query = static::createModelQuery();
 
-        if (isset(static::$_traitEnabled_DeleteTimestamp)) {
+        if (!$options->isSoftDeletesIncluded && isset(static::$_traitEnabled_DeleteTimestamp)) {
             $deleteColumn = ColumnName::fromModel(static::getBaseModelClassName(), static::$_traitNameOf_DeletedAt);
             $query->where($deleteColumn, Query::null());
         }
