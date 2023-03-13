@@ -223,7 +223,8 @@ class SpecCertificate extends Certificate
      */
     public function export(ExportOption ...$options) : string
     {
-        $exportOption = ImportExport::checkExportOptions($options, false);
+        [$exportOption, $exportPassword] = ImportExport::checkExportOptions($options, false);
+        _used($exportPassword);
 
         $output = '';
         ErrorHandling::execute(function () use(&$output) {
