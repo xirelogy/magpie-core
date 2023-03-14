@@ -57,6 +57,10 @@ class Request implements Capturable
      * @var ServerCollection Server variables
      */
     public readonly ServerCollection $serverVars;
+    /**
+     * @var RequestState Associated request state
+     */
+    public readonly RequestState $state;
 
 
     /**
@@ -77,6 +81,8 @@ class Request implements Capturable
         $this->headers = $this->serverVars->getHeaders();
 
         $this->requestUri = Uri::safeParse($this->serverVars->safeOptional('REQUEST_URI', '/'));
+
+        $this->state = new RequestState();
     }
 
 
