@@ -113,7 +113,7 @@ class RouteMap implements SourceCacheTranslatable
                 if (!$value) continue;
             }
 
-            $domainMiddlewares->mergeIn(static::listRouteUseMiddlewareClassNamesFromAttribute($method));
+            $routeMiddlewares->mergeIn(static::listRouteUseMiddlewareClassNamesFromAttribute($method));
 
             $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefix, $routeEntry, $routeMiddlewares, $variables);
         }
