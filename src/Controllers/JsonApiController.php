@@ -33,7 +33,7 @@ abstract class JsonApiController extends Controller
      */
     protected final function onCall(ControllerCallable $callable, Request $request, array $routeArguments) : Response
     {
-        $scopes = new ScopedCollection($this->onSetupContextScopes());
+        $scopes = new ScopedCollection($this->onSetupContextScopesBeforeCall($request, $routeArguments));
 
         try {
             $this->onBeforeCall($request, $routeArguments);
@@ -58,7 +58,22 @@ abstract class JsonApiController extends Controller
 
     /**
      * Setup all the scopes
+     * @param Request $request
+     * @param array $routeArguments
      * @return iterable<Scoped>
+     */
+    protected function onSetupContextScopesBeforeCall(Request $request, array $routeArguments) : iterable
+    {
+        _used($request, $routeArguments);
+
+        return [];
+    }
+
+
+    /**
+     * Setup all the scopes
+     * @return iterable<Scoped>
+     * @deprecated
      */
     protected function onSetupContextScopes() : iterable
     {
