@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Closure;
 use Magpie\Exceptions\InvalidStateException;
 use Magpie\Models\AllColumns;
+use Magpie\Models\Concepts\QueryArgumentable;
 use Magpie\Models\Connection;
 use Magpie\Models\Impls\Traits\CommonActualModelQuery;
 use Magpie\Models\Impls\Traits\WithQueryFilterService;
@@ -143,10 +144,17 @@ class ActualModelQuery extends ModelQuery
                 $query->sql .= ', ';
             }
 
-            $query->sql .= $context->getColumnNameSql($assignKey) . ' = ?';
+            $query->sql .= $context->getColumnNameSql($assignKey) . ' = ';
 
-            $assignColumnSchema = $context->getColumnSchema($assignKey);
-            $query->values[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue) : $assignValue;
+            if ($assignValue instanceof QueryArgumentable) {
+                // Handle query arguments differently
+                $query->append($assignValue->_finalize($context));
+            } else {
+                // Handle like a value
+                $assignColumnSchema = $context->getColumnSchema($assignKey);
+                $query->sql .= '?';
+                $query->values[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue) : $assignValue;
+            }
         }
 
         // Add the conditions
