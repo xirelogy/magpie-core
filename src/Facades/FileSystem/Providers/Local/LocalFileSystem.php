@@ -11,6 +11,8 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\FileSystem\FileSystem;
 use Magpie\Facades\FileSystem\FileSystemConfig;
 use Magpie\General\Concepts\BinaryDataProvidable;
+use Magpie\General\Concepts\TargetReadable;
+use Magpie\General\Concepts\TargetWritable;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\System\Kernel\BootContext;
@@ -96,6 +98,36 @@ class LocalFileSystem extends FileSystem
         } catch (Exception $ex) {
             throw new FileOperationFailedException($path, _l('write'), previous: $ex);
         }
+    }
+
+
+    /**
+     * Create a target to read from
+     * @param string $path
+     * @return TargetReadable
+     * @throws SafetyCommonException
+     */
+    public function readFrom(string $path) : TargetReadable
+    {
+        $checkedPath = $this->checkPath($path);
+        if ($checkedPath === null) throw new FileNotFoundException($path);
+
+        return new LocalFileReadTarget($checkedPath);
+    }
+
+
+    /**
+     * Create a target to write to
+     * @param string $path
+     * @return TargetWritable
+     * @throws SafetyCommonException
+     */
+    public function writeTo(string $path) : TargetWritable
+    {
+        $checkedPath = $this->checkPath($path);
+        if ($checkedPath === null) throw new FileNotFoundException($path);
+
+        return new LocalFileWriteTarget($checkedPath);
     }
 
 
