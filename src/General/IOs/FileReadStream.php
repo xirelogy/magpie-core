@@ -90,7 +90,7 @@ class FileReadStream implements StreamReadable, Releasable, Closeable
      */
     public static function from(string $path) : static
     {
-        if (!LocalRootFileSystem::instance()->isFileExist($path)) throw new FileNotFoundException($path);
+        if (static::isCheckPath($path) && !LocalRootFileSystem::instance()->isFileExist($path)) throw new FileNotFoundException($path);
 
         $file = fopen($path, 'r');
         if ($file === false) throw new FileOperationFailedException($path);
@@ -107,5 +107,22 @@ class FileReadStream implements StreamReadable, Releasable, Closeable
     public static function _fromResource(mixed $file) : static
     {
         return new static($file);
+    }
+
+
+    /**
+     * Is path checked
+     * @param string $path
+     * @return bool
+     */
+    protected static function isCheckPath(string $path) : bool
+    {
+        if (str_starts_with($path, 'file://')) return true;
+
+        if (str_starts_with($path, 'zip://')) return false;
+        if (str_starts_with($path, 'http://')) return false;
+        if (str_starts_with($path, 'https://')) return false;
+
+        return true;
     }
 }
