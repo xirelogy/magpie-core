@@ -5,22 +5,8 @@ namespace Magpie\General\Concepts;
 /**
  * Interface to anything that can provide binary content
  */
-interface BinaryContentable extends BinaryDataProvidable
+interface BinaryContentable extends PrimitiveBinaryContentable
 {
-    /**
-     * Associated MIME type (if any)
-     * @return string|null
-     */
-    public function getMimeType() : ?string;
-
-
-    /**
-     * Associated filename (if any)
-     * @return string|null
-     */
-    public function getFilename() : ?string;
-
-
     /**
      * Binary content data size
      * @return int
