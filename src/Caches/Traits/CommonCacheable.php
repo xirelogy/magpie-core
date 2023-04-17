@@ -77,6 +77,18 @@ trait CommonCacheable
      */
     public function delete() : void
     {
+        $this->deleteFromCache();
+    }
+
+
+    /**
+     * Delete the current item from cache
+     * @return void
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    protected final function deleteFromCache() : void
+    {
         $cacheNamespace = $this->getCurrentCacheNamespace();
         $cacheKey = $this->getCacheKey();
 
