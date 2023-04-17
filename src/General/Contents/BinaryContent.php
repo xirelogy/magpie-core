@@ -13,6 +13,7 @@ use Magpie\Facades\Http\HttpClient;
 use Magpie\General\Concepts\BinaryContentable;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\FileSystemAccessible;
+use Magpie\General\Concepts\PrimitiveBinaryContentable;
 use Magpie\General\Contents\Impls\UpgradedBinaryContent;
 use Magpie\General\Contents\Impls\UpgradedFileBinaryContent;
 use Magpie\General\Names\CommonHttpHeader;
@@ -25,6 +26,19 @@ use Magpie\General\Traits\StaticClass;
 class BinaryContent
 {
     use StaticClass;
+
+
+    /**
+     * Upgrade simple BinaryDataProvidable to a PrimitiveBinaryContentable
+     * @param BinaryDataProvidable $content
+     * @return PrimitiveBinaryContentable
+     */
+    public static function asPrimitiveBinaryContentable(BinaryDataProvidable $content) : PrimitiveBinaryContentable
+    {
+        if ($content instanceof PrimitiveBinaryContentable) return $content;
+
+        return new UpgradedBinaryContent($content);
+    }
 
 
     /**
@@ -50,7 +64,7 @@ class BinaryContent
      */
     public static function asDataUrl(BinaryDataProvidable $content) : string
     {
-        $content = static::asBinaryContentable($content);
+        $content = static::asPrimitiveBinaryContentable($content);
         $mimeType = $content->getMimeType() ?? CommonMimeType::BINARY;
 
         $header = "data:$mimeType;base64,";

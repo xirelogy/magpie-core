@@ -6,6 +6,7 @@ use Exception;
 use Magpie\General\Concepts\BinaryContentable;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\FileSystemAccessible;
+use Magpie\General\Concepts\PrimitiveBinaryContentable;
 use Magpie\General\Contents\BinaryContent;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Sugars\Quote;
@@ -22,9 +23,9 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
 
 
     /**
-     * @var BinaryContentable Associated content
+     * @var PrimitiveBinaryContentable Associated content
      */
-    public readonly BinaryContentable $content;
+    public readonly PrimitiveBinaryContentable $content;
     /**
      * @var bool If content served as attachment
      */
@@ -49,7 +50,7 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
      */
     public function __construct(BinaryDataProvidable $content)
     {
-        $this->content = BinaryContent::asBinaryContentable($content);
+        $this->content = BinaryContent::asPrimitiveBinaryContentable($content);
     }
 
 

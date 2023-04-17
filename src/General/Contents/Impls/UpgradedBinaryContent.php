@@ -4,6 +4,7 @@ namespace Magpie\General\Contents\Impls;
 
 use Magpie\General\Concepts\BinaryContentable;
 use Magpie\General\Concepts\BinaryDataProvidable;
+use Magpie\General\Concepts\PrimitiveBinaryContentable;
 use Magpie\General\Sugars\Excepts;
 
 /**
@@ -33,6 +34,8 @@ class UpgradedBinaryContent implements BinaryContentable
      */
     public function getMimeType() : ?string
     {
+        if ($this->content instanceof PrimitiveBinaryContentable) return $this->content->getMimeType();
+
         return null;
     }
 
@@ -42,6 +45,8 @@ class UpgradedBinaryContent implements BinaryContentable
      */
     public function getFilename() : ?string
     {
+        if ($this->content instanceof PrimitiveBinaryContentable) return $this->content->getFilename();
+
         return null;
     }
 
