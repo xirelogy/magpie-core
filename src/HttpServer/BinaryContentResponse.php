@@ -3,7 +3,6 @@
 namespace Magpie\HttpServer;
 
 use Exception;
-use Magpie\General\Concepts\BinaryContentable;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\FileSystemAccessible;
 use Magpie\General\Concepts\PrimitiveBinaryContentable;
