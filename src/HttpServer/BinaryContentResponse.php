@@ -139,9 +139,9 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
         ));
 
         $ret = $method . '; filename=' . Quote::double($fallbackFilename);
-        /*if ($utfFilename !== $fallbackFilename) {
+        if ($utfFilename !== $fallbackFilename) {
             $ret .= '; filename*=utf-8\'\'' . $utfFilename;
-        }*/
+        }
 
         return $ret;
     }
