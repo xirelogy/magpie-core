@@ -80,7 +80,7 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
         if ($this->isAttachment) {
             $filename = $this->filename ?? $this->content->getFilename();
             if ($filename !== null) {
-                $this->withHeader(CommonHttpHeader::CONTENT_DISPOSITION, 'attachment; filename=' . Quote::double(static::encodeFilename($filename)));
+                $this->withHeader(CommonHttpHeader::CONTENT_DISPOSITION, static::encodeDispositionFilename('attachment', $filename));
             }
         }
 
@@ -120,15 +120,29 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
 
 
     /**
-     * Encode as filename
+     * Encode as disposition type and filename
+     * @param string $method
      * @param string $filename
      * @return string
      */
-    protected static function encodeFilename(string $filename) : string
+    protected static function encodeDispositionFilename(string $method, string $filename) : string
     {
-        $filename = str_replace('/', '_', $filename);
-        $filename = str_replace('\\', '_', $filename);
+        $fallbackFilename = str_replace(
+            ['%', '/', '\\', '"', "\x7f"],
+            ['_', '_', '_', '\\"', '_'],
+            $filename,
+        );
+        $utfFilename = rawurlencode(str_replace(
+            ['%', '/', '\\'],
+            '',
+            $filename,
+        ));
 
-        return urlencode($filename);
+        $ret = $method . '; filename=' . Quote::double($fallbackFilename);
+        /*if ($utfFilename !== $fallbackFilename) {
+            $ret .= '; filename*=utf-8\'\'' . $utfFilename;
+        }*/
+
+        return $ret;
     }
 }
