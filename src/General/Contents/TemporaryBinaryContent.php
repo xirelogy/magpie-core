@@ -2,11 +2,10 @@
 
 namespace Magpie\General\Contents;
 
-use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
-use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
+use Magpie\Facades\FileSystem\Providers\Local\LocalTemporaryFileSystem;
 use Magpie\General\Concepts\BinaryContentable;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\FileSystemAccessible;
@@ -68,7 +67,7 @@ class TemporaryBinaryContent implements BinaryContentable, FileSystemAccessible,
     {
         if (!$this->isValid) return;
 
-        Excepts::noThrow(fn() => LocalRootFileSystem::instance()->deleteFile($this->path));
+        Excepts::noThrow(fn() => LocalTemporaryFileSystem::instance()->deleteFile($this->path));
 
         $this->isValid = false;
     }
@@ -106,7 +105,7 @@ class TemporaryBinaryContent implements BinaryContentable, FileSystemAccessible,
      */
     public function getData() : string
     {
-        return LocalRootFileSystem::instance()->readFile($this->path)->getData();
+        return LocalTemporaryFileSystem::instance()->readFile($this->path)->getData();
     }
 
 
@@ -132,19 +131,18 @@ class TemporaryBinaryContent implements BinaryContentable, FileSystemAccessible,
         // Shortcut function
         if ($content instanceof static) return $content;
 
-        $path = @tempnam(sys_get_temp_dir(), 'magpie_');
-        if ($path === false) throw new OperationFailedException();
+        $fs = LocalTemporaryFileSystem::instance();
 
+        $path = $fs->createFilename('magpie');
         $data = $content->getData();
         $dataSize = strlen($data);
 
-        LocalRootFileSystem::instance()->writeFile($path, $data);
+        $fs->writeFile($path, $data);
 
         if ($content instanceof BinaryContentable) {
             return new static($path, $content->getMimeType(), $content->getFilename(), $content->getDataSize());
         } else {
             return new static($path, null, null, strlen($dataSize));
         }
-
     }
 }
