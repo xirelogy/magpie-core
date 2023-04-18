@@ -7,7 +7,7 @@ use Magpie\Exceptions\SafetyCommonException;
 /**
  * A writable target
  */
-interface TargetWritable
+interface TargetWritable extends TargetScopeable
 {
     /**
      * Create a corresponding writable stream

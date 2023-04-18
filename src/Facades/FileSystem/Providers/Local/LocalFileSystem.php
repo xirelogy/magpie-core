@@ -234,7 +234,7 @@ class LocalFileSystem extends FileSystem
      */
     protected function checkPath(string $path) : ?string
     {
-        $checkedPath = parent::checkPath($path);
+        $checkedPath = $this->defaultCheckPath($path);
         if ($checkedPath === null) return null;
 
         $ret = $this->config->rootPath;

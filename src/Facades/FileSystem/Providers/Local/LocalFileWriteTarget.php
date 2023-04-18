@@ -6,13 +6,14 @@ use Magpie\Exceptions\FileOperationFailedException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\StreamWriteable;
 use Magpie\General\Concepts\TargetWritable;
+use Magpie\General\Contexts\Scoped;
 use Magpie\General\IOs\FileWriteStream;
 use Throwable;
 
 /**
  * Write target to write to local file
  */
-class LocalFileWriteTarget implements TargetWritable
+class LocalFileWriteTarget extends LocalScopedTarget implements TargetWritable
 {
     /**
      * @var string Target path
@@ -23,9 +24,13 @@ class LocalFileWriteTarget implements TargetWritable
     /**
      * Constructor
      * @param string $path
+     * @param callable():iterable<Scoped>|null $getScopesFn
+     * @noinspection PhpDocSignatureInspection
      */
-    public function __construct(string $path)
+    public function __construct(string $path, ?callable $getScopesFn = null)
     {
+        parent::__construct($getScopesFn);
+
         $this->path = $path;
     }
 

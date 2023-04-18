@@ -104,6 +104,17 @@ abstract class FileSystem implements TypeClassable, SystemBootable
      */
     protected function checkPath(string $path) : ?string
     {
+        return $this->defaultCheckPath($path);
+    }
+
+
+    /**
+     * Check the path (default)
+     * @param string $path
+     * @return string|null
+     */
+    protected function defaultCheckPath(string $path) : ?string
+    {
         $path = static::normalizePath($path);
 
         // Prevent traversal beyond root
