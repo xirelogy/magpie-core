@@ -3,6 +3,8 @@
 namespace Magpie\Configurations;
 
 use Dotenv\Dotenv;
+use Dotenv\Repository\Adapter\AdapterInterface;
+use Dotenv\Repository\Adapter\EnvConstAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use Dotenv\Repository\RepositoryInterface;
 use Magpie\General\Traits\StaticClass;
@@ -80,7 +82,16 @@ class Env
      */
     public static function _boot(string $projectPath) : void
     {
-        $dotEnv = Dotenv::createImmutable($projectPath);
+        $repository = static::getRepository();
+        $names = null;
+
+        // Use .env.example when .env does not exist
+        $envFilename = $projectPath;
+        if (!str_ends_with($envFilename, '/')) $envFilename .= '/';
+        $envFilename .= '.env';
+        if (!file_exists($envFilename)) $names = ['.env.example'];
+
+        $dotEnv = Dotenv::create($repository, $projectPath, $names);
         $dotEnv->load();
     }
 
@@ -92,11 +103,29 @@ class Env
     protected static function getRepository() : RepositoryInterface
     {
         if (static::$repository === null) {
-            $builder = RepositoryBuilder::createWithDefaultAdapters();
+            $builder = RepositoryBuilder::createWithNoAdapters();
+
+            /** @var AdapterInterface $adapter */
+            foreach (static::getRepositoryAdapters() as $adapter) {
+                $instance = $adapter::create();
+                if ($instance->isDefined()) {
+                    $builder = $builder->addAdapter($instance->get());
+                }
+            }
 
             static::$repository = $builder->immutable()->make();
         }
 
         return static::$repository;
+    }
+
+
+    /**
+     * All repository adapters
+     * @return iterable<class-string<AdapterInterface>>
+     */
+    protected static function getRepositoryAdapters() : iterable
+    {
+        yield EnvConstAdapter::class;
     }
 }
