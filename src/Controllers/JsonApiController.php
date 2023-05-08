@@ -71,17 +71,6 @@ abstract class JsonApiController extends Controller
 
 
     /**
-     * Setup all the scopes
-     * @return iterable<Scoped>
-     * @deprecated
-     */
-    protected function onSetupContextScopes() : iterable
-    {
-        return [];
-    }
-
-
-    /**
      * Handle before route call
      * @param Request $request
      * @param array $routeArguments
