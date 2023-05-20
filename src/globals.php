@@ -2,10 +2,10 @@
 
 use Magpie\Codecs\Formats\PrettyGeneralFormatter;
 use Magpie\Configurations\Env;
-use Magpie\Exceptions\StringFormatterException;
+use Magpie\Exceptions\StringFormatException;
 use Magpie\Facades\Log;
 use Magpie\General\Str;
-use Magpie\General\Sugars\StringFormatter;
+use Magpie\General\Sugars\StringFormat;
 use Magpie\General\Sugars\StringOf;
 use Magpie\HttpServer\Response;
 use Magpie\Locales\Concepts\Localizable;
@@ -61,11 +61,11 @@ function _l(string $text, ?string $className = null) : Localizable
  *                      will take the current brace position.
  * @param mixed ...$args Arguments
  * @return string
- * @throws StringFormatterException
+ * @throws StringFormatException
  */
 function _format(string $format, mixed ...$args) : string
 {
-    return StringFormatter::format($format, ...$args);
+    return StringFormat::format($format, ...$args);
 }
 
 
@@ -81,7 +81,7 @@ function _format(string $format, mixed ...$args) : string
 function _format_safe(string $format, mixed ...$args) : ?string
 {
     try {
-        return StringFormatter::format($format, ...$args);
+        return StringFormat::format($format, ...$args);
     } catch (Throwable) {
         return null;
     }

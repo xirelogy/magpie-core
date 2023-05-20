@@ -7,7 +7,7 @@ use Throwable;
 /**
  * Exception due to invalid format string (to string formatter)
  */
-class InvalidFormatStringException extends StringFormatterException
+class InvalidFormatStringException extends StringFormatException
 {
     /**
      * Constructor

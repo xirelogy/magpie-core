@@ -6,7 +6,7 @@ use Exception;
 use Magpie\Exceptions\InvalidFormatArgumentException;
 use Magpie\Exceptions\InvalidFormatStringException;
 use Magpie\Exceptions\IndexOutOfRangeException;
-use Magpie\Exceptions\StringFormatterException;
+use Magpie\Exceptions\StringFormatException;
 use Magpie\General\Str;
 use Magpie\General\Traits\StaticClass;
 use Stringable;
@@ -15,7 +15,7 @@ use Stringable;
  * Support for applying arguments to a format string, then providing the final
  * output string
  */
-final class StringFormatter
+final class StringFormat
 {
     use StaticClass;
 
@@ -28,7 +28,7 @@ final class StringFormatter
      *                      will take the current brace position.
      * @param mixed ...$args Arguments
      * @return string
-     * @throws StringFormatterException
+     * @throws StringFormatException
      * @noinspection PhpRedundantCatchClauseInspection
      */
     public static function format(string $format, mixed ...$args) : string
@@ -65,7 +65,7 @@ final class StringFormatter
                 $start = $endBracePos + 2;
                 ++$thisIndex;
             }
-        } catch (StringFormatterException $ex) {
+        } catch (StringFormatException $ex) {
             throw $ex;
         } catch (Exception $ex) {
             throw new InvalidFormatStringException(previous: $ex);

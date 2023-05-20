@@ -7,7 +7,7 @@ use Throwable;
 /**
  * Exception due to invalid format argument
  */
-class InvalidFormatArgumentException extends StringFormatterException
+class InvalidFormatArgumentException extends StringFormatException
 {
     /**
      * @var mixed Payload that causes the exception
