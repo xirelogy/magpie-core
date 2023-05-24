@@ -17,6 +17,7 @@ use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\System\Kernel\BootContext;
 use Magpie\System\Kernel\BootRegistrar;
+use Magpie\System\Kernel\Kernel;
 
 /**
  * Local file system
@@ -276,6 +277,25 @@ class LocalFileSystem extends FileSystem
         if ($cwd === false) throw new OperationFailedException();
 
         $config = new LocalFileSystemConfig($cwd);
+        return static::specificInitialize($config);
+    }
+
+
+    /**
+     * Initialize an instance with project root as base
+     * @return static
+     * @throws SafetyCommonException
+     */
+    public static function initializeFromProjectDir() : static
+    {
+        if (!Kernel::hasCurrent()) throw new OperationFailedException();
+
+        $prefix = Kernel::current()->projectPath;
+        while (str_ends_with($prefix, '/')) {
+            $prefix = substr($prefix, 0, -1);
+        }
+
+        $config = new LocalFileSystemConfig($prefix);
         return static::specificInitialize($config);
     }
 
