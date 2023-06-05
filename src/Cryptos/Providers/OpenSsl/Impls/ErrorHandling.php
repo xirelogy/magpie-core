@@ -65,7 +65,7 @@ class ErrorHandling
             $lhs = substr($errorMessage, 0, $fnPos + 2);
             if (!str_contains($lhs, ' ')) {
                 $source = $lhs;
-                $errorMessage = substr($errorMessage, $fnPos + 3);
+                $errorMessage = trim(substr($errorMessage, $fnPos + 3));
             }
         }
 
