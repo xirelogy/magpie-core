@@ -26,6 +26,16 @@ class Numerals implements PreferStringable
 
 
     /**
+     * Expressed as binary data (big endian)
+     * @return string
+     */
+    public function asBinary() : string
+    {
+        return $this->binData;
+    }
+
+
+    /**
      * Expressed as hex string
      * @return string
      */
@@ -45,7 +55,7 @@ class Numerals implements PreferStringable
 
 
     /**
-     * Construct from binary data
+     * Construct from binary data (big endian)
      * @param string $binData
      * @return static
      */
