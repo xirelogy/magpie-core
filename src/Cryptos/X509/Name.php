@@ -8,34 +8,45 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Sugars\Excepts;
 
 /**
- * X.509 names (combined from multiple components)
+ * X.509 names (combined from multiple name attributes)
  */
 class Name implements PreferStringable
 {
     /**
-     * @var array<string, string> Names with component short name as keys
+     * @var array<NameAttribute> List of attributes to form the name
      */
-    protected array $names;
+    protected array $attributes;
 
 
     /**
      * Constructor
-     * @param array<string, string> $names
+     * @param iterable<NameAttribute> $attributes
      */
-    protected function __construct(array $names)
+    protected function __construct(iterable $attributes)
     {
-        $this->names = $names;
+        $this->attributes = iter_flatten($attributes, false);
+    }
+
+
+    /**
+     * All attributes
+     * @return iterable<NameAttribute>
+     */
+    public function getAttributes() : iterable
+    {
+        yield from $this->attributes;
     }
 
 
     /**
      * All components (aka attributes)
      * @return iterable<string, string>
+     * @deprecated
      */
     public function getComponents() : iterable
     {
-        foreach ($this->names as $component => $value) {
-            yield $component => $value;
+        foreach ($this->attributes as $attribute) {
+            yield $attribute->shortName => $attribute->value;
         }
     }
 
@@ -46,8 +57,8 @@ class Name implements PreferStringable
     public function __toString() : string
     {
         $ret = '';
-        foreach ($this->names as $component => $value) {
-            $ret .= "/$component=$value";
+        foreach ($this->attributes as $attribute) {
+            $ret .= "/$attribute";
         }
 
         return $ret;
@@ -55,13 +66,42 @@ class Name implements PreferStringable
 
 
     /**
+     * Create from attributes
+     * @param iterable<NameAttribute> $attributes
+     * @return static
+     */
+    public static function fromAttributes(iterable $attributes) : static
+    {
+        return new static(iter_flatten($attributes));
+    }
+
+
+    /**
      * Create from map of components
      * @param iterable<string, string> $names
      * @return static
+     * @deprecated
      */
     public static function fromComponents(iterable $names) : static
     {
-        return new static(iter_flatten($names));
+        return static::fromAttributesMap($names);
+    }
+
+
+    /**
+     * Create from attribute map
+     * @param iterable $attributes
+     * @return static
+     */
+    public static function fromAttributesMap(iterable $attributes) : static
+    {
+        $translate = function (iterable $attributes) {
+            foreach ($attributes as $shortName => $value) {
+                yield new NameAttribute($shortName, $value);
+            }
+        };
+
+        return new static($translate($attributes));
     }
 
 
@@ -73,23 +113,23 @@ class Name implements PreferStringable
      */
     public static function fromText(string $text) : static
     {
-        $components = [];
+        $attributes = [];
         $start = 0;
 
         for (;;) {
             if (substr($text, $start, 1) !== '/') throw new InvalidDataException();
             $nextSlash = strpos($text, '/', $start + 1);
-            $component = $nextSlash !== false ? substr($text, $start + 1, $nextSlash - $start - 1) : substr($text, $start + 1);
+            $attribute = $nextSlash !== false ? substr($text, $start + 1, $nextSlash - $start - 1) : substr($text, $start + 1);
 
-            $equalPos = strpos($component, '=');
+            $equalPos = strpos($attribute, '=');
             if ($equalPos === false) throw new InvalidDataException();
 
-            $componentKey = substr($component, 0, $equalPos);
-            $componentValue = substr($component, $equalPos + 1);
-            $components[$componentKey] = $componentValue;
+            $attributeKey = substr($attribute, 0, $equalPos);
+            $attributeValue = substr($attribute, $equalPos + 1);
+            $attributes[] = new NameAttribute($attributeKey, $attributeValue);
 
             // Check for exit condition or continue
-            if ($nextSlash === false) return static::fromComponents($components);
+            if ($nextSlash === false) return static::fromAttributes($attributes);
             $start = $nextSlash;
         }
     }

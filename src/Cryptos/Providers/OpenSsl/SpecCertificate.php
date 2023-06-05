@@ -105,7 +105,7 @@ class SpecCertificate extends Certificate
      */
     public function getSubject() : Name
     {
-        return Name::fromComponents($this->inDetails['subject'] ?? []);
+        return Name::fromAttributesMap($this->inDetails['subject'] ?? []);
     }
 
 
@@ -114,7 +114,7 @@ class SpecCertificate extends Certificate
      */
     public function getIssuer() : Name
     {
-        return Name::fromComponents($this->inDetails['issuer'] ?? []);
+        return Name::fromAttributesMap($this->inDetails['issuer'] ?? []);
     }
 
 
