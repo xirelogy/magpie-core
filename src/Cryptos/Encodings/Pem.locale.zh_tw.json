@@ -1,0 +1,8 @@
+{
+  "Unexpected 'BEGIN' line": "未預料的BEGIN行",
+  "Unexpected 'END' line": "未預料的END行",
+  "Unmatched content type at 'END' line": "END行的內容類型不匹配",
+  "Unexpected content without content type": "未預料無內容類型的內容",
+  "Unexpected end of file": "未預料的文件結尾",
+  "": ""
+}
