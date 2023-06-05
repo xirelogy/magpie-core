@@ -4,6 +4,7 @@ namespace Magpie\Cryptos\Providers\OpenSsl;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPublicKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Algorithms\Hashes\CommonHashTypeClass;
 use Magpie\Cryptos\Contents\CryptoContent;
@@ -159,7 +160,7 @@ class SpecCertificate extends Certificate
 
         $implKey = SpecImplAsymmKey::initializeFromKey($inKey);
 
-        return PublicKey::_fromRaw($implKey->getAlgoTypeClass(), $implKey);
+        return CommonPublicKey::_fromRaw($implKey->getAlgoTypeClass(), $implKey);
     }
 
 

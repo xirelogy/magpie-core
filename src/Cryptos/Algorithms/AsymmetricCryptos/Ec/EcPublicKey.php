@@ -2,6 +2,7 @@
 
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos\Ec;
 
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPublicKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Impls\ImplAsymmKey;
@@ -17,7 +18,7 @@ use Magpie\General\Packs\PackContext;
  * Elliptic Curve public key
  */
 #[FactoryTypeClass(EcPublicKey::TYPECLASS, PublicKey::class)]
-class EcPublicKey extends PublicKey
+class EcPublicKey extends CommonPublicKey
 {
     /**
      * Current type class

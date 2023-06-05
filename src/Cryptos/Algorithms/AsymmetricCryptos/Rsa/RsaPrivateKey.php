@@ -3,6 +3,7 @@
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos\Rsa;
 
 use Exception;
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPrivateKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PrivateKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Context;
@@ -21,7 +22,7 @@ use Magpie\General\Packs\PackContext;
  * RSA private key
  */
 #[FactoryTypeClass(RsaPrivateKey::TYPECLASS, PrivateKey::class)]
-class RsaPrivateKey extends PrivateKey
+class RsaPrivateKey extends CommonPrivateKey
 {
     /**
      * Current type class

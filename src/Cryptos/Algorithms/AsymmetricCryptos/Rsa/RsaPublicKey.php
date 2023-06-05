@@ -2,6 +2,7 @@
 
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos\Rsa;
 
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPublicKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Impls\ImplAsymmKey;
 use Magpie\Cryptos\Impls\ImplRsaAsymmKey;
@@ -16,7 +17,7 @@ use Magpie\General\Packs\PackContext;
  * RSA public key
  */
 #[FactoryTypeClass(RsaPublicKey::TYPECLASS, PublicKey::class)]
-class RsaPublicKey extends PublicKey
+class RsaPublicKey extends CommonPublicKey
 {
     /**
      * Current type class

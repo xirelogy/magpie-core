@@ -32,14 +32,7 @@ abstract class PublicKey extends Key implements Importable
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public function encrypt(string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
-    {
-        $padding = Padding::accept($padding);
-        $chunking = Chunking::accept($chunking) ?? new NoChunking();
-
-        $crypto = $this->getImpl()->preparePublicKeyEncryption($padding, $chunking, $maxSize);
-        return $chunking->encrypt($crypto, $plaintext, $maxSize);
-    }
+    public abstract function encrypt(string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
 
 
     /**
@@ -51,21 +44,7 @@ abstract class PublicKey extends Key implements Importable
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public function verify(string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool
-    {
-        $hashTypeClass = $hashAlgorithm instanceof Hasher ? $hashAlgorithm->getTypeClass() : $hashAlgorithm;
-
-        return $this->getImpl()->publicVerify($plaintext, $signature, $hashTypeClass);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    protected function getExportName() : string
-    {
-        return 'PUBLIC KEY';
-    }
+    public abstract function verify(string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool;
 
 
     /**
@@ -79,22 +58,10 @@ abstract class PublicKey extends Key implements Importable
 
     /**
      * @inheritDoc
-     * @internal
      */
-    public static function _fromRaw(string $algoTypeClass, ImplAsymmKey $implKey) : static
+    protected static function onConstructImplKey(ImplAsymmKey $implKey) : static
     {
-        $className = ClassFactory::resolve($algoTypeClass, self::class);
-        if (!is_subclass_of($className, self::class)) throw new ClassNotOfTypeException($className, self::class);
-
-        return $className::onSpecificFromRaw($implKey);
+        $algoTypeClass = $implKey->getAlgoTypeClass();
+        return CommonPublicKey::_fromRaw($algoTypeClass, $implKey);
     }
-
-
-    /**
-     * Create specific key instance
-     * @param ImplAsymmKey $implKey
-     * @return static
-     * @throws SafetyCommonException
-     */
-    protected abstract static function onSpecificFromRaw(ImplAsymmKey $implKey) : static;
 }

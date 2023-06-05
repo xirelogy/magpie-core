@@ -2,7 +2,7 @@
 
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos\Rsa;
 
-use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PrivateKeyGenerator;
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPrivateKeyGenerator;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Impls\ImplRsaAsymmKeyGenerator;
 use Magpie\Exceptions\NotOfTypeException;
@@ -11,7 +11,7 @@ use Magpie\Exceptions\SafetyCommonException;
 /**
  * RSA private key generator
  */
-abstract class RsaPrivateKeyGenerator extends PrivateKeyGenerator
+abstract class RsaPrivateKeyGenerator extends CommonPrivateKeyGenerator
 {
     /**
      * Default number of bits

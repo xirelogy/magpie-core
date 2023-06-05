@@ -2,14 +2,14 @@
 
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos\Ec;
 
-use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PrivateKeyGenerator;
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPrivateKeyGenerator;
 use Magpie\Cryptos\Impls\ImplEcAsymmKeyGenerator;
 use Magpie\Exceptions\NotOfTypeException;
 
 /**
  * Elliptic Curve private key generator
  */
-class EcPrivateKeyGenerator extends PrivateKeyGenerator
+class EcPrivateKeyGenerator extends CommonPrivateKeyGenerator
 {
     /**
      * @var ImplEcAsymmKeyGenerator Underlying implementation
