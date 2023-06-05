@@ -77,7 +77,7 @@ class SpecCertificate extends Certificate
      */
     public function getVersion() : int
     {
-        return $this->inDetails['version'];
+        return $this->inDetails['version'] + 1;
     }
 
 
