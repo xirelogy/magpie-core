@@ -35,6 +35,8 @@ class RsaPublicKey extends CommonPublicKey
      */
     protected function __construct(ImplRsaAsymmKey $impl)
     {
+        parent::__construct();
+
         $this->impl = $impl;
     }
 

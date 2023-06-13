@@ -36,6 +36,8 @@ class EcPublicKey extends CommonPublicKey
      */
     protected function __construct(ImplEcAsymmKey $impl)
     {
+        parent::__construct();
+
         $this->impl = $impl;
     }
 

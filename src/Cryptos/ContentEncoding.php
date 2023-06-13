@@ -4,6 +4,7 @@ namespace Magpie\Cryptos;
 
 /**
  * Common content encoding when storing cryptography related contents
+ * @deprecated
  */
 enum ContentEncoding : string
 {

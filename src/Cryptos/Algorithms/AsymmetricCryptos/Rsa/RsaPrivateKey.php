@@ -40,6 +40,8 @@ class RsaPrivateKey extends CommonPrivateKey
      */
     protected function __construct(ImplRsaAsymmKey $impl)
     {
+        parent::__construct();
+
         $this->impl = $impl;
     }
 

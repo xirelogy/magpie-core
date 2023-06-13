@@ -7,7 +7,7 @@ use Carbon\CarbonInterface;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPublicKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Algorithms\Hashes\CommonHashTypeClass;
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Contents\ExportOption;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Numerals;
@@ -23,7 +23,6 @@ use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
 use Magpie\Exceptions\UnsupportedValueException;
-use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\Objects\BinaryData;
 use OpenSSLAsymmetricKey;
@@ -239,12 +238,11 @@ class SpecCertificate extends Certificate
     /**
      * @inheritDoc
      */
-    protected static function specificImport(CryptoContent|BinaryDataProvidable|string $source) : static
+    protected static function specificImport(CryptoFormatContent $source) : static
     {
-        [$data] = ImportExport::readAsPem($source, false);
-        $data = PemEncoding::reformat($data, 'CERTIFICATE');
+        $openSslSource = ImportExport::readAsOpenSslPem($source, 'CERTIFICATE');
 
-        $inCert = ErrorHandling::execute(fn () => openssl_x509_read($data));
+        $inCert = ErrorHandling::execute(fn () => openssl_x509_read($openSslSource->pemData));
 
         return static::_fromRaw($inCert);
     }

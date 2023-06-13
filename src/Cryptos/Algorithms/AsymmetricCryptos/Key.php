@@ -3,26 +3,23 @@
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos;
 
 use Magpie\Cryptos\Concepts\AlgoTypeClassable;
-use Magpie\Cryptos\Concepts\Exportable;
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Context;
+use Magpie\Cryptos\CryptoObject;
 use Magpie\Cryptos\Exceptions\CryptoException;
-use Magpie\Cryptos\Impls\ImplAsymmKey;
 use Magpie\Cryptos\Impls\ImplContext;
+use Magpie\Cryptos\Providers\AsymmetricKeyImporter;
+use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\General\Concepts\BinaryDataProvidable;
-use Magpie\General\Concepts\Packable;
+use Magpie\Exceptions\StreamException;
 use Magpie\General\Packs\PackContext;
-use Magpie\General\Traits\CommonPackable;
+use Magpie\General\Sugars\Excepts;
 
 /**
  * Asymmetric cryptography key
  */
-abstract class Key implements Packable, AlgoTypeClassable, Exportable
+abstract class Key extends CryptoObject implements AlgoTypeClassable
 {
-    use CommonPackable;
-
-
     /**
      * Number of bits in the current key
      * @return int
@@ -35,35 +32,53 @@ abstract class Key implements Packable, AlgoTypeClassable, Exportable
      */
     protected function onPack(object $ret, PackContext $context) : void
     {
+        parent::onPack($ret, $context);
+
         $ret->algoTypeClass = $this->getAlgoTypeClass();
     }
 
 
     /**
-     * Parse for a key from given source
-     * @param CryptoContent|BinaryDataProvidable|string $source
-     * @param bool $isPrivate
-     * @param Context|null $context
-     * @return static
-     * @throws SafetyCommonException
-     * @throws CryptoException
+     * @inheritDoc
      */
-    protected static function onImport(CryptoContent|BinaryDataProvidable|string $source, bool $isPrivate, ?Context $context) : static
+    protected static function onImport(CryptoFormatContent $source, ?Context $context) : static
     {
-        $context = $context ?? Context::getDefault();
+        if ($context === null) {
+            foreach (AsymmetricKeyImporter::getTryImporterLists() as $tryImporter) {
+                $ret = Excepts::noThrow(fn () => $tryImporter->import($source, static::class));
+                if ($ret instanceof static) return $ret;
+            }
+        }
 
-        $implContext = ImplContext::initialize($context->getTypeClass());
-        $implKey = $implContext->parseAsymmetricKey($source, $isPrivate);
+        $context = $context ?? AsymmetricKeyImporter::getDefaultContext();
 
-        return static::onConstructImplKey($implKey);
+        return static::onImportKey($source, $context);
     }
 
 
     /**
-     * @param ImplAsymmKey $implKey
+     * Parse and import key from given source
+     * @param CryptoFormatContent $source
+     * @param Context $context
      * @return static
      * @throws SafetyCommonException
+     * @throws PersistenceException
+     * @throws StreamException
      * @throws CryptoException
      */
-    protected static abstract function onConstructImplKey(ImplAsymmKey $implKey) : static;
+    protected static function onImportKey(CryptoFormatContent $source, Context $context) : static
+    {
+        $implContext = ImplContext::initialize($context->getTypeClass());
+        return $implContext->parseAsymmetricKey($source, static::isImportAsPrivate());
+    }
+
+
+    /**
+     * If import should be treating as private key
+     * @return bool|null
+     */
+    protected static function isImportAsPrivate() : ?bool
+    {
+        return null;
+    }
 }

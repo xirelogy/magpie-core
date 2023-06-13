@@ -5,41 +5,27 @@ namespace Magpie\Cryptos\X509;
 use Carbon\CarbonInterface;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Algorithms\Hashes\Hasher;
-use Magpie\Cryptos\Concepts\Exportable;
-use Magpie\Cryptos\Concepts\Importable;
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Context;
+use Magpie\Cryptos\CryptoObject;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Numerals;
+use Magpie\Cryptos\Providers\CertificateImporter;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
-use Magpie\General\Concepts\BinaryDataProvidable;
-use Magpie\General\Concepts\Packable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Packs\PackContext;
-use Magpie\General\Traits\CommonPackable;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Objects\BinaryData;
 
 /**
  * A X.509 certificate
  */
-abstract class Certificate implements TypeClassable, Packable, Importable, Exportable
+abstract class Certificate extends CryptoObject implements TypeClassable
 {
-    use CommonPackable;
-
-
-    /**
-     * Constructor
-     */
-    protected function __construct()
-    {
-
-    }
-
-
     /**
      * Certificate version
      * @return int
@@ -145,6 +131,8 @@ abstract class Certificate implements TypeClassable, Packable, Importable, Expor
      */
     protected function onPack(object $ret, PackContext $context) : void
     {
+        parent::onPack($ret, $context);
+
         $ret->version = $this->getVersion();
         $ret->serialNumber = $this->getSerialNumber();
         $ret->name = $this->getName();
@@ -159,9 +147,16 @@ abstract class Certificate implements TypeClassable, Packable, Importable, Expor
     /**
      * @inheritDoc
      */
-    public static function import(CryptoContent|BinaryDataProvidable|string $source, ?Context $context = null) : static
+    protected static function onImport(CryptoFormatContent $source, ?Context $context) : static
     {
-        $context = $context ?? Context::getDefault();
+        if ($context === null) {
+            foreach (CertificateImporter::getTryImporterLists() as $tryImporter) {
+                $ret = Excepts::noThrow(fn () => $tryImporter->import($source, static::class));
+                if ($ret instanceof static) return $ret;
+            }
+        }
+
+        $context = $context ?? CertificateImporter::getDefaultContext();
 
         $className = ClassFactory::resolve($context->getTypeClass(), self::class);
         if (!is_subclass_of($className, self::class)) throw new ClassNotOfTypeException($className, self::class);
@@ -172,12 +167,12 @@ abstract class Certificate implements TypeClassable, Packable, Importable, Expor
 
     /**
      * Specifically parse from certificate source
-     * @param CryptoContent|BinaryDataProvidable|string $source
+     * @param CryptoFormatContent $source
      * @return static
      * @throws SafetyCommonException
      * @throws PersistenceException
      * @throws StreamException
      * @throws CryptoException
      */
-    protected abstract static function specificImport(CryptoContent|BinaryDataProvidable|string $source) : static;
+    protected abstract static function specificImport(CryptoFormatContent $source) : static;
 }

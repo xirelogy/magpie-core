@@ -2,11 +2,13 @@
 
 namespace Magpie\Cryptos\Impls;
 
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Key;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Exceptions\ClassNotOfTypeException;
+use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\General\Concepts\BinaryDataProvidable;
+use Magpie\Exceptions\StreamException;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\Objects\BinaryData;
@@ -37,14 +39,16 @@ abstract class ImplContext implements TypeClassable
 
 
     /**
-     * Parse for asymmetric key
-     * @param CryptoContent|BinaryDataProvidable|string $source
-     * @param bool $isPrivate
-     * @return ImplAsymmKey
+     * Parse and import asymmetric key
+     * @param CryptoFormatContent $source
+     * @param bool|null $isPrivate
+     * @return Key
      * @throws SafetyCommonException
+     * @throws PersistenceException
+     * @throws StreamException
      * @throws CryptoException
      */
-    public abstract function parseAsymmetricKey(CryptoContent|BinaryDataProvidable|string $source, bool $isPrivate) : ImplAsymmKey;
+    public abstract function parseAsymmetricKey(CryptoFormatContent $source, ?bool $isPrivate) : Key;
 
 
     /**

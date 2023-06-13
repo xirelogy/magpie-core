@@ -41,6 +41,8 @@ class EcPrivateKey extends CommonPrivateKey
      */
     protected function __construct(ImplEcAsymmKey $impl)
     {
+        parent::__construct();
+
         $this->impl = $impl;
     }
 

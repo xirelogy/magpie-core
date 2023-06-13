@@ -1,13 +1,18 @@
 <?php
 
+/** @noinspection PhpDeprecationInspection */
+
 namespace Magpie\Cryptos\Contents;
 
 use Magpie\Cryptos\ContentEncoding;
+use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Contents\SimpleBinaryContent;
 
 /**
  * May store content related to cryptography
+ * @deprecated CryptoContent had been replaced by CryptoFormatContent
  */
 class CryptoContent
 {
@@ -56,6 +61,29 @@ class CryptoContent
     {
         $this->password = $password;
         return $this;
+    }
+
+
+    /**
+     * Convert to CryptoFormatContent to support upgrading from CryptoContent
+     * @return CryptoFormatContent|BinaryDataProvidable|string
+     * @throws SafetyCommonException
+     */
+    public function upgradeToCryptoFormatContent() : CryptoFormatContent|BinaryDataProvidable|string
+    {
+        if ($this->encoding === null) {
+            // When encoding not available, likely assumed to be PEM
+            if ($this->password === null) return $this->source;
+
+            return PemCryptoFormatContent::fromData($this->source, $this->password);
+        }
+
+        return match ($this->encoding) {
+            ContentEncoding::PEM => PemCryptoFormatContent::fromData($this->source, $this->password),
+            ContentEncoding::DER => DerCryptoFormatContent::fromData($this->source, $this->password),
+            ContentEncoding::P12 => Pkcs12CryptoFormatContent::fromData($this->source, $this->password),
+            default => throw new UnsupportedValueException($this->encoding),
+        };
     }
 
 

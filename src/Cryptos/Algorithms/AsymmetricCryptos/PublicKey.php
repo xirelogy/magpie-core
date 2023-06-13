@@ -3,19 +3,12 @@
 namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos;
 
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Chunkings\Chunking;
-use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Chunkings\NoChunking;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Paddings\Padding;
 use Magpie\Cryptos\Algorithms\Hashes\CommonHashTypeClass;
 use Magpie\Cryptos\Algorithms\Hashes\Hasher;
 use Magpie\Cryptos\Concepts\Importable;
-use Magpie\Cryptos\Contents\CryptoContent;
-use Magpie\Cryptos\Context;
 use Magpie\Cryptos\Exceptions\CryptoException;
-use Magpie\Cryptos\Impls\ImplAsymmKey;
-use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\General\Concepts\BinaryDataProvidable;
-use Magpie\General\Factories\ClassFactory;
 use Magpie\Objects\BinaryData;
 
 /**
@@ -50,18 +43,8 @@ abstract class PublicKey extends Key implements Importable
     /**
      * @inheritDoc
      */
-    public static function import(CryptoContent|BinaryDataProvidable|string $source, ?Context $context = null) : static
+    protected static function isImportAsPrivate() : ?bool
     {
-        return static::onImport($source, false, $context);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    protected static function onConstructImplKey(ImplAsymmKey $implKey) : static
-    {
-        $algoTypeClass = $implKey->getAlgoTypeClass();
-        return CommonPublicKey::_fromRaw($algoTypeClass, $implKey);
+        return false;
     }
 }

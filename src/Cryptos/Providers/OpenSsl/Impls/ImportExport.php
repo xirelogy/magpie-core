@@ -2,17 +2,20 @@
 
 namespace Magpie\Cryptos\Providers\OpenSsl\Impls;
 
-use Magpie\Cryptos\ContentEncoding;
+use Magpie\Cryptos\Contents\BlockContent;
 use Magpie\Cryptos\Contents\CompactPemExportOption;
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
+use Magpie\Cryptos\Contents\DerCryptoFormatContent;
 use Magpie\Cryptos\Contents\ExportOption;
 use Magpie\Cryptos\Contents\PasswordExportOption;
-use Magpie\Exceptions\InvalidDataException;
+use Magpie\Cryptos\Contents\PemCryptoFormatContent;
+use Magpie\Cryptos\Encodings\Pem;
+use Magpie\Cryptos\Exceptions\CryptoException;
+use Magpie\Cryptos\Providers\OpenSsl\Exceptions\OpenSslImportMissingPreferredTypeException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
 use Magpie\Exceptions\UnsupportedValueException;
-use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Traits\StaticClass;
 
 /**
@@ -25,41 +28,49 @@ class ImportExport
 
 
     /**
-     * Read in PEM format
-     * @param CryptoContent|BinaryDataProvidable|string $source
-     * @param bool $isAllowPassword
-     * @return array{0:string, 1:string|null}
+     * Read content and format into the PEM format that OpenSSL expects
+     * @param CryptoFormatContent $source
+     * @param string|null $preferredBlockType
+     * @return OpenSslCryptoContent
      * @throws SafetyCommonException
      * @throws PersistenceException
      * @throws StreamException
+     * @throws CryptoException
      */
-    public static function readAsPem(CryptoContent|BinaryDataProvidable|string $source, bool $isAllowPassword) : array
+    public static function readAsOpenSslPem(CryptoFormatContent $source, ?string $preferredBlockType = null) : OpenSslCryptoContent
     {
-        [$data, $encoding, $password] = static::readSource($source);
-        $encoding = $encoding ?? ContentEncoding::PEM;
+        if ($source instanceof PemCryptoFormatContent) {
+            // PEM content, or anything similar to PEM (default understanding)
+            $data = $source->data->getData();
 
-        if ($encoding !== ContentEncoding::PEM) throw new UnsupportedValueException($encoding, _l('source encoding'));
+            if (Pem::hasContentType($data)) {
+                // Has content type, this is the kind of content expected
+                $blocks = Pem::decode($data);
+                $pemData = Pem::encode($blocks);
+            } else {
+                // No content type, need to 'create' using preferred block type
+                if ($preferredBlockType === null) throw new OpenSslImportMissingPreferredTypeException();
 
-        if (!$isAllowPassword && $password !== null) throw new InvalidDataException();
+                $pemData = Pem::encode([
+                    new BlockContent($preferredBlockType, $data),
+                ]);
+            }
 
-        return [$data, $password];
-    }
+            return new OpenSslCryptoContent($pemData, $source->password);
+        }
 
+        if ($source instanceof DerCryptoFormatContent) {
+            // DER content, will need a preferred block type to operate
+            if ($preferredBlockType === null) throw new OpenSslImportMissingPreferredTypeException();
 
-    /**
-     * Read from source
-     * @param CryptoContent|BinaryDataProvidable|string $source
-     * @return array{0:string, 1:ContentEncoding|null, 2:string|null}
-     * @throws SafetyCommonException
-     * @throws PersistenceException
-     * @throws StreamException
-     */
-    protected static function readSource(CryptoContent|BinaryDataProvidable|string $source) : array
-    {
-        if (is_string($source)) return [$source, null, null];
-        if ($source instanceof BinaryDataProvidable) return [$source->getData(), null, null];
+            $pemData = Pem::encode([
+                new BlockContent($preferredBlockType, base64_encode($source->data->getData())),
+            ]);
 
-        return [$source->source->getData(), $source->encoding, $source->password];
+            return new OpenSslCryptoContent($pemData, $source->password);
+        }
+
+        throw new UnsupportedValueException($source);
     }
 
 

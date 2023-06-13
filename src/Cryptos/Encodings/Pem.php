@@ -52,6 +52,30 @@ class Pem
 
 
     /**
+     * Check if the content is PEM format with proper content type
+     * @param string $data
+     * @return bool
+     */
+    public static function hasContentType(string $data) : bool
+    {
+        foreach (TextContent::getRows($data) as $row) {
+            // Empty lines ignored
+            if (Str::isNullOrEmpty(trim($row))) continue;
+
+            if (str_starts_with($row, static::TEXT_PREFIX_BEGIN) && str_ends_with($row, static::TEXT_SUFFIX)) {
+                // Begin line detected, considered valid
+                return true;
+            } else {
+                // Otherwise, something is wrong
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * Decode from PEM format
      * @param string $data
      * @return iterable<BlockContent>
