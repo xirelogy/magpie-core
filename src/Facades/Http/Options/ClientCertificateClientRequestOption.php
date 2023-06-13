@@ -3,6 +3,8 @@
 namespace Magpie\Facades\Http\Options;
 
 use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\Http\HttpClientRequestOption;
 use Magpie\General\Concepts\BinaryDataProvidable;
 
@@ -17,21 +19,21 @@ class ClientCertificateClientRequestOption extends HttpClientRequestOption
     public const TYPECLASS = 'client-cert';
 
     /**
-     * @var CryptoContent The certificate
+     * @var CryptoFormatContent The certificate
      */
-    public CryptoContent $certificate;
+    public CryptoFormatContent $certificate;
     /**
-     * @var CryptoContent The private key
+     * @var CryptoFormatContent The private key
      */
-    public CryptoContent $privateKey;
+    public CryptoFormatContent $privateKey;
 
 
     /**
      * Constructor
-     * @param CryptoContent $certificate
-     * @param CryptoContent $privateKey
+     * @param CryptoFormatContent $certificate
+     * @param CryptoFormatContent $privateKey
      */
-    protected function __construct(CryptoContent $certificate, CryptoContent $privateKey)
+    protected function __construct(CryptoFormatContent $certificate, CryptoFormatContent $privateKey)
     {
         parent::__construct();
 
@@ -51,12 +53,13 @@ class ClientCertificateClientRequestOption extends HttpClientRequestOption
 
     /**
      * Create option
-     * @param CryptoContent|BinaryDataProvidable|string $certificate
-     * @param CryptoContent|BinaryDataProvidable|string $privateKey
+     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $certificate
+     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $privateKey
      * @return static
+     * @throws SafetyCommonException
      */
-    public static function create(CryptoContent|BinaryDataProvidable|string $certificate, CryptoContent|BinaryDataProvidable|string $privateKey) : static
+    public static function create(CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $certificate, CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $privateKey) : static
     {
-        return new static(CryptoContent::accept($certificate), CryptoContent::accept($privateKey));
+        return new static(CryptoFormatContent::accept($certificate), CryptoFormatContent::accept($privateKey));
     }
 }

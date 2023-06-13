@@ -7,8 +7,10 @@ use CURLFile;
 use CurlHandle;
 use Exception;
 use Fiber;
-use Magpie\Cryptos\ContentEncoding;
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
+use Magpie\Cryptos\Contents\DerCryptoFormatContent;
+use Magpie\Cryptos\Contents\PemCryptoFormatContent;
+use Magpie\Cryptos\Contents\Pkcs12CryptoFormatContent;
 use Magpie\Exceptions\DuplicatedKeyException;
 use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\PersistenceException;
@@ -441,7 +443,7 @@ abstract class CurlHttpClientPendingRequest extends HttpClientPendingRequest
             /**
              * Constructor
              * @param CurlHandle $ch
-             * @param callable(CryptoContent,int,int|null,int|null):iterable $translateCryptoContentOptionsFn
+             * @param callable(CryptoFormatContent,int,int|null,int|null):iterable $translateCryptoContentOptionsFn
              * @param callable(CurlDownloadStreamSetup):void $setDownloadSetupFn
              */
             public function __construct(CurlHandle $ch, callable $translateCryptoContentOptionsFn, callable $setDownloadSetupFn)
@@ -457,7 +459,7 @@ abstract class CurlHttpClientPendingRequest extends HttpClientPendingRequest
              * @inheritDoc
              * @noinspection PhpRedundantCatchClauseInspection
              */
-            public function translateCryptoContentOptions(CryptoContent $content, int $pathOption, ?int $typeOption, ?int $passwordOption) : iterable
+            public function translateCryptoContentOptions(CryptoFormatContent $content, int $pathOption, ?int $typeOption, ?int $passwordOption) : iterable
             {
                 try {
                     yield from ($this->translateCryptoContentOptionsFn)($content, $pathOption, $typeOption, $passwordOption);
@@ -480,7 +482,7 @@ abstract class CurlHttpClientPendingRequest extends HttpClientPendingRequest
 
     /**
      * Translate crypto related content into CURL's option
-     * @param CryptoContent $content
+     * @param CryptoFormatContent $content
      * @param int $pathOption
      * @param int|null $typeOption
      * @param int|null $passwordOption
@@ -489,18 +491,18 @@ abstract class CurlHttpClientPendingRequest extends HttpClientPendingRequest
      * @throws PersistenceException
      * @throws StreamException
      */
-    protected function translateCryptoContentOptions(CryptoContent $content, int $pathOption, ?int $typeOption, ?int $passwordOption) : iterable
+    protected function translateCryptoContentOptions(CryptoFormatContent $content, int $pathOption, ?int $typeOption, ?int $passwordOption) : iterable
     {
-        $file = BinaryContent::getFileSystemAccessible($content->source, $isReleasable);
+        $file = BinaryContent::getFileSystemAccessible($content->data, $isReleasable);
         if ($isReleasable) $this->releasedAfterRequest->addIfReleasable($file);
 
         yield $pathOption => $file->getFileSystemPath();
 
-        if ($typeOption !== null && $content->encoding !== null) {
-            $curlType = match ($content->encoding) {
-                ContentEncoding::PEM => 'PEM',
-                ContentEncoding::DER => 'DER',
-                ContentEncoding::P12 => 'P12',
+        if ($typeOption !== null) {
+            $curlType = match ($content::getTypeClass()) {
+                PemCryptoFormatContent::TYPECLASS => 'PEM',
+                DerCryptoFormatContent::TYPECLASS => 'DER',
+                Pkcs12CryptoFormatContent::TYPECLASS => 'P12',
                 default => null,
             };
 

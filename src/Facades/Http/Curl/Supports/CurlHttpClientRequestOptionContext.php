@@ -3,7 +3,7 @@
 namespace Magpie\Facades\Http\Curl\Supports;
 
 use CurlHandle;
-use Magpie\Cryptos\Contents\CryptoContent;
+use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\Http\Curl\Impls\CurlDownloadStreamSetup;
 use Magpie\Facades\Http\Curl\Impls\CurlSafeUtils;
@@ -46,14 +46,14 @@ abstract class CurlHttpClientRequestOptionContext extends HttpClientRequestOptio
 
     /**
      * Translate crypto related content into CURL's option
-     * @param CryptoContent $content
+     * @param CryptoFormatContent $content
      * @param int $pathOption
      * @param int|null $typeOption
      * @param int|null $passwordOption
      * @return iterable<int, mixed>
      * @throws SafetyCommonException
      */
-    public abstract function translateCryptoContentOptions(CryptoContent $content, int $pathOption, ?int $typeOption, ?int $passwordOption) : iterable;
+    public abstract function translateCryptoContentOptions(CryptoFormatContent $content, int $pathOption, ?int $typeOption, ?int $passwordOption) : iterable;
 
 
     /**
