@@ -25,8 +25,9 @@ abstract class CommonPrivateKey extends PrivateKey
     /**
      * @inheritDoc
      */
-    public function decrypt(string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
+    public function decrypt(BinaryData|string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
     {
+        $ciphertext = BinaryData::acceptBinary($ciphertext)->asBinary();
         $padding = Padding::accept($padding);
         $chunking = Chunking::accept($chunking) ?? new NoChunking();
 
@@ -38,8 +39,9 @@ abstract class CommonPrivateKey extends PrivateKey
     /**
      * @inheritDoc
      */
-    public function sign(string $plaintext, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : BinaryData
+    public function sign(BinaryData|string $plaintext, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : BinaryData
     {
+        $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
         $hashTypeClass = $hashAlgorithm instanceof Hasher ? $hashAlgorithm->getTypeClass() : $hashAlgorithm;
 
         return $this->getImpl()->privateSign($plaintext, $hashTypeClass);

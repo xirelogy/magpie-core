@@ -24,8 +24,9 @@ abstract class CommonPublicKey extends PublicKey
     /**
      * @inheritDoc
      */
-    public function encrypt(string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
+    public function encrypt(BinaryData|string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
     {
+        $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
         $padding = Padding::accept($padding);
         $chunking = Chunking::accept($chunking) ?? new NoChunking();
 
@@ -37,8 +38,9 @@ abstract class CommonPublicKey extends PublicKey
     /**
      * @inheritDoc
      */
-    public function verify(string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool
+    public function verify(BinaryData|string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool
     {
+        $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
         $hashTypeClass = $hashAlgorithm instanceof Hasher ? $hashAlgorithm->getTypeClass() : $hashAlgorithm;
 
         return $this->getImpl()->publicVerify($plaintext, $signature, $hashTypeClass);

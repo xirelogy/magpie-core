@@ -25,25 +25,25 @@ abstract class PrivateKey extends Key implements Importable
 {
     /**
      * Decrypt using this private key
-     * @param string $ciphertext
+     * @param BinaryData|string $ciphertext
      * @param Padding|string|null $padding
      * @param Chunking|string|null $chunking
      * @return string
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function decrypt(string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
+    public abstract function decrypt(BinaryData|string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
 
 
     /**
      * Sign using this private key
-     * @param string $plaintext
+     * @param BinaryData|string $plaintext
      * @param Hasher|string $hashAlgorithm
      * @return BinaryData
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function sign(string $plaintext, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : BinaryData;
+    public abstract function sign(BinaryData|string $plaintext, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : BinaryData;
 
 
     /**

@@ -25,26 +25,26 @@ abstract class PublicKey extends Key implements Importable
 {
     /**
      * Encrypt using this public key
-     * @param string $plaintext
+     * @param BinaryData|string $plaintext
      * @param Padding|string|null $padding
      * @param Chunking|string|null $chunking
      * @return string
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function encrypt(string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
+    public abstract function encrypt(BinaryData|string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
 
 
     /**
      * Verify plaintext signature using this public key
-     * @param string $plaintext
+     * @param BinaryData|string $plaintext
      * @param BinaryData $signature
      * @param Hasher|string $hashAlgorithm
      * @return bool
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function verify(string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool;
+    public abstract function verify(BinaryData|string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool;
 
 
     /**
