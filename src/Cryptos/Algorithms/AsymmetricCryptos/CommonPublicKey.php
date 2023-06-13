@@ -45,8 +45,6 @@ abstract class CommonPublicKey extends PublicKey
     }
 
 
-
-
     /**
      * @inheritDoc
      */
