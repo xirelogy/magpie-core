@@ -62,7 +62,7 @@ abstract class Cipher implements Packable
      */
     public final function encrypt(BinaryData|string $plaintext, ?CipherContext $context = null) : BinaryData
     {
-        $plaintext = static::acceptData($plaintext);
+        $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
         $ciphertext = $this->onEncryptBinary($plaintext, $context);
 
         return BinaryData::fromBinary($ciphertext);
@@ -90,7 +90,7 @@ abstract class Cipher implements Packable
      */
     public final function decrypt(BinaryData|string $ciphertext, ?CipherContext $context = null) : BinaryData
     {
-        $ciphertext = static::acceptData($ciphertext);
+        $ciphertext = BinaryData::acceptBinary($ciphertext)->asBinary();
         $plaintext = $this->onDecryptBinary($ciphertext, $context);
 
         return BinaryData::fromBinary($plaintext);
@@ -114,18 +114,5 @@ abstract class Cipher implements Packable
     protected function onPack(object $ret, PackContext $context) : void
     {
         // purposely NOP as default
-    }
-
-
-    /**
-     * Accept data
-     * @param BinaryData|string $data
-     * @return string
-     */
-    protected static function acceptData(BinaryData|string $data) : string
-    {
-        if ($data instanceof BinaryData) return $data->asBinary();
-
-        return $data;
     }
 }

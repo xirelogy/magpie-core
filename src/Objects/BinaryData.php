@@ -115,4 +115,16 @@ class BinaryData implements PreferStringable
 
         return new static($binData);
     }
+
+
+    /**
+     * Accept and convert into BinaryData, whereby string is understood as binary string
+     * @param BinaryData|string $data
+     * @return static
+     */
+    public static function acceptBinary(self|string $data) : static
+    {
+        if ($data instanceof static) return $data;
+        return static::fromBinary($data);
+    }
 }

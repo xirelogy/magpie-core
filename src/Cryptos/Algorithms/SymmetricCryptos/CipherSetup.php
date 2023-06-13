@@ -188,9 +188,7 @@ class CipherSetup implements Packable, AlgoTypeClassable
      */
     protected static function acceptData(BinaryData|string $data) : string
     {
-        if ($data instanceof BinaryData) return $data->asBinary();
-
-        return $data;
+        return BinaryData::acceptBinary($data)->asBinary();
     }
 
 

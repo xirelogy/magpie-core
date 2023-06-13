@@ -42,8 +42,8 @@ class AeadDecryptionCipherContext extends AeadCipherContext
     public static function create(BinaryData|string $tag, BinaryData|string $aad) : static
     {
         return new static(
-            static::acceptBinaryData($tag),
-            static::acceptBinaryData($aad),
+            BinaryData::acceptBinary($tag),
+            BinaryData::acceptBinary($aad),
         );
     }
 

@@ -65,7 +65,7 @@ abstract class HmacHasher
      */
     public static function initialize(string $typeClass, BinaryData|string $keySpec) : Hasher
     {
-        $key = static::acceptKey($keySpec);
+        $key = BinaryData::acceptBinary($keySpec);
         $nativeAlgo = CommonNativeHashType::checkHmacTypeClass($typeClass);
         if ($nativeAlgo !== null) {
             return CommonNativeHmacHasher::createNativeInstance($typeClass, $nativeAlgo, $key);
@@ -86,17 +86,4 @@ abstract class HmacHasher
      * @throws CryptoException
      */
     protected abstract static function specificHmacInitialize(BinaryData $key) : Hasher;
-
-
-    /**
-     * Accept the key
-     * @param BinaryData|string $keySpec
-     * @return BinaryData
-     */
-    protected static function acceptKey(BinaryData|string $keySpec) : BinaryData
-    {
-        if ($keySpec instanceof BinaryData) return $keySpec;
-
-        return BinaryData::fromBinary($keySpec);
-    }
 }
