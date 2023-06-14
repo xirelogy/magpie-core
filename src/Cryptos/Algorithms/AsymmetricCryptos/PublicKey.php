@@ -4,7 +4,6 @@ namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos;
 
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Chunkings\Chunking;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Paddings\Padding;
-use Magpie\Cryptos\Algorithms\Hashes\CommonHashTypeClass;
 use Magpie\Cryptos\Algorithms\Hashes\Hasher;
 use Magpie\Cryptos\Concepts\Importable;
 use Magpie\Cryptos\Exceptions\CryptoException;
