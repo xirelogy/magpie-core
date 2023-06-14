@@ -8,12 +8,13 @@ use Magpie\General\Concepts\TypeClassable;
 
 /**
  * A private key generator
+ * @template T
  */
 abstract class PrivateKeyGenerator implements TypeClassable
 {
     /**
      * Generate
-     * @return PrivateKey
+     * @return T
      * @throws SafetyCommonException
      * @throws CryptoException
      */

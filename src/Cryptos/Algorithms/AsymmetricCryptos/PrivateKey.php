@@ -68,7 +68,7 @@ abstract class PrivateKey extends Key implements Importable
     /**
      * Create the private key generator
      * @param Context|null $context
-     * @return PrivateKeyGenerator
+     * @return PrivateKeyGenerator<static>
      * @throws SafetyCommonException
      * @throws CryptoException
      */
