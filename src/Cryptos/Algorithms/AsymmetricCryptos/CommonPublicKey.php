@@ -38,9 +38,10 @@ abstract class CommonPublicKey extends PublicKey
     /**
      * @inheritDoc
      */
-    public function verify(BinaryData|string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool
+    public function verify(BinaryData|string $plaintext, BinaryData $signature, Hasher|string|null $hashAlgorithm = null) : bool
     {
         $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
+        $hashAlgorithm = $hashAlgorithm ?? CommonHashTypeClass::SHA1;
         $hashTypeClass = $hashAlgorithm instanceof Hasher ? $hashAlgorithm->getTypeClass() : $hashAlgorithm;
 
         return $this->getImpl()->publicVerify($plaintext, $signature, $hashTypeClass);

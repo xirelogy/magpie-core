@@ -39,9 +39,10 @@ abstract class CommonPrivateKey extends PrivateKey
     /**
      * @inheritDoc
      */
-    public function sign(BinaryData|string $plaintext, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : BinaryData
+    public function sign(BinaryData|string $plaintext, Hasher|string|null $hashAlgorithm = null) : BinaryData
     {
         $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
+        $hashAlgorithm = $hashAlgorithm ?? CommonHashTypeClass::SHA1;
         $hashTypeClass = $hashAlgorithm instanceof Hasher ? $hashAlgorithm->getTypeClass() : $hashAlgorithm;
 
         return $this->getImpl()->privateSign($plaintext, $hashTypeClass);

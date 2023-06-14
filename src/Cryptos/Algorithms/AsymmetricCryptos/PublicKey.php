@@ -32,12 +32,12 @@ abstract class PublicKey extends Key implements Importable
      * Verify plaintext signature using this public key
      * @param BinaryData|string $plaintext
      * @param BinaryData $signature
-     * @param Hasher|string $hashAlgorithm
+     * @param Hasher|string|null $hashAlgorithm
      * @return bool
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function verify(BinaryData|string $plaintext, BinaryData $signature, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : bool;
+    public abstract function verify(BinaryData|string $plaintext, BinaryData $signature, Hasher|string|null $hashAlgorithm = null) : bool;
 
 
     /**

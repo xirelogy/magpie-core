@@ -4,7 +4,6 @@ namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos;
 
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Chunkings\Chunking;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Paddings\Padding;
-use Magpie\Cryptos\Algorithms\Hashes\CommonHashTypeClass;
 use Magpie\Cryptos\Algorithms\Hashes\Hasher;
 use Magpie\Cryptos\Concepts\Importable;
 use Magpie\Cryptos\Context;
@@ -32,12 +31,12 @@ abstract class PrivateKey extends Key implements Importable
     /**
      * Sign using this private key
      * @param BinaryData|string $plaintext
-     * @param Hasher|string $hashAlgorithm
+     * @param Hasher|string|null $hashAlgorithm
      * @return BinaryData
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function sign(BinaryData|string $plaintext, Hasher|string $hashAlgorithm = CommonHashTypeClass::SHA1) : BinaryData;
+    public abstract function sign(BinaryData|string $plaintext, Hasher|string|null $hashAlgorithm = null) : BinaryData;
 
 
     /**
