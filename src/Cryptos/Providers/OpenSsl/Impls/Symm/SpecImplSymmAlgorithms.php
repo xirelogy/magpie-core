@@ -73,15 +73,15 @@ class SpecImplSymmAlgorithms
             case 'des':
             case 'desx':
                 // DES uses fixed 56 bits (1 bit parity every 7 bits)
-                return $keyNumBits === 56;
+                return $keyNumBits === 56 || $keyNumBits === 64;
 
             case 'des-ede':
-                // 2-key Triple-DES uses fixed 112 bits
-                return $keyNumBits === 112;
+                // 2-key Triple-DES uses fixed 112 bits (1 bit parity every 7 bits)
+                return $keyNumBits === 112 || $keyNumBits === 128;
 
             case 'des-ede3':
-                // 3-key Triple-DES uses fixed 168 bits
-                return $keyNumBits === 168;
+                // 3-key Triple-DES uses fixed 168 bits (1 bit parity every 7 bits)
+                return $keyNumBits === 168 || $keyNumBits === 192;
 
             default:
                 // If not recognized here, not supported!
