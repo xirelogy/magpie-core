@@ -267,6 +267,10 @@ class ClassFactory implements SourceCacheable
     public static function saveSourceCache() : void
     {
         static::ensureBoot();
+
+        ksort(static::$classMap);
+        ksort(static::$featureMap);
+
         SourceCache::instance()->setCache(static::class, [
             'classMap' => static::$classMap,
             'featureMap' => static::$featureMap,
