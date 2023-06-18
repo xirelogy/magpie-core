@@ -21,11 +21,11 @@ abstract class PrivateKey extends Key implements Importable
      * @param BinaryData|string $ciphertext
      * @param Padding|string|null $padding
      * @param Chunking|string|null $chunking
-     * @return string
+     * @return BinaryData
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function decrypt(BinaryData|string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
+    public abstract function decrypt(BinaryData|string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : BinaryData;
 
 
     /**

@@ -24,14 +24,14 @@ abstract class CommonPublicKey extends PublicKey
     /**
      * @inheritDoc
      */
-    public function encrypt(BinaryData|string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
+    public function encrypt(BinaryData|string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : BinaryData
     {
         $plaintext = BinaryData::acceptBinary($plaintext)->asBinary();
         $padding = Padding::accept($padding);
         $chunking = Chunking::accept($chunking) ?? new NoChunking();
 
         $crypto = $this->getImpl()->preparePublicKeyEncryption($padding, $chunking, $maxSize);
-        return $chunking->encrypt($crypto, $plaintext, $maxSize);
+        return BinaryData::fromBinary($chunking->encrypt($crypto, $plaintext, $maxSize));
     }
 
 

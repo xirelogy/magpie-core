@@ -25,14 +25,14 @@ abstract class CommonPrivateKey extends PrivateKey
     /**
      * @inheritDoc
      */
-    public function decrypt(BinaryData|string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string
+    public function decrypt(BinaryData|string $ciphertext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : BinaryData
     {
         $ciphertext = BinaryData::acceptBinary($ciphertext)->asBinary();
         $padding = Padding::accept($padding);
         $chunking = Chunking::accept($chunking) ?? new NoChunking();
 
         $crypto = $this->getImpl()->preparePrivateKeyDecryption($padding, $chunking, $maxSize);
-        return $chunking->decrypt($crypto, $ciphertext, $maxSize);
+        return BinaryData::fromBinary($chunking->decrypt($crypto, $ciphertext, $maxSize));
     }
 
 

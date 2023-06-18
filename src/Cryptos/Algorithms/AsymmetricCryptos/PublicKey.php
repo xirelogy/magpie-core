@@ -20,11 +20,11 @@ abstract class PublicKey extends Key implements Importable
      * @param BinaryData|string $plaintext
      * @param Padding|string|null $padding
      * @param Chunking|string|null $chunking
-     * @return string
+     * @return BinaryData
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public abstract function encrypt(BinaryData|string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : string;
+    public abstract function encrypt(BinaryData|string $plaintext, Padding|string|null $padding = null, Chunking|string|null $chunking = null) : BinaryData;
 
 
     /**
