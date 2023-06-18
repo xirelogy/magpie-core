@@ -144,9 +144,19 @@ class SpecCertificate extends Certificate
         if (!array_key_exists('extensions', $this->inDetails)) return;
         if (!array_key_exists('subjectAltName', $this->inDetails['extensions'])) return;
 
+        $buffer = null;
+        $retNames = [];
         foreach (explode(',', $this->inDetails['extensions']['subjectAltName']) as $altName) {
-            yield trim($altName);
+            if (str_contains($altName, ':')) {
+                if ($buffer !== null) $retNames[] = $buffer;
+                $buffer = trim($altName);
+            } else {
+                if ($buffer !== null) $buffer .= ",$altName";
+            }
         }
+
+        if ($buffer !== null) $retNames[] = $buffer;
+        yield from $retNames;
     }
 
 
