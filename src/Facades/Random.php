@@ -5,6 +5,7 @@ namespace Magpie\Facades;
 use Magpie\General\Concepts\Randomable;
 use Magpie\General\Randoms\MtRandomProvider;
 use Magpie\General\Traits\StaticClass;
+use Magpie\Objects\BinaryData;
 use Magpie\System\Kernel\Kernel;
 
 /**
@@ -47,6 +48,17 @@ class Random
     public static function bytes(int $length) : string
     {
         return static::getRandomProvider()->bytes($length);
+    }
+
+
+    /**
+     * Generate a random bytes string of given length and return as BinaryData
+     * @param int $length
+     * @return BinaryData
+     */
+    public static function binary(int $length) : BinaryData
+    {
+        return static::getRandomProvider()->binary($length);
     }
 
 

@@ -2,6 +2,8 @@
 
 namespace Magpie\General\Traits;
 
+use Magpie\Objects\BinaryData;
+
 /**
  * Common randomable implementation
  */
@@ -49,5 +51,16 @@ trait CommonRandomable
         }
 
         return $ret;
+    }
+
+
+    /**
+     * Generate a random bytes string of given length and return as BinaryData
+     * @param int $length
+     * @return BinaryData
+     */
+    public function binary(int $length) : BinaryData
+    {
+        return BinaryData::fromBinary($this->bytes($length));
     }
 }
