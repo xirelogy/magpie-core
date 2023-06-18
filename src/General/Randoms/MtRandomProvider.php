@@ -4,17 +4,15 @@ namespace Magpie\General\Randoms;
 
 use Magpie\General\Concepts\Randomable;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
-use Magpie\General\Traits\CommonRandomable;
 use Magpie\General\Traits\SingletonInstance;
 
 /**
  * Random number generator using Mersenne Twister characteristics
  */
-#[FactoryTypeClass(MtRandom::TYPECLASS, Randomable::class)]
-class MtRandom implements Randomable
+#[FactoryTypeClass(MtRandomProvider::TYPECLASS, Randomable::class)]
+class MtRandomProvider extends RandomProvider
 {
     use SingletonInstance;
-    use CommonRandomable;
 
     /**
      * Current type class

@@ -3,7 +3,7 @@
 namespace Magpie\Facades;
 
 use Magpie\General\Concepts\Randomable;
-use Magpie\General\Randoms\MtRandom;
+use Magpie\General\Randoms\MtRandomProvider;
 use Magpie\General\Traits\StaticClass;
 use Magpie\System\Kernel\Kernel;
 
@@ -61,6 +61,6 @@ class Random
             if ($provider instanceof Randomable) return $provider;
         }
 
-        return MtRandom::instance();
+        return MtRandomProvider::instance();
     }
 }

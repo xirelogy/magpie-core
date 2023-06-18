@@ -2,10 +2,13 @@
 
 namespace Magpie\General\Concepts;
 
+use Magpie\Objects\BinaryData;
+use Magpie\System\Concepts\DefaultProviderRegistrable;
+
 /**
  * May generate random data
  */
-interface Randomable extends TypeClassable
+interface Randomable extends TypeClassable, DefaultProviderRegistrable
 {
     /**
      * Generate a random integer within the given numeric range
@@ -31,4 +34,12 @@ interface Randomable extends TypeClassable
      * @return string
      */
     public function bytes(int $length) : string;
+
+
+    /**
+     * Generate a random bytes string of given length and return as BinaryData
+     * @param int $length
+     * @return BinaryData
+     */
+    public function binary(int $length) : BinaryData;
 }
