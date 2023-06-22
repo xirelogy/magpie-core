@@ -3,6 +3,7 @@
 namespace Magpie\Cryptos\Contents;
 
 use Magpie\General\Concepts\BinaryDataProvidable;
+use Magpie\Objects\BinaryData;
 
 /**
  * DER format to store cryptographic related data
@@ -13,6 +14,17 @@ class DerCryptoFormatContent extends CryptoFormatContent
      * Current type class
      */
     public const TYPECLASS = 'der';
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function onGetBinaryBlocks() : iterable
+    {
+        $data = $this->data->getData();
+
+        yield new BinaryBlockContent(null, BinaryData::fromBinary($data));
+    }
 
 
     /**

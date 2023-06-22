@@ -7,8 +7,9 @@ use Carbon\CarbonInterface;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\CommonPublicKey;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Algorithms\Hashes\CommonHashTypeClass;
-use Magpie\Cryptos\Contents\CryptoFormatContent;
+use Magpie\Cryptos\Contents\BinaryBlockContent;
 use Magpie\Cryptos\Contents\ExportOption;
+use Magpie\Cryptos\Contents\PemCryptoFormatContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Numerals;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplAsymmKey;
@@ -219,7 +220,10 @@ class SpecCertificate extends Certificate
         if ($verifier instanceof SpecCertificate) {
             return $verifier->inCert;
         } elseif ($verifier instanceof Certificate) {
-            return SpecCertificate::specificImport($verifier->export())->inCert;
+            $source = PemCryptoFormatContent::fromData($verifier->export());
+            $cert = iter_first(SpecCertificate::onImport($source, null));
+            if (!$cert instanceof SpecCertificate) throw new UnsupportedValueException($verifier, _l('certificate verifier'));
+            return $cert->inCert;
         } else if ($verifier instanceof PublicKey) {
             return openssl_pkey_get_public($verifier->export());
         } else {
@@ -248,11 +252,13 @@ class SpecCertificate extends Certificate
     /**
      * @inheritDoc
      */
-    protected static function specificImport(CryptoFormatContent $source) : static
+    protected static function specificImportBinary(BinaryBlockContent $source, ?string $password) : ?static
     {
-        $openSslSource = ImportExport::readAsOpenSslPem($source, 'CERTIFICATE');
+        if ($source->type !== null && $source->type !== 'CERTIFICATE') return null;
 
-        $inCert = ErrorHandling::execute(fn () => openssl_x509_read($openSslSource->pemData));
+        $pemData = ImportExport::formatAsOpenSslPem($source->data, 'CERTIFICATE');
+
+        $inCert = ErrorHandling::execute(fn () => openssl_x509_read($pemData));
 
         return static::_fromRaw($inCert);
     }

@@ -2,7 +2,14 @@
 
 namespace Magpie\Cryptos\Contents;
 
+use Magpie\Cryptos\Exceptions\CryptoException;
+use Magpie\Cryptos\Exceptions\GeneralCryptoException;
+use Magpie\Exceptions\GeneralPersistenceException;
+use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Exceptions\StreamException;
+use Magpie\Exceptions\StreamReadFailureException;
+use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Contents\SimpleBinaryContent;
@@ -45,6 +52,38 @@ abstract class CryptoFormatContent extends CommonObject implements TypeClassable
     {
         $this->password = $password;
         return $this;
+    }
+
+
+    /**
+     * Get all associated binary blocks (in DER format)
+     * @return iterable<BinaryBlockContent>
+     * @throws SafetyCommonException
+     * @throws CryptoException
+     * @throws PersistenceException
+     * @throws StreamException
+     */
+    public final function getBinaryBlocks() : iterable
+    {
+        yield from $this->onGetBinaryBlocks();
+    }
+
+
+    /**
+     * Get all associated binary blocks (in DER format)
+     * @return iterable<BinaryBlockContent>
+     * @throws SafetyCommonException
+     * @throws CryptoException
+     * @throws PersistenceException
+     * @throws StreamException
+     */
+    protected function onGetBinaryBlocks() : iterable
+    {
+        _throwable(1) ?? throw new GeneralCryptoException();
+        _throwable(2) ?? throw new GeneralPersistenceException();
+        _throwable(2) ?? throw new StreamReadFailureException();
+
+        throw new UnsupportedValueException($this, _l('binary blocks from crypto format content'));
     }
 
 

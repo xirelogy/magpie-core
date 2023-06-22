@@ -5,6 +5,7 @@ namespace Magpie\Cryptos\X509;
 use Carbon\CarbonInterface;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Algorithms\Hashes\Hasher;
+use Magpie\Cryptos\Contents\BinaryBlockContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Context;
 use Magpie\Cryptos\CryptoObject;
@@ -147,11 +148,32 @@ abstract class Certificate extends CryptoObject implements TypeClassable
     /**
      * @inheritDoc
      */
-    protected static function onImport(CryptoFormatContent $source, ?Context $context) : static
+    protected static function onImport(CryptoFormatContent $source, ?Context $context) : iterable
     {
         if ($context === null) {
             foreach (CertificateImporter::getTryImporterLists() as $tryImporter) {
                 $ret = Excepts::noThrow(fn () => $tryImporter->import($source, static::class));
+                if ($ret !== null) {
+                    foreach ($ret as $subRet) {
+                        if ($subRet instanceof static) yield $subRet;
+                    }
+                    return;
+                }
+            }
+        }
+
+        yield from parent::onImport($source, $context);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function onImportFromBinary(BinaryBlockContent $source, ?string $password, ?Context $context) : ?self
+    {
+        if ($context === null) {
+            foreach (CertificateImporter::getTryImporterLists() as $tryImporter) {
+                $ret = Excepts::noThrow(fn () => $tryImporter->importBinary($source, $password, static::class));
                 if ($ret instanceof static) return $ret;
             }
         }
@@ -161,18 +183,19 @@ abstract class Certificate extends CryptoObject implements TypeClassable
         $className = ClassFactory::resolve($context->getTypeClass(), self::class);
         if (!is_subclass_of($className, self::class)) throw new ClassNotOfTypeException($className, self::class);
 
-        return $className::specificImport($source);
+        return $className::specificImportBinary($source, $password);
     }
 
 
     /**
-     * Specifically parse from certificate source
-     * @param CryptoFormatContent $source
-     * @return static
+     * Specifically parse from binary block content source
+     * @param BinaryBlockContent $source
+     * @param string|null $password
+     * @return static|null
      * @throws SafetyCommonException
      * @throws PersistenceException
      * @throws StreamException
      * @throws CryptoException
      */
-    protected abstract static function specificImport(CryptoFormatContent $source) : static;
+    protected abstract static function specificImportBinary(BinaryBlockContent $source, ?string $password) : ?static;
 }
