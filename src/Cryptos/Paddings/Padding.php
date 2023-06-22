@@ -2,17 +2,27 @@
 
 namespace Magpie\Cryptos\Paddings;
 
+use Exception;
 use Magpie\Cryptos\Exceptions\CryptoException;
+use Magpie\Cryptos\Exceptions\WrongPaddingCryptoException;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Facades\Log;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
+use Magpie\General\Str;
 
 /**
  * Padding schema
  */
 abstract class Padding implements TypeClassable
 {
+    /**
+     * @var bool Will throw exception when decode error
+     */
+    protected bool $isThrowOnDecodeError = true;
+
+
     /**
      * Encode a payload, applying the padding
      * @param string $payload
@@ -31,6 +41,23 @@ abstract class Padding implements TypeClassable
      * @throws CryptoException
      */
     public abstract function decode(string $payload) : string;
+
+
+    /**
+     * Handle error while decoding a payload
+     * @param string $payload
+     * @param string|null $message
+     * @return string
+     * @throws CryptoException
+     */
+    protected function handleDecodeError(string $payload, ?string $message = null) : string
+    {
+        $ex = !Str::isNullOrEmpty($message) ? new Exception($message) : null;
+        if ($this->isThrowOnDecodeError) throw new WrongPaddingCryptoException(static::getTypeClass(), previous: $ex);
+
+        Log::warning('Wrong padding', [$message]);
+        return $payload;
+    }
 
 
     /**

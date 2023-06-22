@@ -3,6 +3,7 @@
 namespace Magpie\Cryptos\Paddings;
 
 use Magpie\Cryptos\Algorithms\SymmetricCryptos\CipherSetup;
+use Magpie\Cryptos\Paddings\Traits\CommonPkcsBlockPadding;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 
 /**
@@ -11,6 +12,8 @@ use Magpie\General\Factories\Annotations\FactoryTypeClass;
 #[FactoryTypeClass(Pkcs7Padding::TYPECLASS, Padding::class)]
 class Pkcs7Padding extends Padding
 {
+    use CommonPkcsBlockPadding;
+
     /**
      * Current type class
      */
@@ -46,11 +49,7 @@ class Pkcs7Padding extends Padding
      */
     public function encode(string $payload) : string
     {
-        $blockSize = $this->blockSize;
-
-        $pad = $blockSize - (strlen($payload) % $blockSize);
-        if ($pad === 0) $pad = $blockSize;
-        return $payload . str_repeat(chr($pad), $pad);
+        return $this->blockEncode($payload, $this->blockSize);
     }
 
 
@@ -59,12 +58,7 @@ class Pkcs7Padding extends Padding
      */
     public function decode(string $payload) : string
     {
-        $blockSize = $this->blockSize;
-
-        $pad = ord($payload[strlen($payload) - 1]);
-        if ($pad < 1 || $pad > $blockSize) return $payload;
-
-        return substr($payload, 0, strlen($payload) - $pad);
+        return $this->blockDecode($payload, $this->blockSize);
     }
 
 
