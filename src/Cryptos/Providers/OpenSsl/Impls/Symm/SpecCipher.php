@@ -6,6 +6,9 @@ use Magpie\Cryptos\Algorithms\SymmetricCryptos\AeadDecryptionCipherContext;
 use Magpie\Cryptos\Algorithms\SymmetricCryptos\AeadEncryptionCipherContext;
 use Magpie\Cryptos\Algorithms\SymmetricCryptos\Cipher;
 use Magpie\Cryptos\Algorithms\SymmetricCryptos\CipherContext;
+use Magpie\Cryptos\Exceptions\DecryptionFailedException;
+use Magpie\Cryptos\Exceptions\EncryptionFailedException;
+use Magpie\Cryptos\Exceptions\WrongPaddingCryptoException;
 use Magpie\Cryptos\Paddings\NoPadding;
 use Magpie\Cryptos\Paddings\Padding;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\ErrorHandling;
@@ -66,7 +69,7 @@ class SpecCipher extends Cipher
             $ciphertext = ErrorHandling::execute(fn () => openssl_encrypt($plaintext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv));
         }
 
-        if ($ciphertext === false) throw ErrorHandling::captureError();
+        if ($ciphertext === false) throw new EncryptionFailedException(previous: ErrorHandling::captureError());
 
         return $ciphertext;
     }
@@ -87,6 +90,10 @@ class SpecCipher extends Cipher
 
         if ($plaintext === false) throw ErrorHandling::captureError();
 
-        return $this->padding->decode($plaintext);
+        try {
+            return $this->padding->decode($plaintext);
+        } catch (WrongPaddingCryptoException $ex) {
+            throw new DecryptionFailedException(previous: $ex);
+        }
     }
 }
