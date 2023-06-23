@@ -9,6 +9,8 @@ use Magpie\Cryptos\Contents\BinaryBlockContent;
 use Magpie\Cryptos\Contents\CryptoContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
+use Magpie\Cryptos\Exceptions\DecryptionFailedException;
+use Magpie\Cryptos\Exceptions\PasswordRequiredCryptoException;
 use Magpie\Cryptos\Providers\Importer;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
@@ -187,6 +189,9 @@ abstract class CryptoObject implements Packable, Importable, Exportable
     {
         try {
             return $fn();
+        } catch (PasswordRequiredCryptoException|DecryptionFailedException $ex) {
+            // These two exceptions cannot be ignored
+            throw $ex;
         } catch (Throwable) {
             // Ignored with default return
             return null;
