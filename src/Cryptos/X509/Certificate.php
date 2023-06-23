@@ -6,7 +6,6 @@ use Carbon\CarbonInterface;
 use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PublicKey;
 use Magpie\Cryptos\Algorithms\Hashes\Hasher;
 use Magpie\Cryptos\Contents\BinaryBlockContent;
-use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Context;
 use Magpie\Cryptos\CryptoObject;
 use Magpie\Cryptos\Exceptions\CryptoException;
@@ -19,7 +18,6 @@ use Magpie\Exceptions\StreamException;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Packs\PackContext;
-use Magpie\General\Sugars\Excepts;
 use Magpie\Objects\BinaryData;
 
 /**
@@ -148,35 +146,10 @@ abstract class Certificate extends CryptoObject implements TypeClassable
     /**
      * @inheritDoc
      */
-    protected static function onImport(CryptoFormatContent $source, ?Context $context) : iterable
-    {
-        if ($context === null) {
-            foreach (CertificateImporter::getTryImporterLists() as $tryImporter) {
-                $ret = Excepts::noThrow(fn () => $tryImporter->import($source, static::class));
-                if ($ret !== null) {
-                    foreach ($ret as $subRet) {
-                        if ($subRet instanceof static) yield $subRet;
-                    }
-                    return;
-                }
-            }
-        }
-
-        yield from parent::onImport($source, $context);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
     protected static function onImportFromBinary(BinaryBlockContent $source, ?string $password, ?Context $context) : ?self
     {
-        if ($context === null) {
-            foreach (CertificateImporter::getTryImporterLists() as $tryImporter) {
-                $ret = Excepts::noThrow(fn () => $tryImporter->importBinary($source, $password, static::class));
-                if ($ret instanceof static) return $ret;
-            }
-        }
+        $tryImported = static::onTryImportBinaryUsing(static::getImporterClass(), $source, $password, $context);
+        if ($tryImported instanceof static) return $tryImported;
 
         $context = $context ?? CertificateImporter::getDefaultContext();
 
@@ -198,4 +171,13 @@ abstract class Certificate extends CryptoObject implements TypeClassable
      * @throws CryptoException
      */
     protected abstract static function specificImportBinary(BinaryBlockContent $source, ?string $password) : ?static;
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static final function getImporterClass() : ?string
+    {
+        return CertificateImporter::class;
+    }
 }

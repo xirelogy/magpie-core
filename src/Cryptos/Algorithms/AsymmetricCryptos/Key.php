@@ -4,13 +4,11 @@ namespace Magpie\Cryptos\Algorithms\AsymmetricCryptos;
 
 use Magpie\Cryptos\Concepts\AlgoTypeClassable;
 use Magpie\Cryptos\Contents\BinaryBlockContent;
-use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Context;
 use Magpie\Cryptos\CryptoObject;
 use Magpie\Cryptos\Impls\ImplContext;
 use Magpie\Cryptos\Providers\AsymmetricKeyImporter;
 use Magpie\General\Packs\PackContext;
-use Magpie\General\Sugars\Excepts;
 
 /**
  * Asymmetric cryptography key
@@ -38,40 +36,24 @@ abstract class Key extends CryptoObject implements AlgoTypeClassable
     /**
      * @inheritDoc
      */
-    protected static function onImport(CryptoFormatContent $source, ?Context $context) : iterable
+    protected static function onImportFromBinary(BinaryBlockContent $source, ?string $password, ?Context $context) : ?self
     {
-        if ($context === null) {
-            foreach (AsymmetricKeyImporter::getTryImporterLists() as $tryImporter) {
-                $ret = Excepts::noThrow(fn () => $tryImporter->import($source, static::class));
-                if ($ret !== null) {
-                    foreach ($ret as $subRet) {
-                        if ($subRet instanceof static) yield $subRet;
-                    }
-                    return;
-                }
-            }
-        }
+        $tryImported = static::onTryImportBinaryUsing(static::getImporterClass(), $source, $password, $context);
+        if ($tryImported instanceof static) return $tryImported;
 
-        yield from parent::onImport($source, $context);
+        $context = $context ?? AsymmetricKeyImporter::getDefaultContext();
+
+        $implContext = ImplContext::initialize($context->getTypeClass());
+        return $implContext->parseAsymmetricKeyFromBinary($source, $password, static::isImportAsPrivate());
     }
 
 
     /**
      * @inheritDoc
      */
-    protected static function onImportFromBinary(BinaryBlockContent $source, ?string $password, ?Context $context) : ?self
+    protected static final function getImporterClass() : ?string
     {
-        if ($context === null) {
-            foreach (AsymmetricKeyImporter::getTryImporterLists() as $tryImporter) {
-                $ret = Excepts::noThrow(fn () => $tryImporter->importBinary($source, $password, static::class));
-                if ($ret instanceof static) return $ret;
-            }
-        }
-
-        $context = $context ?? AsymmetricKeyImporter::getDefaultContext();
-
-        $implContext = ImplContext::initialize($context->getTypeClass());
-        return $implContext->parseAsymmetricKeyFromBinary($source, $password, static::isImportAsPrivate());
+        return AsymmetricKeyImporter::class;
     }
 
 
