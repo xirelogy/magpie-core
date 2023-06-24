@@ -2,6 +2,7 @@
 
 namespace Magpie\Cryptos;
 
+use Magpie\Cryptos\Algorithms\AsymmetricCryptos\Key;
 use Magpie\Cryptos\Concepts\Exportable;
 use Magpie\Cryptos\Concepts\Importable;
 use Magpie\Cryptos\Concepts\TryImporterListable;
@@ -11,6 +12,7 @@ use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Impls\TryErrorHandling;
 use Magpie\Cryptos\Providers\Importer;
+use Magpie\Cryptos\X509\Certificate;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
@@ -147,7 +149,19 @@ abstract class CryptoObject implements Packable, Importable, Exportable
      * @throws PersistenceException
      * @throws StreamException
      */
-    protected static abstract function onImportFromBinary(BinaryBlockContent $source, ?string $password, ?Context $context) : ?self;
+    protected static function onImportFromBinary(BinaryBlockContent $source, ?string $password, ?Context $context) : ?self
+    {
+        return match ($source->type) {
+            'CERTIFICATE' ,
+                => Certificate::onImportFromBinary($source, $password, $context),
+            'PUBLIC KEY',
+            'PRIVATE KEY',
+            'ENCRYPTED PRIVATE KEY',
+                => Key::onImportFromBinary($source, $password, $context),
+            default,
+                => null,
+        };
+    }
 
 
     /**
