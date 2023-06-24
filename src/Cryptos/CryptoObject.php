@@ -9,8 +9,7 @@ use Magpie\Cryptos\Contents\BinaryBlockContent;
 use Magpie\Cryptos\Contents\CryptoContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
-use Magpie\Cryptos\Exceptions\DecryptionFailedException;
-use Magpie\Cryptos\Exceptions\PasswordRequiredCryptoException;
+use Magpie\Cryptos\Impls\TryErrorHandling;
 use Magpie\Cryptos\Providers\Importer;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
@@ -20,7 +19,6 @@ use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\Packable;
 use Magpie\General\Packs\PackContext;
 use Magpie\General\Traits\CommonPackable;
-use Throwable;
 
 /**
  * An object (handle) related to cryptographic operations
@@ -123,7 +121,7 @@ abstract class CryptoObject implements Packable, Importable, Exportable
         if (!is_subclass_of($importerClassName, TryImporterListable::class)) return null;
 
         foreach ($importerClassName::getTryImporterLists() as $tryImporter) {
-            $importedRets = static::importNoThrow(fn () => $tryImporter->import($source, static::class));
+            $importedRets = TryErrorHandling::noThrow(fn () => $tryImporter->import($source, static::class));
             if ($importedRets === null) continue;
 
             $ret = [];
@@ -170,32 +168,11 @@ abstract class CryptoObject implements Packable, Importable, Exportable
         if (!is_subclass_of($importerClassName, TryImporterListable::class)) return null;
 
         foreach ($importerClassName::getTryImporterLists() as $tryImporter) {
-            $ret = static::importNoThrow(fn () => $tryImporter->importBinary($source, $password, static::class));
+            $ret = TryErrorHandling::noThrow(fn () => $tryImporter->importBinary($source, $password, static::class));
             if ($ret instanceof static) return $ret;
         }
 
         return null;
-    }
-
-
-    /**
-     * Safely try to import
-     * @param callable():mixed $fn
-     * @return mixed
-     * @throws SafetyCommonException
-     * @throws CryptoException
-     */
-    protected static final function importNoThrow(callable $fn) : mixed
-    {
-        try {
-            return $fn();
-        } catch (PasswordRequiredCryptoException|DecryptionFailedException $ex) {
-            // These two exceptions cannot be ignored
-            throw $ex;
-        } catch (Throwable) {
-            // Ignored with default return
-            return null;
-        }
     }
 
 
