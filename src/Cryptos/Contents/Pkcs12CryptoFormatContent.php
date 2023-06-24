@@ -2,6 +2,8 @@
 
 namespace Magpie\Cryptos\Contents;
 
+use Magpie\Cryptos\Impls\TryErrorHandling;
+use Magpie\Cryptos\Providers\Pkcs12CryptoFormatContentHandler;
 use Magpie\General\Concepts\BinaryDataProvidable;
 
 /**
@@ -13,6 +15,20 @@ class Pkcs12CryptoFormatContent extends CryptoFormatContent
      * Current type class
      */
     public const TYPECLASS = 'pkcs12';
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function onGetBinaryBlocks() : iterable
+    {
+        foreach (Pkcs12CryptoFormatContentHandler::getTryContentHandleLists() as $handler) {
+            $result = TryErrorHandling::noThrow(fn () => $handler->getBinaryBlocks($this));
+            if ($result !== null) return $result;
+        }
+
+        return parent::onGetBinaryBlocks();
+    }
 
 
     /**
