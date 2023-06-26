@@ -64,7 +64,7 @@ class SpecImplContext extends ImplContext
     /**
      * @inheritDoc
      */
-    public function createSymmetricCipher(string $algoTypeClass, ?int $blockNumBits) : ImplSymmCipher
+    public function createSymmetricCipher(string $algoTypeClass, ?int $blockNumBits, ?string $mode) : ImplSymmCipher
     {
         $openSslAlgoTypeClass = SpecImplSymmAlgorithms::translateAlgorithm($algoTypeClass);
         $setup = SpecImplSymmAlgorithms::getAlgorithm($openSslAlgoTypeClass);
@@ -78,7 +78,7 @@ class SpecImplContext extends ImplContext
             $setupBlock = iter_first($setup->blocks);
         }
 
-        return new SpecImplSymmCipher($algoTypeClass, $openSslAlgoTypeClass, $setup->hasMultiBlockSize, $setupBlock);
+        return new SpecImplSymmCipher($algoTypeClass, $openSslAlgoTypeClass, $setup->hasMultiBlockSize, $setupBlock, $mode);
     }
 
 

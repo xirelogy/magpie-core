@@ -53,16 +53,11 @@ class CipherSetup implements Packable, AlgoTypeClassable
      * Constructor
      * @param string $algoTypeClass
      * @param ImplSymmCipher $impl
-     * @throws SafetyCommonException
-     * @throws CryptoException
      */
     protected function __construct(string $algoTypeClass, ImplSymmCipher $impl)
     {
         $this->algoTypeClass = $algoTypeClass;
         $this->impl = $impl;
-
-        $defaultMode = $impl->getDefaultMode();
-        if ($defaultMode !== null) $this->mode = $impl->setMode($defaultMode);
     }
 
 
@@ -91,6 +86,7 @@ class CipherSetup implements Packable, AlgoTypeClassable
      * @return $this
      * @throws SafetyCommonException
      * @throws CryptoException
+     * @deprecated Mode shall be set during initialization and no longer changed.
      */
     public function withMode(string $mode) : static
     {
@@ -196,15 +192,16 @@ class CipherSetup implements Packable, AlgoTypeClassable
      * Initialize setup
      * @param string $algoTypeClass Algorithm type class
      * @param int|null $blockNumBits Block size (in bits)
+     * @param string|null $mode Algorithm mode
      * @param Context|null $context
      * @return static
      * @throws SafetyCommonException
      * @throws CryptoException
      */
-    public static function initialize(string $algoTypeClass, ?int $blockNumBits = null, ?Context $context = null) : static
+    public static function initialize(string $algoTypeClass, ?int $blockNumBits = null, ?string $mode = null, ?Context $context = null) : static
     {
         $inContext = static::getImplContext($context);
-        $impl = $inContext->createSymmetricCipher($algoTypeClass, $blockNumBits);
+        $impl = $inContext->createSymmetricCipher($algoTypeClass, $blockNumBits, $mode);
 
         return new static($algoTypeClass, $impl);
     }

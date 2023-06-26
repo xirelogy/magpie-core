@@ -5,6 +5,7 @@ namespace Magpie\Cryptos\Providers\OpenSsl\Impls\Symm;
 use Magpie\Cryptos\Impls\ImplSymmCipher;
 use Magpie\Cryptos\Paddings\Padding;
 use Magpie\Exceptions\InvalidArgumentException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\Exceptions\UnsupportedValueException;
 
@@ -38,7 +39,7 @@ class SpecImplSymmCipher implements ImplSymmCipher
     /**
      * @var string|null Current selected mode
      */
-    protected ?string $mode = null;
+    protected ?string $mode;
 
 
     /**
@@ -47,13 +48,21 @@ class SpecImplSymmCipher implements ImplSymmCipher
      * @param string $openSslAlgoTypeClass
      * @param bool $hasMultiBlockSize
      * @param AlgorithmBlockSetup $blockSetup
+     * @param string|null $mode
+     * @throws SafetyCommonException
      */
-    public function __construct(string $algoTypeClass, string $openSslAlgoTypeClass, bool $hasMultiBlockSize, AlgorithmBlockSetup $blockSetup)
+    public function __construct(string $algoTypeClass, string $openSslAlgoTypeClass, bool $hasMultiBlockSize, AlgorithmBlockSetup $blockSetup, ?string $mode)
     {
         $this->algoTypeClass = $algoTypeClass;
         $this->openSslAlgoTypeClass = $openSslAlgoTypeClass;
         $this->hasMultiBlockSize = $hasMultiBlockSize;
         $this->blockSetup = $blockSetup;
+
+        if ($mode !== null && !array_key_exists($mode, $blockSetup->modes)) {
+            throw new InvalidArgumentException('mode');
+        }
+
+        $this->mode = static::checkMode($mode ?? static::getDefaultMode($blockSetup), $blockSetup);
     }
 
 
@@ -71,21 +80,8 @@ class SpecImplSymmCipher implements ImplSymmCipher
      */
     public function setMode(string $mode) : string
     {
-        if (!array_key_exists($mode, $this->blockSetup->modes)) throw new InvalidArgumentException('mode');
-
-        $this->mode = $mode;
+        $this->mode = static::checkMode($mode, $this->blockSetup);
         return $mode;
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getDefaultMode() : ?string
-    {
-        if (array_key_exists(static::DEFAULT_MODE, $this->blockSetup->modes)) return static::DEFAULT_MODE;
-        if (count($this->blockSetup->modes) > 0) return iter_first($this->blockSetup->modes);
-        return null;
     }
 
 
@@ -149,5 +145,34 @@ class SpecImplSymmCipher implements ImplSymmCipher
         if ($this->mode !== null) $ret .= '-' . $this->mode;
 
         return $ret;
+    }
+
+
+    /**
+     * Check that the mode is supported
+     * @param string|null $mode
+     * @param AlgorithmBlockSetup $blockSetup
+     * @return string|null
+     * @throws SafetyCommonException
+     */
+    protected static function checkMode(?string $mode, AlgorithmBlockSetup $blockSetup) : ?string
+    {
+        if ($mode === null) return null;
+
+        if (!array_key_exists($mode, $blockSetup->modes)) throw new InvalidArgumentException('mode');
+        return $mode;
+    }
+
+
+    /**
+     * Get the default mode
+     * @param AlgorithmBlockSetup $blockSetup
+     * @return string|null
+     */
+    protected static function getDefaultMode(AlgorithmBlockSetup $blockSetup) : ?string
+    {
+        if (array_key_exists(static::DEFAULT_MODE, $blockSetup->modes)) return static::DEFAULT_MODE;
+        if (count($blockSetup->modes) > 0) return iter_first($blockSetup->modes);
+        return null;
     }
 }
