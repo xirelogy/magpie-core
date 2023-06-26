@@ -62,11 +62,11 @@ class SpecCipher extends Cipher
             $aad = $context->aad->asBinary();
             $tagLength = $context->tagLength;
             $ciphertext = ErrorHandling::execute(function () use($plaintext, &$outTag, $aad, $tagLength) {
-                return openssl_encrypt($plaintext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv, $outTag, $aad, $tagLength);
+                return openssl_encrypt($plaintext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv ?? '', $outTag, $aad, $tagLength);
             });
             $context->outTag = BinaryData::fromBinary($outTag);
         } else {
-            $ciphertext = ErrorHandling::execute(fn () => openssl_encrypt($plaintext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv));
+            $ciphertext = ErrorHandling::execute(fn () => openssl_encrypt($plaintext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv ?? ''));
         }
 
         if ($ciphertext === false) throw new EncryptionFailedException(previous: ErrorHandling::captureError());
@@ -83,9 +83,9 @@ class SpecCipher extends Cipher
         if ($context instanceof AeadDecryptionCipherContext) {
             $tag = $context->tag->asBinary();
             $aad = $context->aad->asBinary();
-            $plaintext = ErrorHandling::execute(fn () => openssl_decrypt($ciphertext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv, $tag, $aad));
+            $plaintext = ErrorHandling::execute(fn () => openssl_decrypt($ciphertext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv ?? '', $tag, $aad));
         } else {
-            $plaintext = ErrorHandling::execute(fn () => openssl_decrypt($ciphertext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv));
+            $plaintext = ErrorHandling::execute(fn () => openssl_decrypt($ciphertext, $this->openSslAlgoName, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv ?? ''));
         }
 
         if ($plaintext === false) throw ErrorHandling::captureError();
