@@ -73,7 +73,9 @@ class SpecContext extends Context
         ClassFactory::includeDirectory(__DIR__);
         ClassFactory::includeDirectory(__DIR__ . '/Impls');
 
-        Pkcs12CryptoFormatContentHandler::registerTryImporter(static::createPkcs12ContentHandler());
+        if (extension_loaded('openssl')) {
+            Pkcs12CryptoFormatContentHandler::registerTryImporter(static::createPkcs12ContentHandler());
+        }
 
         ClassFactory::setDefaultTypeClassCheck(Context::class, function () : ?string {
             if (!extension_loaded('openssl')) return null;
