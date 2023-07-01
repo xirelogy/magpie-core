@@ -12,6 +12,7 @@ use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Exceptions\DecryptionFailedException;
 use Magpie\Cryptos\Exceptions\PasswordRequiredCryptoException;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\ErrorHandling;
+use Magpie\Cryptos\Providers\OpenSsl\Impls\Symm\SpecSymmetricCipherAlgorithms;
 use Magpie\Cryptos\Providers\Pkcs12CryptoFormatContentHandler;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\General\Factories\ClassFactory;
@@ -74,6 +75,7 @@ class SpecContext extends Context
         ClassFactory::includeDirectory(__DIR__ . '/Impls');
 
         if (extension_loaded('openssl')) {
+            SpecSymmetricCipherAlgorithms::register();
             Pkcs12CryptoFormatContentHandler::registerTryImporter(static::createPkcs12ContentHandler());
         }
 

@@ -1,0 +1,8 @@
+{
+  "Provided bit size is invalid": "所提供的比特大小不正确",
+  "Provided bit size {{0}} is invalid": "所提供的比特大小{{0}}不正确",
+  "Provided bit size {{0}} is invalid, {{1}} expected": "所提供的比特大小{{0}}不正确，应为{{1}}",
+  "Provided {{1}} bit size {{0}} is invalid": "所提供的{{1}}比特大小{{0}}不正确",
+  "Provided {{1}} bit size {{0}} is invalid, {{2}} expected": "所提供的{{1}}比特大小{{0}}不正确，应为{{2}}",
+  "": ""
+}

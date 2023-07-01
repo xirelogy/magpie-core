@@ -28,18 +28,6 @@ abstract class ImplContext implements TypeClassable
 
 
     /**
-     * Create symmetric key cipher
-     * @param string $algoTypeClass
-     * @param int|null $blockNumBits
-     * @param string|null $mode
-     * @return ImplSymmCipher
-     * @throws SafetyCommonException
-     * @throws CryptoException
-     */
-    public abstract function createSymmetricCipher(string $algoTypeClass, ?int $blockNumBits, ?string $mode) : ImplSymmCipher;
-
-
-    /**
      * Try to parse and import asymmetric key
      * @param BinaryBlockContent $source
      * @param string|null $password

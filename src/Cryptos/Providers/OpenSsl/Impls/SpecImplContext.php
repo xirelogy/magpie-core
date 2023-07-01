@@ -11,17 +11,11 @@ use Magpie\Cryptos\Contents\BinaryBlockContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Impls\ImplContext;
 use Magpie\Cryptos\Impls\ImplEcCurve;
-use Magpie\Cryptos\Impls\ImplSymmCipher;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplAsymmKey;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplAsymmKeyGenerator;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplEcCurve;
-use Magpie\Cryptos\Providers\OpenSsl\Impls\Symm\SpecImplSymmAlgorithms;
-use Magpie\Cryptos\Providers\OpenSsl\Impls\Symm\SpecImplSymmCipher;
 use Magpie\Cryptos\Providers\OpenSsl\SpecContext;
-use Magpie\Exceptions\MissingArgumentException;
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\Exceptions\UnsupportedException;
-use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\Objects\BinaryData;
 
@@ -56,27 +50,6 @@ class SpecImplContext extends ImplContext
         $ret = openssl_random_pseudo_bytes($numBytes);
 
         return BinaryData::fromBinary($ret);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function createSymmetricCipher(string $algoTypeClass, ?int $blockNumBits, ?string $mode) : ImplSymmCipher
-    {
-        $openSslAlgoTypeClass = SpecImplSymmAlgorithms::translateAlgorithm($algoTypeClass);
-        $setup = SpecImplSymmAlgorithms::getAlgorithm($openSslAlgoTypeClass);
-
-        if ($setup->hasMultiBlockSize) {
-            if ($blockNumBits === null) throw new MissingArgumentException('blockNumBits');
-            if (!array_key_exists($blockNumBits, $setup->blocks)) throw new UnsupportedValueException($blockNumBits, _l('block size'));
-            $setupBlock = $setup->blocks[$blockNumBits];
-        } else {
-            if ($blockNumBits !== null) throw new UnsupportedException(_l('Block size cannot be specified'));
-            $setupBlock = iter_first($setup->blocks);
-        }
-
-        return new SpecImplSymmCipher($algoTypeClass, $openSslAlgoTypeClass, $setup->hasMultiBlockSize, $setupBlock, $mode);
     }
 
 

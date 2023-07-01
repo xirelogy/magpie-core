@@ -8,6 +8,7 @@ use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Impls\ImplContext;
 use Magpie\Cryptos\Impls\ImplSymmCipher;
 use Magpie\Cryptos\Paddings\Padding;
+use Magpie\Cryptos\Providers\SymmetricCipherAlgorithms;
 use Magpie\Exceptions\InvalidArgumentException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\Packable;
@@ -200,10 +201,7 @@ class CipherSetup implements Packable, AlgoTypeClassable
      */
     public static function initialize(string $algoTypeClass, ?int $blockNumBits = null, ?string $mode = null, ?Context $context = null) : static
     {
-        $inContext = static::getImplContext($context);
-        $impl = $inContext->createSymmetricCipher($algoTypeClass, $blockNumBits, $mode);
-
-        return new static($algoTypeClass, $impl);
+        return SymmetricCipherAlgorithms::_initializeCipherSetup($algoTypeClass, $blockNumBits, $mode, $context);
     }
 
 
