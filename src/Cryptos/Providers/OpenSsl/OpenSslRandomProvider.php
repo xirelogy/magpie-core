@@ -6,6 +6,9 @@ use Magpie\General\Concepts\Randomable;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\General\Randoms\RandomProvider;
 
+/**
+ * OpenSSL's random provider
+ */
 #[FactoryTypeClass(OpenSslRandomProvider::TYPECLASS, Randomable::class)]
 class OpenSslRandomProvider extends RandomProvider
 {
