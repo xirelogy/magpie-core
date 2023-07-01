@@ -20,7 +20,7 @@ use Magpie\System\Kernel\BootContext;
 use Magpie\System\Kernel\BootRegistrar;
 
 /**
- * X.509 certificate supported by OpenSSL
+ * OpenSSL specific context
  */
 #[FactoryTypeClass(SpecContext::TYPECLASS, Context::class)]
 class SpecContext extends Context
