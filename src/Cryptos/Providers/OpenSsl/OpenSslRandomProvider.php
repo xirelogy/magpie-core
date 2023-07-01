@@ -15,7 +15,7 @@ class OpenSslRandomProvider extends RandomProvider
     /**
      * Current type class
      */
-    public const TYPECLASS = 'openssl';
+    public const TYPECLASS = SpecContext::TYPECLASS;
 
 
     /**
