@@ -35,6 +35,10 @@ abstract class RouteDomain
      */
     public readonly ?string $domain;
     /**
+     * @var array<string> Alternative domains that should be routed to this domain
+     */
+    public readonly array $altDomains;
+    /**
      * @var bool If current domain is booted up
      */
     private bool $isBoot = false;
@@ -51,10 +55,12 @@ abstract class RouteDomain
     /**
      * Constructor
      * @param string|null $domain
+     * @param string ...$altDomains
      */
-    protected function __construct(?string $domain = null)
+    protected function __construct(?string $domain = null, string ...$altDomains)
     {
         $this->domain = $domain !== null ? trim($domain) : null;
+        $this->altDomains = $altDomains;
         $this->middlewares = new RouteMiddlewareCollection();
     }
 

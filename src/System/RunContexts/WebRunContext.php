@@ -42,7 +42,11 @@ class WebRunContext extends RunContext
         $appConfig = Kernel::current()->getConfig();
 
         $hostname = $this->request->getHostname();
-        $routeDomain = RouteRegistry::_route($hostname);
+        $routeDomain = RouteRegistry::_route($hostname, $domainArguments);
+
+        if ($domainArguments !== null) {
+            $this->request->domainArguments = Request::_createRouteArgumentsCollectionFrom($domainArguments);
+        }
 
         try {
             $this->onRun($appConfig, $routeDomain, $this->request);

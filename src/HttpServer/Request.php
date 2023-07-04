@@ -30,6 +30,10 @@ class Request implements Capturable
      */
     public readonly RouteContext $routeContext;
     /**
+     * @var UserCollectable Domain arguments
+     */
+    public UserCollectable $domainArguments;
+    /**
      * @var UserCollectable Route arguments
      */
     public UserCollectable $routeArguments;
@@ -73,6 +77,7 @@ class Request implements Capturable
     protected function __construct(UserCollectable $queries, UserCollectable $posts, UserCollectable $cookies, ServerCollection $serverVars)
     {
         $this->routeContext = new ActualRouteContext();
+        $this->domainArguments = static::_createRouteArgumentsCollectionFrom([]);
         $this->routeArguments = static::_createRouteArgumentsCollectionFrom([]);
         $this->queries = $queries;
         $this->posts = $posts;
