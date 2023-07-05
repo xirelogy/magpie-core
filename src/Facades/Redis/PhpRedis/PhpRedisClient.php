@@ -4,6 +4,7 @@
 
 namespace Magpie\Facades\Redis\PhpRedis;
 
+use Closure;
 use Exception;
 use Magpie\Exceptions\InvalidDataException;
 use Magpie\Exceptions\MissingArgumentException;
@@ -44,20 +45,24 @@ class PhpRedisClient extends RedisClient
     public const TYPECLASS = 'phpredis';
 
     /**
-     * @var Redis The underlying redis connection object
+     * @var RedisClientConfig Redis configuration
      */
-    protected Redis $redis;
+    protected readonly RedisClientConfig $config;
+    /**
+     * @var Redis|null The underlying redis connection object
+     */
+    private ?Redis $redis = null;
 
 
     /**
      * Constructor
-     * @param Redis $redis
+     * @param RedisClientConfig $config
      */
-    protected function __construct(Redis $redis)
+    protected function __construct(RedisClientConfig $config)
     {
         parent::__construct();
 
-        $this->redis = $redis;
+        $this->config = $config;
     }
 
 
@@ -84,7 +89,8 @@ class PhpRedisClient extends RedisClient
      */
     public function has(string $key) : bool
     {
-        return static::safeExecute('exists', fn () => $this->redis->exists($key));
+        $redis = $this->ensureRedis();
+        return static::safeExecute('exists', fn() => $redis->exists($key));
     }
 
 
@@ -93,7 +99,8 @@ class PhpRedisClient extends RedisClient
      */
     public function get(string $key) : ?string
     {
-        $ret = static::safeExecute('get', fn () => $this->redis->get($key));
+        $redis = $this->ensureRedis();
+        $ret = static::safeExecute('get', fn() => $redis->get($key));
 
         return $ret !== false ? "$ret" : null;
     }
@@ -104,9 +111,10 @@ class PhpRedisClient extends RedisClient
      */
     public function getMultiple(iterable $keys) : iterable
     {
+        $redis = $this->ensureRedis();
         $keys = iter_flatten($keys, false);
 
-        $values = static::safeExecute('mGet', fn () => $this->redis->mGet($keys));
+        $values = static::safeExecute('mGet', fn() => $redis->mGet($keys));
 
         $i = 0;
         foreach ($values as $value) {
@@ -122,18 +130,19 @@ class PhpRedisClient extends RedisClient
      */
     public function setWithOptions(string $key, string $value) : RedisSetCommand
     {
-        return new class($this->redis, $key, $value) extends RedisSetCommand {
+        return new class($this->ensureRedis(...), $key, $value) extends RedisSetCommand {
             /**
              * Constructor
-             * @param Redis $redis
+             * @param Closure $redisFn
              * @param string $key
              * @param string $value
              */
             public function __construct(
-                protected Redis $redis,
+                protected Closure $redisFn,
                 protected string $key,
                 protected string $value,
-            ) {
+            )
+            {
 
             }
 
@@ -143,6 +152,8 @@ class PhpRedisClient extends RedisClient
              */
             public function go() : bool
             {
+                $redis = ($this->redisFn)();
+
                 $options = [];
 
                 if ($this->ifNotYetExist) {
@@ -166,9 +177,9 @@ class PhpRedisClient extends RedisClient
 
                 try {
                     if (count($options) > 0) {
-                        return $this->redis->set($this->key, $this->value, $options) !== false;
+                        return $redis->set($this->key, $this->value, $options) !== false;
                     } else {
-                        return $this->redis->set($this->key, $this->value) !== false;
+                        return $redis->set($this->key, $this->value) !== false;
                     }
                 } catch (RedisSafetyException $ex) {
                     throw $ex;
@@ -187,12 +198,14 @@ class PhpRedisClient extends RedisClient
      */
     public function setTtl(string $key, int|Duration $ttl) : bool
     {
+        $redis = $this->ensureRedis();
+
         $ttl = Duration::accept($ttl);
         $matchedValue = MultiPrecision::matchPrecision($ttl, [-3, 0], $matchedPrecision);
 
         return match ($matchedPrecision) {
-            -3 => static::safeExecute('pExpire', fn () => $this->redis->pExpire($key, $matchedValue) !== false),
-            0 => static::safeExecute('expire', fn () => $this->redis->expire($key, $matchedValue) !== false),
+            -3 => static::safeExecute('pExpire', fn() => $redis->pExpire($key, $matchedValue) !== false),
+            0 => static::safeExecute('expire', fn() => $redis->expire($key, $matchedValue) !== false),
             default => throw new UnsupportedException(),
         };
     }
@@ -203,7 +216,8 @@ class PhpRedisClient extends RedisClient
      */
     public function delete(string $key) : bool
     {
-        return static::safeExecute('del', fn () => $this->redis->del($key) > 0);
+        $redis = $this->ensureRedis();
+        return static::safeExecute('del', fn() => $redis->del($key) > 0);
     }
 
 
@@ -212,7 +226,8 @@ class PhpRedisClient extends RedisClient
      */
     public function listSize(string $key) : int
     {
-        $ret = static::safeExecute('lLen', fn () => $this->redis->lLen($key));
+        $redis = $this->ensureRedis();
+        $ret = static::safeExecute('lLen', fn() => $redis->lLen($key));
         if ($ret === false) throw new InvalidDataException();
 
         return $ret;
@@ -224,7 +239,8 @@ class PhpRedisClient extends RedisClient
      */
     public function listPushFront(string $key, string ...$values) : bool
     {
-        return static::safeExecute('lPush', fn () => $this->redis->lPush($key, ...$values) !== false);
+        $redis = $this->ensureRedis();
+        return static::safeExecute('lPush', fn() => $redis->lPush($key, ...$values) !== false);
     }
 
 
@@ -233,12 +249,13 @@ class PhpRedisClient extends RedisClient
      */
     public function listPopFront(string $key, ?RedisBlockingOptions $blocking = null) : ?string
     {
-        return static::safeExecute('lPop', function() use($key, $blocking) {
+        $redis = $this->ensureRedis();
+        return static::safeExecute('lPop', function () use ($redis, $key, $blocking) {
             if ($blocking !== null) {
-                $ret = $this->redis->blPop($key, $blocking->timeout->getSeconds());
+                $ret = $redis->blPop($key, $blocking->timeout->getSeconds());
                 return static::bPopResult($ret);
             } else {
-                $ret = $this->redis->lPop($key);
+                $ret = $redis->lPop($key);
                 return static::popResult($ret);
             }
         });
@@ -250,7 +267,8 @@ class PhpRedisClient extends RedisClient
      */
     public function listPushBack(string $key, string ...$values) : bool
     {
-        return static::safeExecute('rPush', fn () => $this->redis->rPush($key, ...$values) !== false);
+        $redis = $this->ensureRedis();
+        return static::safeExecute('rPush', fn() => $redis->rPush($key, ...$values) !== false);
     }
 
 
@@ -259,12 +277,13 @@ class PhpRedisClient extends RedisClient
      */
     public function listPopBack(string $key, ?RedisBlockingOptions $blocking = null) : ?string
     {
-        return static::safeExecute('rPop', function() use($key, $blocking) {
+        $redis = $this->ensureRedis();
+        return static::safeExecute('rPop', function () use ($redis, $key, $blocking) {
             if ($blocking !== null) {
-                $ret = $this->redis->brPop($key, $blocking->timeout->getSeconds());
+                $ret = $redis->brPop($key, $blocking->timeout->getSeconds());
                 return static::bPopResult($ret);
             } else {
-                $ret = $this->redis->rPop($key);
+                $ret = $redis->rPop($key);
                 return static::popResult($ret);
             }
         });
@@ -300,7 +319,8 @@ class PhpRedisClient extends RedisClient
      */
     public function sortedSetSize(string $key) : int
     {
-        return static::safeExecute('zCard()', fn() => $this->redis->zCard($key));
+        $redis = $this->ensureRedis();
+        return static::safeExecute('zCard()', fn() => $redis->zCard($key));
     }
 
 
@@ -309,16 +329,17 @@ class PhpRedisClient extends RedisClient
      */
     public function sortedSetPushWithOptions(string $key) : RedisSortedSetPushCommand
     {
-        return new class($this->redis, $key) extends RedisSortedSetPushCommand {
+        return new class($this->ensureRedis(...), $key) extends RedisSortedSetPushCommand {
             /**
              * Constructor
-             * @param Redis $redis
+             * @param Closure $redisFn
              * @param string $key
              */
             public function __construct(
-                protected Redis $redis,
+                protected Closure $redisFn,
                 protected string $key,
-            ) {
+            )
+            {
 
             }
 
@@ -328,6 +349,7 @@ class PhpRedisClient extends RedisClient
              */
             public function go() : int
             {
+                $redis = ($this->redisFn)();
                 $options = [];
 
                 if ($this->ifNotYetExist) {
@@ -350,7 +372,7 @@ class PhpRedisClient extends RedisClient
                 if (count($packedValues) <= 0) throw new MissingArgumentException();
 
                 try {
-                    return $this->redis->zAdd($this->key, $options, ...$packedValues);
+                    return $redis->zAdd($this->key, $options, ...$packedValues);
                 } catch (RedisSafetyException $ex) {
                     throw $ex;
                 } catch (PhpRedisException $ex) {
@@ -368,16 +390,17 @@ class PhpRedisClient extends RedisClient
      */
     public function sortedSetGetWithOptions(string $key) : RedisSortedSetGetCommand
     {
-        return new class($this->redis, $key) extends RedisSortedSetGetCommand {
+        return new class($this->ensureRedis(...), $key) extends RedisSortedSetGetCommand {
             /**
              * Constructor
-             * @param Redis $redis
+             * @param Closure $redisFn
              * @param string $key
              */
             public function __construct(
-                protected Redis $redis,
+                protected Closure $redisFn,
                 protected string $key,
-            ) {
+            )
+            {
 
             }
 
@@ -387,6 +410,7 @@ class PhpRedisClient extends RedisClient
              */
             public function query() : iterable
             {
+                $redis = ($this->redisFn)();
                 $min = static::translateScore($this->minScore, $this->isMinInclusive, '-inf');
                 $max = static::translateScore($this->maxScore, $this->isMaxInclusive, '+inf');
 
@@ -396,8 +420,8 @@ class PhpRedisClient extends RedisClient
 
                 try {
                     $result = match ($this->order) {
-                        RedisSortOrder::ASC => $this->redis->zRangeByScore($this->key, $min, $max, $options),
-                        RedisSortOrder::DESC => $this->redis->zRevRangeByScore($this->key, $max, $min, $options),
+                        RedisSortOrder::ASC => $redis->zRangeByScore($this->key, $min, $max, $options),
+                        RedisSortOrder::DESC => $redis->zRevRangeByScore($this->key, $max, $min, $options),
                         default => throw new UnsupportedValueException($this->order, _l('sort')),
                     };
                 } catch (RedisSafetyException $ex) {
@@ -440,7 +464,8 @@ class PhpRedisClient extends RedisClient
      */
     public function sortedSetDelete(string $key, mixed $value) : int
     {
-        return static::safeExecute('zRem()', fn() => $this->redis->zRem($key, $value));
+        $redis = $this->ensureRedis();
+        return static::safeExecute('zRem()', fn() => $redis->zRem($key, $value));
     }
 
 
@@ -449,11 +474,12 @@ class PhpRedisClient extends RedisClient
      */
     public function eval(RedisLuaScript $script, mixed ...$arguments) : mixed
     {
-        return static::safeExecute('eval()', function() use($script, $arguments) {
-            $this->redis->clearLastError();
-            $ret = $this->redis->eval($script->content, $arguments, $script->numberOfKeys);
+        $redis = $this->ensureRedis();
+        return static::safeExecute('eval()', function () use ($redis, $script, $arguments) {
+            $redis->clearLastError();
+            $ret = $redis->eval($script->content, $arguments, $script->numberOfKeys);
 
-            $err = $this->redis->getLastError();
+            $err = $redis->getLastError();
             if ($err !== null) throw new RedisOperationFailedException($err);
 
             return $ret;
@@ -466,7 +492,34 @@ class PhpRedisClient extends RedisClient
      */
     protected static function specificInitialize(RedisClientConfig $config) : static
     {
-        return static::safeExecute(_l('initialize'), function() use($config) {
+        return new static($config);
+    }
+
+
+    /**
+     * Ensure that redis is available
+     * @return Redis
+     * @throws RedisSafetyException
+     */
+    protected final function ensureRedis() : Redis
+    {
+        if ($this->redis === null) {
+            $this->redis = static::initializeRedisFromConfig($this->config);
+        }
+
+        return $this->redis;
+    }
+
+
+    /**
+     * Initialize redis from given configuration
+     * @param RedisClientConfig $config
+     * @return Redis
+     * @throws RedisSafetyException
+     */
+    private static function initializeRedisFromConfig(RedisClientConfig $config) : Redis
+    {
+        return static::safeExecute(_l('initialize'), function () use ($config) {
             $redis = new Redis();
 
             $redis->connect($config->host, $config->port ?? RedisClientConfig::DEFAULT_PORT);
@@ -483,7 +536,7 @@ class PhpRedisClient extends RedisClient
                 if (!$redis->select($config->database)) throw new RedisSelectDatabaseFailedException();
             }
 
-            return new static($redis);
+            return $redis;
         });
     }
 
