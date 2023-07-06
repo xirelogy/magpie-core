@@ -7,7 +7,6 @@ use Magpie\Exceptions\InvalidDataException;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\OutOfRangeException;
 use Magpie\Exceptions\SafetyCommonException;
-use Magpie\Objects\BinaryData;
 
 /**
  * IP address subnet
