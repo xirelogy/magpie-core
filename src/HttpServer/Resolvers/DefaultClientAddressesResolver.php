@@ -1,16 +1,18 @@
 <?php
 
-namespace Magpie\HttpServer\Impls;
+namespace Magpie\HttpServer\Resolvers;
 
+use Magpie\General\Traits\StaticCreatable;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\ServerCollection;
 
 /**
- * Naive implementation of ClientAddressesResolvable
- * @internal
+ * Default client address resolver: only consider the directly visible remote address
  */
-class NaiveClientAddressesResolver implements ClientAddressesResolvable
+class DefaultClientAddressesResolver implements ClientAddressesResolvable
 {
+    use StaticCreatable;
+
     /**
      * @inheritDoc
      */

@@ -9,6 +9,7 @@ use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Names\CommonHttpMethod;
+use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\UserCollectable;
 use Magpie\HttpServer\Exceptions\HttpNotFoundException;
 use Magpie\HttpServer\Request;
@@ -163,6 +164,27 @@ abstract class RouteDomain
             _used($request);
             throw new HttpNotFoundException();
         });
+    }
+
+
+    /**
+     * Get client addresses resolver specific for this domain, if any
+     * @return ClientAddressesResolvable|null
+     */
+    protected function getClientAddressesResolver() : ?ClientAddressesResolvable
+    {
+        return null;
+    }
+
+
+    /**
+     * Get client addresses resolver specific for this domain, if any
+     * @return ClientAddressesResolvable|null
+     * @internal
+     */
+    public final function _getClientAddressesResolver() : ?ClientAddressesResolvable
+    {
+        return $this->getClientAddressesResolver();
     }
 
 

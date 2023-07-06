@@ -11,12 +11,14 @@ use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Factories\NamedStringCodec;
 use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\HttpServer\BinaryContentResponse;
+use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\HttpResponseExceptionRenderable;
 use Magpie\HttpServer\Concepts\Renderable;
 use Magpie\HttpServer\Exceptions\HttpServiceUnavailableException;
 use Magpie\HttpServer\Renderers\DefaultHttpResponseExceptionRenderer;
 use Magpie\HttpServer\Renderers\StringRenderer;
 use Magpie\HttpServer\Request;
+use Magpie\HttpServer\Resolvers\DefaultClientAddressesResolver;
 use Magpie\HttpServer\Response;
 use Magpie\Logs\Concepts\LogRelayable;
 use Magpie\Logs\LogConfig;
@@ -170,6 +172,16 @@ abstract class AppConfig
     public function getModelSourceSyncDirectories() : iterable
     {
         return $this->getModelSourceDirectories();
+    }
+
+
+    /**
+     * Get the default client address resolver
+     * @return ClientAddressesResolvable
+     */
+    public function getDefaultClientAddressesResolver() : ClientAddressesResolvable
+    {
+        return DefaultClientAddressesResolver::create();
     }
 
 

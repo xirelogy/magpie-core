@@ -8,13 +8,13 @@ use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpMethod;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\UserCollectable;
-use Magpie\HttpServer\Impls\NaiveClientAddressesResolver;
 use Magpie\Objects\Uri;
 use Magpie\Routes\Impls\ActualRouteContext;
 use Magpie\Routes\RouteContext;
 use Magpie\Routes\RouteDomain;
 use Magpie\System\Concepts\Capturable;
 use Magpie\System\Kernel\ExceptionHandler;
+use Magpie\System\Kernel\Kernel;
 
 /**
  * Representation of an HTTP request made to this server
@@ -144,7 +144,7 @@ class Request implements Capturable
     {
         $directAddress = $this->serverVars->safeOptional('REMOTE_ADDR');
 
-        yield from static::getClientAddressesResolver()->resolveFrom($directAddress, $this->serverVars);
+        yield from $this->getClientAddressesResolver()->resolveFrom($directAddress, $this->serverVars);
     }
 
 
@@ -152,9 +152,10 @@ class Request implements Capturable
      * Get client addresses resolver
      * @return ClientAddressesResolvable
      */
-    protected static function getClientAddressesResolver() : ClientAddressesResolvable
+    protected function getClientAddressesResolver() : ClientAddressesResolvable
     {
-        return new NaiveClientAddressesResolver();
+        return $this->routeDomain?->_getClientAddressesResolver()
+            ?? Kernel::current()->getConfig()->getDefaultClientAddressesResolver();
     }
 
 
