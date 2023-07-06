@@ -193,4 +193,14 @@ class Ipv6Address extends IpAddress
 
         return new static($retGroups);
     }
+
+
+    /**
+     * Loopback (localhost) address
+     * @return static
+     */
+    public static function loopback() : static
+    {
+        return new static([0, 0, 0, 0, 0, 0, 0, 1]);
+    }
 }
