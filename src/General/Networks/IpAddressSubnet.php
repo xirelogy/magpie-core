@@ -144,10 +144,16 @@ final class IpAddressSubnet implements PreferStringable
     public static function parse(string $value) : static
     {
         $components = explode('/', $value);
-        if (count($components) !== 2) throw new InvalidDataFormatException();
+        $totalComponents = count($components);
+
+        if ($totalComponents < 1 || $totalComponents > 2) throw new InvalidDataFormatException();
 
         $address = IpAddress::parse($components[0]);
-        $prefix = static::parsePrefix($components[1], $address::getNumBits());
+        if ($totalComponents > 1) {
+            $prefix = static::parsePrefix($components[1], $address::getNumBits());
+        } else {
+            $prefix = $address::getNumBits();
+        }
 
         return new static($address, $prefix);
     }
