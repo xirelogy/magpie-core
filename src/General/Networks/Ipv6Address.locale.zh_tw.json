@@ -1,0 +1,7 @@
+{
+  "wrong number of groups": "組別數量錯誤",
+  "group must be hexadecimal": "組別必須為十六進制",
+  "group value out of range": "組別超出範圍",
+  "overflow": "溢出",
+  "": ""
+}

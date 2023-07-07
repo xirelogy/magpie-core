@@ -1,0 +1,6 @@
+{
+  "wrong number of octets": "八位位组数量错误",
+  "octet must be numeric": "八位位组必须为数字",
+  "octet value out of range": "八位位组超出范围",
+  "": ""
+}
