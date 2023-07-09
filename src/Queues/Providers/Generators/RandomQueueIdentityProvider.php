@@ -9,14 +9,13 @@ use Magpie\System\Kernel\Kernel;
 
 /**
  * Provide queue identity using randomly generated string
- * @deprecated Renamed into RandomQueueIdentityProvider
  */
-class RandomIdentityProvider implements QueueIdentityProvidable
+class RandomQueueIdentityProvider implements QueueIdentityProvidable
 {
     /**
      * Current type class
      */
-    public const TYPECLASS = 'random-legacy';
+    public const TYPECLASS = 'random';
     /**
      * Default output length
      */
