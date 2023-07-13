@@ -100,7 +100,9 @@ abstract class AppConfig
         $config = $this->createDefaultLogConfig();
         $logRelay = ConfigurableLogRelay::fromEnv($config);
 
-        Kernel::current()->setLogger(new DefaultLogger($logRelay));
+        if ($logRelay !== null) {
+            Kernel::current()->setLogger(new DefaultLogger($logRelay));
+        }
     }
 
 

@@ -27,15 +27,15 @@ abstract class ConfigurableLogRelay extends LogRelay implements TypeClassable
      * Create configuration from environment variables
      * @param LogConfig $config
      * @param string|null $prefix
-     * @return static
+     * @return static|null
      * @throws ArgumentException
      */
-    public static function fromEnv(LogConfig $config, ?string $prefix = null) : static
+    public static function fromEnv(LogConfig $config, ?string $prefix = null) : ?static
     {
         $parserHost = new EnvParserHost();
         $envKey = new EnvKeySchema('LOG', $prefix);
 
-        if (!$parserHost->has($envKey->key('TYPE'))) return new SimpleFileLogRelay($config);
+        if (!$parserHost->has($envKey->key('TYPE'))) return null;
 
         return static::fromEnvType($parserHost, $envKey, [
             static::ENV_PAYLOAD_CONFIG => $config,
