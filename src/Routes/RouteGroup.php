@@ -5,7 +5,6 @@ namespace Magpie\Routes;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\InvalidStateException;
 use Magpie\Exceptions\UnsupportedException;
-use Magpie\Routes\Annotations\RouteUseMiddleware;
 use Magpie\Routes\Impls\RouteMap;
 use Magpie\Routes\Impls\RouteMiddlewareCollection;
 use Magpie\System\HardCore\AutoloadReflection;
@@ -35,7 +34,7 @@ abstract class RouteGroup
 
     /**
      * All middlewares to be used
-     * @return iterable<RouteUseMiddleware>
+     * @return iterable<class-string<RouteMiddleware>>
      */
     protected function getUseMiddlewares() : iterable
     {

@@ -13,7 +13,6 @@ use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\UserCollectable;
 use Magpie\HttpServer\Exceptions\HttpNotFoundException;
 use Magpie\HttpServer\Request;
-use Magpie\Routes\Annotations\RouteUseMiddleware;
 use Magpie\Routes\Concepts\RouteHandleable;
 use Magpie\Routes\Handlers\ClosureRouteHandler;
 use Magpie\Routes\Handlers\ControllerMethodRouteHandler;
@@ -133,7 +132,7 @@ abstract class RouteDomain
 
     /**
      * All middlewares to be used
-     * @return iterable<RouteUseMiddleware>
+     * @return iterable<class-string<RouteMiddleware>>
      */
     protected function getUseMiddlewares() : iterable
     {
