@@ -27,6 +27,9 @@ trait CommonLoadTranslation
 
         $ret = [];
 
+        // Where there isn't a class, translation is not available
+        if (trim($className) === '') return $ret;
+
         foreach (AutoloadReflection::instance()->getClassFilenames($className) as $filename) {
             if (str_ends_with($filename, '.php')) $filename = substr($filename, 0, strlen($filename) - 4);
             $filename .= ".locale.$locale.json";
