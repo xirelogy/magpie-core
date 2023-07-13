@@ -53,7 +53,11 @@ abstract class Controller
         };
 
         // Relay to callable
-        $routeArguments = iter_flatten($request->routeArguments->all(), false);
+        $routeArgumentsFn = function () use ($request) {
+            yield from $request->domainArguments->all();
+            yield from $request->routeArguments->all();
+        };
+        $routeArguments = iter_flatten($routeArgumentsFn(), false);
         return $this->onCall($callable, $request, $routeArguments);
     }
 
