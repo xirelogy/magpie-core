@@ -3,6 +3,7 @@
 namespace Magpie\HttpServer;
 
 use Exception;
+use Magpie\Codecs\Parsers\IntegerParser;
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpMethod;
@@ -38,9 +39,17 @@ class Request implements Capturable
      */
     public UserCollectable $routeArguments;
     /**
+     * @var string|null The resolved hostname
+     */
+    public readonly ?string $hostname;
+    /**
      * @var Uri Request URI
      */
     public readonly Uri $requestUri;
+    /**
+     * @var Uri Full request URI
+     */
+    public readonly Uri $fullUri;
     /**
      * @var UserCollectable Queries from request URL
      */
@@ -87,6 +96,10 @@ class Request implements Capturable
 
         $this->requestUri = Uri::safeParse($this->serverVars->safeOptional('REQUEST_URI', default: '/'));
 
+        $scheme = static::resolveSchemeIsHttps($this->headers, $this->serverVars) ? 'https' : 'http';
+        $this->hostname = static::resolveHostname($this->headers, $this->serverVars);
+        $this->fullUri = static::createFullUri($scheme, $this->hostname, $this->requestUri);
+
         $this->state = new RequestState();
     }
 
@@ -114,15 +127,11 @@ class Request implements Capturable
     /**
      * Hostname
      * @return string|null
+     * @deprecated
      */
     public function getHostname() : ?string
     {
-        $parser = StringParser::create()->withEmptyAsNull();
-
-        return $this->headers->safeOptional(CommonHttpHeader::HOST, $parser)
-            ?? $this->serverVars->safeOptional('SERVER_NAME', $parser)
-            ?? $this->serverVars->safeOptional('SERVER_ADDR', $parser)
-            ?? null;
+        return $this->hostname;
     }
 
 
@@ -185,6 +194,68 @@ class Request implements Capturable
         $serverVars = ServerCollection::capture();
 
         return new static($queries, $posts, $cookies, $serverVars);
+    }
+
+
+    /**
+     * Resolve if the request scheme is HTTPS
+     * @param HeaderCollection $headers
+     * @param ServerCollection $serverVars
+     * @return bool
+     */
+    protected static function resolveSchemeIsHttps(HeaderCollection $headers, ServerCollection $serverVars) : bool
+    {
+        $lowerStringParser = StringParser::createTrimEmptyAsNull()
+            ->withPreprocessor(function (?string $value) : ?string {
+                if ($value === null) return null;
+                return strtolower($value);
+            });
+
+        // Determined according to forwarding headers
+        if ($headers->safeOptional('X-Forwarded-Proto', $lowerStringParser) === 'https') return true;
+        if ($headers->safeOptional('X-Forwarded-Port', IntegerParser::create()) === 443) return true;
+
+        // Determined according to local server variables
+        if ($serverVars->safeOptional('HTTPS', $lowerStringParser) === 'on') return true;
+        if ($serverVars->safeOptional('REQUEST_SCHEME', $lowerStringParser) === 'https') return true;
+        if ($serverVars->safeOptional('SERVER_PORT', IntegerParser::create()) === 443) return true;
+
+        return false;
+    }
+
+
+    /**
+     * Resolve for request hostname in order
+     * @param HeaderCollection $headers
+     * @param ServerCollection $serverVars
+     * @return string|null
+     */
+    protected static function resolveHostname(HeaderCollection $headers, ServerCollection $serverVars) : ?string
+    {
+        $parser = StringParser::create()->withEmptyAsNull();
+
+        return $headers->safeOptional(CommonHttpHeader::HOST, $parser)
+            ?? $serverVars->safeOptional('SERVER_NAME', $parser)
+            ?? $serverVars->safeOptional('SERVER_ADDR', $parser)
+            ?? null;
+    }
+
+
+    /**
+     * Create a full URI
+     * @param string $scheme
+     * @param string|null $hostname
+     * @param Uri $requestUri
+     * @return Uri
+     */
+    protected static function createFullUri(string $scheme, ?string $hostname, Uri $requestUri) : Uri
+    {
+        $ret = new Uri($requestUri->path);
+        $ret->host = $hostname;
+        if ($hostname !== null) $ret->scheme = $scheme;
+        $ret->query = $requestUri->query;
+
+        return $ret;
     }
 
 

@@ -41,7 +41,7 @@ class WebRunContext extends RunContext
     {
         $appConfig = Kernel::current()->getConfig();
 
-        $hostname = $this->request->getHostname();
+        $hostname = $this->request->hostname ?? '';
         $routeDomain = RouteRegistry::_route($hostname, $domainArguments);
 
         if ($domainArguments !== null) {
