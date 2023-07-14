@@ -85,7 +85,7 @@ class Request implements Capturable
         $this->serverVars = $serverVars;
         $this->headers = $this->serverVars->getHeaders();
 
-        $this->requestUri = Uri::safeParse($this->serverVars->safeOptional('REQUEST_URI', '/'));
+        $this->requestUri = Uri::safeParse($this->serverVars->safeOptional('REQUEST_URI', default: '/'));
 
         $this->state = new RequestState();
     }

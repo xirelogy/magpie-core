@@ -3,7 +3,6 @@
 namespace Magpie\HttpServer;
 
 use Magpie\Codecs\ParserHosts\ArrayParserHost;
-use Magpie\General\Sugars\Excepts;
 use Magpie\HttpServer\Concepts\Collectable;
 
 /**
@@ -19,19 +18,6 @@ abstract class Collection extends ArrayParserHost implements Collectable
     protected function __construct(iterable $keyValues, ?string $prefix = null)
     {
         parent::__construct(iter_flatten($keyValues), $prefix);
-    }
-
-
-    /**
-     * A value is optionally required from current parser host. Any exception is
-     * treated as the default value returned
-     * @param string|int $key
-     * @param mixed|null $default
-     * @return mixed
-     */
-    public function safeOptional(string|int $key, mixed $default = null) : mixed
-    {
-        return Excepts::noThrow(fn () => $this->optional($key, default: $default), $default);
     }
 
 

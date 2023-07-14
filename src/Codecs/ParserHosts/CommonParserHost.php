@@ -5,6 +5,7 @@ namespace Magpie\Codecs\ParserHosts;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\MissingArgumentException;
+use Magpie\General\Sugars\Excepts;
 
 /**
  * Common parser host
@@ -81,6 +82,15 @@ abstract class CommonParserHost implements ParserHost
         $inKey = $this->acceptKey($key);
 
         return $this->obtain($inKey, false, $parser, $default);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function safeOptional(string|int $key, ?Parser $parser = null, mixed $default = null) : mixed
+    {
+        return Excepts::noThrow(fn () => $this->optional($key, $parser, $default), $default);
     }
 
 
