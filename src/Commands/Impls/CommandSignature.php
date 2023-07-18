@@ -7,10 +7,10 @@ use Magpie\Commands\Exceptions\CommandOptionException;
 use Magpie\Commands\Exceptions\DisallowedCommandOptionPayloadException;
 use Magpie\Commands\Exceptions\MissingCommandArgumentException;
 use Magpie\Commands\Exceptions\MissingCommandOptionPayloadException;
-use Magpie\Commands\Exceptions\UnknownCommandOptionException;
 use Magpie\Exceptions\DuplicatedKeyException;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\UnexpectedException;
+use Magpie\General\Str;
 use Magpie\General\Sugars\Quote;
 use Magpie\Locales\Concepts\Localizable;
 
@@ -80,7 +80,12 @@ class CommandSignature
             if ($thisArgIndex >= $argc) break;
 
             $thisArg = $argv[$thisArgIndex];
-            if ($thisArg === '--') break;   // Allow '--' to be options/arguments separator
+
+            // Allow '--' to be options/arguments separator
+            if ($thisArg === '--') {
+                ++$thisArgIndex;
+                break;
+            }
 
             if (str_starts_with($thisArg, '--')) {
                 $this->handleOptions($outOptions, $thisArg);
@@ -97,7 +102,6 @@ class CommandSignature
                 throw new MissingCommandArgumentException($argumentKey, $this->getCommandString());
             }
             $thisArg = $argv[$thisArgIndex];
-            if (str_starts_with($thisArg, '--')) continue;
 
             $outArguments[$argumentKey] = $thisArg;
             ++$thisArgIndex;
@@ -133,15 +137,18 @@ class CommandSignature
             $thisArg = substr($thisArg, 0, $equalPos);
         }
 
-        if (!array_key_exists($thisArg, $this->options)) throw new UnknownCommandOptionException($thisArg, $this->command);
-
-        $optionDefinition = $this->options[$thisArg];
-        if ($optionDefinition->hasPayload) {
-            if ($thisArgPayload === null) throw new MissingCommandOptionPayloadException($thisArg, $this->command);
+        if (array_key_exists($thisArg, $this->options)) {
+            $optionDefinition = $this->options[$thisArg];
+            if ($optionDefinition->hasPayload) {
+                if ($thisArgPayload === null) throw new MissingCommandOptionPayloadException($thisArg, $this->command);
+            } else {
+                if ($thisArgPayload !== null) throw new DisallowedCommandOptionPayloadException($thisArg, $this->command);
+                $thisArgPayload = true;
+            }
         } else {
-            if ($thisArgPayload !== null) throw new DisallowedCommandOptionPayloadException($thisArg, $this->command);
-            $thisArgPayload = true;
+            if (Str::isNullOrEmpty($thisArgPayload)) $thisArgPayload = true;
         }
+
 
         $options[$thisArg] = $thisArgPayload;
     }
