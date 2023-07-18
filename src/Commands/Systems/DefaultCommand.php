@@ -28,7 +28,9 @@ class DefaultCommand extends Command
 
         // Summarize all the commands
         $maxCommandLength = 0;
-        $commandNamespaces = [];
+        $commandNamespaces = [
+            '' => [],
+        ];
         foreach (CommandRegistry::_all() as $command => $signature) {
             $namespace = static::getCommandNamespace($command);
             $maxCommandLength = max($maxCommandLength, strlen($command));
