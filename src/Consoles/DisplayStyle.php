@@ -20,6 +20,10 @@ enum DisplayStyle : string
      */
     case INFO = 'info';
     /**
+     * Note
+     */
+    case NOTE = 'comment';
+    /**
      * strong
      */
     case STRONG = 'strong';

@@ -67,6 +67,17 @@ abstract class StructuredText implements Stringable
 
 
     /**
+     * Create single unit text with note format
+     * @param string $text
+     * @return self
+     */
+    public static function note(string $text) : self
+    {
+        return static::from($text, DisplayStyle::NOTE);
+    }
+
+
+    /**
      * Create single unit text with strong format
      * @param string $text
      * @return self

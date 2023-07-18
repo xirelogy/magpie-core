@@ -41,6 +41,7 @@ class SymfonyConsole extends BasicConsole
 
         $formatter = $this->backend->getFormatter();
         $formatter->setStyle('strong', new SymfonyOutputFormatterStyle('bright-white'));
+        $formatter->setStyle('note', new SymfonyOutputFormatterStyle('gray'));
     }
 
 
@@ -146,6 +147,7 @@ class SymfonyConsole extends BasicConsole
             DisplayStyle::ERROR->value => 'error',
             DisplayStyle::WARNING->value => 'comment',
             DisplayStyle::INFO->value => 'info',
+            DisplayStyle::NOTE->value => 'note',
             DisplayStyle::STRONG->value => 'strong',
             default => null,
         };
