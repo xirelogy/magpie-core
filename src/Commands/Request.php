@@ -14,11 +14,11 @@ abstract class Request
     /**
      * @var OptionsCollection Options
      */
-    public OptionsCollection $options;
+    public readonly OptionsCollection $options;
     /**
      * @var ArgumentsCollection Arguments
      */
-    public ArgumentsCollection $arguments;
+    public readonly ArgumentsCollection $arguments;
     /**
      * @var array<string, string|bool> Options (raw)
      */
