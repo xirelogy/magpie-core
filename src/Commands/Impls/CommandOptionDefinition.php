@@ -2,6 +2,8 @@
 
 namespace Magpie\Commands\Impls;
 
+use Magpie\Locales\Concepts\Localizable;
+
 /**
  * Definition of a command option
  * @internal
@@ -16,6 +18,10 @@ class CommandOptionDefinition
      * @var bool If this option has corresponding payload
      */
     public readonly bool $hasPayload;
+    /**
+     * @var string|Localizable|null Option description
+     */
+    public string|Localizable|null $description = null;
 
 
     /**

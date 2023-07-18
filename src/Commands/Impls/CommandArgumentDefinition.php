@@ -2,6 +2,8 @@
 
 namespace Magpie\Commands\Impls;
 
+use Magpie\Locales\Concepts\Localizable;
+
 /**
  * Definition of a command argument
  * @internal
@@ -16,6 +18,10 @@ class CommandArgumentDefinition
      * @var bool If this argument is mandatory
      */
     public readonly bool $isMandatory;
+    /**
+     * @var string|Localizable|null Argument description
+     */
+    public string|Localizable|null $description = null;
 
 
     /**

@@ -112,7 +112,7 @@ class CommandRegistry
             $descriptionAttr = static::findDescriptionFromAttribute($class);
 
             // Parse the signature
-            $signature = ImplCommandSignature::parse($signatureAttr, $descriptionAttr);
+            $signature = ImplCommandSignature::parse($signatureAttr, $descriptionAttr, $class);
 
             // Register the command
             $commandKey = $signature->command;

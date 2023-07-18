@@ -3,6 +3,10 @@
 namespace Magpie\Commands\Impls;
 
 use Exception;
+use Magpie\Commands\Attributes\CommandArgumentDescription;
+use Magpie\Commands\Attributes\CommandArgumentDescriptionL;
+use Magpie\Commands\Attributes\CommandOptionDescription;
+use Magpie\Commands\Attributes\CommandOptionDescriptionL;
 use Magpie\Commands\Exceptions\CommandOptionException;
 use Magpie\Commands\Exceptions\DisallowedCommandOptionPayloadException;
 use Magpie\Commands\Exceptions\MissingCommandArgumentException;
@@ -13,6 +17,8 @@ use Magpie\Exceptions\UnexpectedException;
 use Magpie\General\Str;
 use Magpie\General\Sugars\Quote;
 use Magpie\Locales\Concepts\Localizable;
+use Magpie\Locales\I18n;
+use ReflectionClass;
 
 /**
  * Command signature
@@ -173,10 +179,11 @@ class CommandSignature
      * Parse from given signature text
      * @param string $signature
      * @param Localizable|string|null $description
+     * @param ReflectionClass|null $class
      * @return static
      * @throws Exception
      */
-    public static function parse(string $signature, Localizable|string|null $description) : static
+    public static function parse(string $signature, Localizable|string|null $description, ?ReflectionClass $class = null) : static
     {
         $tokens = static::tokenize($signature);
 
@@ -199,6 +206,20 @@ class CommandSignature
                     if (array_key_exists($argument->name, $arguments)) throw new DuplicatedKeyException($argument->name, _l('argument'));
                     $arguments[$argument->name] = $argument;
                 }
+            }
+        }
+
+        if ($class !== null) {
+            // Update the signature argument descriptions
+            foreach (static::listArgumentDescriptionsFromAttributes($class) as $argument => $argDescription) {
+                if (!array_key_exists($argument, $arguments)) continue;
+                $arguments[$argument]->description = $argDescription;
+            }
+
+            // Update the signature option descriptions
+            foreach (static::listOptionDescriptionsFromAttributes($class) as $option => $optDescription) {
+                if (!array_key_exists($option, $options)) continue;
+                $options[$option]->description = $optDescription;
             }
         }
 
@@ -253,6 +274,52 @@ class CommandSignature
         }
 
         return new CommandOptionDefinition($content, $hasPayload);
+    }
+
+
+    /**
+     * List all argument descriptions
+     * @param ReflectionClass $class
+     * @return iterable<string, string|Localizable>
+     */
+    protected static function listArgumentDescriptionsFromAttributes(ReflectionClass $class) : iterable
+    {
+        foreach ($class->getAttributes(CommandArgumentDescription::class) as $attribute) {
+            /** @var CommandArgumentDescription $instance */
+            $instance = $attribute->newInstance();
+            if (Str::isNullOrEmpty($instance->desc)) continue;
+            yield $instance->name => $instance->desc;
+        }
+
+        foreach ($class->getAttributes(CommandArgumentDescriptionL::class) as $attribute) {
+            /** @var CommandArgumentDescriptionL $instance */
+            $instance = $attribute->newInstance();
+            if (Str::isNullOrEmpty($instance->desc)) continue;
+            yield $instance->name => I18n::tag($instance->desc, $class->name);
+        }
+    }
+
+
+    /**
+     * List all option descriptions
+     * @param ReflectionClass $class
+     * @return iterable<string, string|Localizable>
+     */
+    protected static function listOptionDescriptionsFromAttributes(ReflectionClass $class) : iterable
+    {
+        foreach ($class->getAttributes(CommandOptionDescription::class) as $attribute) {
+            /** @var CommandOptionDescription $instance */
+            $instance = $attribute->newInstance();
+            if (Str::isNullOrEmpty($instance->desc)) continue;
+            yield $instance->name => $instance->desc;
+        }
+
+        foreach ($class->getAttributes(CommandOptionDescriptionL::class) as $attribute) {
+            /** @var CommandOptionDescriptionL $instance */
+            $instance = $attribute->newInstance();
+            if (Str::isNullOrEmpty($instance->desc)) continue;
+            yield $instance->name => I18n::tag($instance->desc, $class->name);
+        }
     }
 
 
