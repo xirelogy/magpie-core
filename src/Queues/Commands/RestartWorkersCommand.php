@@ -4,6 +4,7 @@ namespace Magpie\Queues\Commands;
 
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Attributes\CommandDescriptionL;
+use Magpie\Commands\Attributes\CommandOptionDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -12,6 +13,7 @@ use Magpie\Queues\Providers\QueueCreator;
 
 #[CommandSignature('queue:restart-workers {--queue=}')]
 #[CommandDescriptionL('Restart all running queue workers')]
+#[CommandOptionDescriptionL('queue', 'Target queue name')]
 class RestartWorkersCommand extends Command
 {
     /**

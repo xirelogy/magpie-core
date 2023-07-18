@@ -1,5 +1,6 @@
 {
   "Check system maintenance state or change system maintenance state": "顯示或改變系統當前維護狀態",
+  "'down' to put system into maintenance, and 'up' to set system as available": "'down'使系統進入維護狀態，'up'使系統進入在綫狀態",
   "System is currently under maintenance": "系統當前維護中",
   "System is currently available": "系統當前在綫",
   "": ""

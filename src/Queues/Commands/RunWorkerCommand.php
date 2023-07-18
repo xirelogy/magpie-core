@@ -8,6 +8,7 @@ use Exception;
 use Magpie\Codecs\Parsers\BooleanParser;
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Attributes\CommandDescriptionL;
+use Magpie\Commands\Attributes\CommandOptionDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -27,6 +28,9 @@ use Magpie\Queues\Providers\QueueCreator;
 
 #[CommandSignature('queue:run-worker {--once} {--queue=} {--timeout=}')]
 #[CommandDescriptionL('Run queue\'s worker')]
+#[CommandOptionDescriptionL('once', 'The worker should only run once and exit')]
+#[CommandOptionDescriptionL('queue', 'Target queue name')]
+#[CommandOptionDescriptionL('timeout', 'Timeout in seconds to wait for job from queue')]
 class RunWorkerCommand extends Command
 {
     /**

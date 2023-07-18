@@ -4,6 +4,7 @@ namespace Magpie\Queues\Commands;
 
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Attributes\CommandDescriptionL;
+use Magpie\Commands\Attributes\CommandOptionDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -17,6 +18,7 @@ use Magpie\System\Process\ProcessStandardStream;
 
 #[CommandSignature('queue:listen {--queue=}')]
 #[CommandDescriptionL('Run queue\'s listener')]
+#[CommandOptionDescriptionL('queue', 'Target queue name')]
 class ListenCommand extends Command
 {
     /**

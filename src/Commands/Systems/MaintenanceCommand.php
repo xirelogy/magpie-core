@@ -6,6 +6,7 @@ use Magpie\Codecs\Parsers\ClosureParser;
 use Magpie\Codecs\Parsers\Exceptions\MustBeValuesParseFailedException;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Parsers\StringParser;
+use Magpie\Commands\Attributes\CommandArgumentDescriptionL;
 use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
@@ -18,6 +19,7 @@ use Magpie\System\Kernel\Kernel;
  */
 #[CommandSignature('sys:maintenance {set?}')]
 #[CommandDescriptionL('Check system maintenance state or change system maintenance state')]
+#[CommandArgumentDescriptionL('set', '\'down\' to put system into maintenance, and \'up\' to set system as available')]
 class MaintenanceCommand extends Command
 {
     /**

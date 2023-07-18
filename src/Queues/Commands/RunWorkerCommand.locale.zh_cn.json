@@ -1,5 +1,8 @@
 {
   "Run queue's worker": "运行队列任务进程",
+  "The worker should only run once and exit": "任务进程将只运行一次后退出",
+  "Target queue name": "目标队列名字",
+  "Timeout in seconds to wait for job from queue": "等待队列任务的超时，以秒表示",
   "{{0}} running...": "{{0}} 执行中…",
   "Job running...": "任务执行中…",
   "{{0}} completed": "{{0}} 完成",
