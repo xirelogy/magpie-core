@@ -3,7 +3,7 @@
 namespace Magpie\Queues\Commands;
 
 use Magpie\Codecs\Parsers\StringParser;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -12,7 +12,7 @@ use Magpie\Queues\Providers\QueueCreator;
 use Magpie\Queues\QueueFailHandler;
 
 #[CommandSignature('queue:retry-failed {id}')]
-#[CommandDescription('Reset a failed job and put it back on queue')]
+#[CommandDescriptionL('Reset a failed job and put it back on queue')]
 class RetryFailedCommand extends Command
 {
     /**

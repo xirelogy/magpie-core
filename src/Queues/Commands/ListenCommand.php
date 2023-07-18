@@ -3,7 +3,7 @@
 namespace Magpie\Queues\Commands;
 
 use Magpie\Codecs\Parsers\StringParser;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -16,7 +16,7 @@ use Magpie\System\Process\ProcessCommandLine;
 use Magpie\System\Process\ProcessStandardStream;
 
 #[CommandSignature('queue:listen {--queue=}')]
-#[CommandDescription('Run queue\'s listener')]
+#[CommandDescriptionL('Run queue\'s listener')]
 class ListenCommand extends Command
 {
     /**

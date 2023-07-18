@@ -1,4 +1,5 @@
 {
+  "Reset a failed job and put it back on queue": "重置失败的任务并将其重新加入队列",
   "Failed job with ID = {{0}} not found": "未找到ID={{0}}的失败任务",
   "Job with ID = {{0}} placed back on queue": "ID={{0}}的失败任务已重新加入队列",
   "": ""

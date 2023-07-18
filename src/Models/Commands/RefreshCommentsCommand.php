@@ -2,12 +2,12 @@
 
 namespace Magpie\Models\Commands;
 
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
 use Magpie\Facades\Console;
-use Magpie\Models\Concepts\ModelCheckListenable;
+use Magpie\Models\ClosureModelCheckListener;
 use Magpie\Models\Model;
 use Magpie\Models\Schemas\Checks\TableSchemaCommenter;
 use Magpie\Models\Schemas\ModelDefinition;
@@ -15,10 +15,10 @@ use Magpie\System\HardCore\AutoloadReflection;
 use Magpie\System\Kernel\Kernel;
 
 /**
- * Apply comments to model source files
+ * Refresh model source files comments
  */
 #[CommandSignature('db:refresh-comments')]
-#[CommandDescription('Apply comments to model source files')]
+#[CommandDescriptionL('Refresh model source files comments')]
 class RefreshCommentsCommand extends Command
 {
     /**
@@ -26,24 +26,15 @@ class RefreshCommentsCommand extends Command
      */
     protected function onRun(Request $request) : void
     {
-        $listener = new class implements ModelCheckListenable {
-            /**
-             * @inheritDoc
-             */
-            public function notifyCheckTable(string $className, string $tableName, bool $isTableExisting) : void
-            {
-                Console::info("Processing table: $tableName");
-            }
-
-
-            /**
-             * @inheritDoc
-             */
-            public function notifyCheckColumn(string $className, string $tableName, string $columnName, string|ModelDefinition|null $columnDef, bool $isColumnExisting) : void
-            {
+        $listener = new ClosureModelCheckListener(
+            function (string $className, string $tableName, bool $isTableExisting) : void {
+                _used($className, $isTableExisting);
+                Console::info(_l('Processing table: ') . $tableName);
+            },
+            function (string $className, string $tableName, string $columnName, string|ModelDefinition|null $columnDef, bool $isColumnExisting) : void {
                 // nop
-            }
-        };
+            },
+        );
 
         $paths = iter_flatten(Kernel::current()->getConfig()->getModelSourceDirectories());
 

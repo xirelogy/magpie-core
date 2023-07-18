@@ -7,7 +7,7 @@ use Carbon\CarbonInterface;
 use Exception;
 use Magpie\Codecs\Parsers\BooleanParser;
 use Magpie\Codecs\Parsers\StringParser;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -26,7 +26,7 @@ use Magpie\Queues\Providers\Queue;
 use Magpie\Queues\Providers\QueueCreator;
 
 #[CommandSignature('queue:run-worker {--once} {--queue=} {--timeout=}')]
-#[CommandDescription('Run queue\'s worker')]
+#[CommandDescriptionL('Run queue\'s worker')]
 class RunWorkerCommand extends Command
 {
     /**

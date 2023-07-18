@@ -22,7 +22,7 @@ class DefaultCommand extends Command
         Console::info(_format(_l('Magpie Framework version {{0}}'), Kernel::current()->getVersion()));
         Console::output('');
 
-        Console::output(StructuredText::strong('Usage:'));
+        Console::output(StructuredText::strong(_l('Usage:')));
         Console::output('  command [options] [arguments]');
         Console::output('');
 
@@ -40,7 +40,7 @@ class DefaultCommand extends Command
             $commandNamespaces[$namespace] = $commandRows;
         }
 
-        Console::output(StructuredText::strong('Available commands:'));
+        Console::output(StructuredText::strong(_l('Available commands:')));
         foreach ($commandNamespaces as $commandNamespace => $commandRows) {
             if (!is_empty_string($commandNamespace)) {
                 Console::output(StructuredText::compound(' ', StructuredText::warning($commandNamespace)));

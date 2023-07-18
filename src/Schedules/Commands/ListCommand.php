@@ -3,7 +3,7 @@
 namespace Magpie\Schedules\Commands;
 
 use Carbon\Carbon;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -16,7 +16,7 @@ use Magpie\Schedules\Impls\ScheduleRegistry;
  * List scheduled items
  */
 #[CommandSignature('schedule:list')]
-#[CommandDescription('List scheduled job')]
+#[CommandDescriptionL('List scheduled job')]
 class ListCommand extends Command
 {
     /**

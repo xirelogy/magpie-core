@@ -1,4 +1,5 @@
 {
+  "Run queue's worker": "運行隊列任務進程",
   "{{0}} running...": "{{0}} 執行中…",
   "Job running...": "任務執行中…",
   "{{0}} completed": "{{0}} 完成",

@@ -2,7 +2,7 @@
 
 namespace Magpie\Routes\Commands;
 
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -10,7 +10,7 @@ use Magpie\Facades\Console;
 use Magpie\Routes\RouteRegistry;
 
 #[CommandSignature('route:delete-caches')]
-#[CommandDescription('Delete route caches')]
+#[CommandDescriptionL('Delete route caches')]
 class DeleteCachesCommand extends Command
 {
     /**
@@ -18,9 +18,9 @@ class DeleteCachesCommand extends Command
      */
     protected function onRun(Request $request) : void
     {
-        Console::info('Deleting route caches...');
+        Console::info(_l('Deleting route caches...'));
         RouteRegistry::deleteSourceCache();
 
-        Console::info('Done');
+        Console::info(_l('Done'));
     }
 }

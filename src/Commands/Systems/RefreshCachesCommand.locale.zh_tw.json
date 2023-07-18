@@ -1,6 +1,7 @@
 {
-  "Removing existing caches...": "舊緩存刪除中…",
-  "Updating caches...": "緩存更新中…",
+  "Refresh and regenerate source cache": "重新生成緩存",
+  "Removing existing caches...": "正在刪除舊緩存…",
+  "Updating caches...": "正在更新緩存…",
   "Done": "完成",
   "": ""
 }

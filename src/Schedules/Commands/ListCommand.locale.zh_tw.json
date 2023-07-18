@@ -1,4 +1,5 @@
 {
+  "List scheduled job": "顯示定時任務列表",
   "Target": "目標",
   "Cron expression": "CRON表達式",
   "Next run": "下次執行",

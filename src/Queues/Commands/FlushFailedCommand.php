@@ -2,7 +2,7 @@
 
 namespace Magpie\Queues\Commands;
 
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -10,7 +10,7 @@ use Magpie\Facades\Console;
 use Magpie\Queues\QueueFailHandler;
 
 #[CommandSignature('queue:flush-failed')]
-#[CommandDescription('Flush all failed jobs')]
+#[CommandDescriptionL('Flush all failed jobs')]
 class FlushFailedCommand extends Command
 {
     /**

@@ -1,4 +1,5 @@
 {
+  "Restart all running queue workers": "重启所有运行中的任务进程",
   "Restart signal sent to queue workers": "已向任务进程发送重启信号",
   "": ""
 }

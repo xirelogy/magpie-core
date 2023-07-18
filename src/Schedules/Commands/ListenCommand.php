@@ -4,7 +4,7 @@ namespace Magpie\Schedules\Commands;
 
 use Carbon\Carbon;
 use Exception;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -20,7 +20,7 @@ use Magpie\System\Process\ProcessCommandLine;
  * Run scheduler in foreground
  */
 #[CommandSignature('schedule:listen')]
-#[CommandDescription('Run scheduler in foreground')]
+#[CommandDescriptionL('Run scheduler in foreground')]
 class ListenCommand extends Command
 {
     /**

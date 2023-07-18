@@ -3,7 +3,7 @@
 namespace Magpie\Schedules\Commands;
 
 use Carbon\Carbon;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -15,7 +15,7 @@ use Magpie\System\Kernel\MainLoop;
  * Run scheduled job
  */
 #[CommandSignature('schedule:run')]
-#[CommandDescription('Run scheduled job')]
+#[CommandDescriptionL('Run scheduled job')]
 class RunCommand extends Command
 {
     /**

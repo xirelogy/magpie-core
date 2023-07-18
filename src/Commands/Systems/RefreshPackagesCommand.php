@@ -3,7 +3,7 @@
 namespace Magpie\Commands\Systems;
 
 use Exception;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -16,7 +16,7 @@ use Magpie\General\Simples\SimpleJSON;
  * Refresh and maintain information about installed packages
  */
 #[CommandSignature('sys:refresh-packages')]
-#[CommandDescription('Refresh and maintain information about installed packages')]
+#[CommandDescriptionL('Refresh and maintain information about installed packages')]
 class RefreshPackagesCommand extends Command
 {
     /**
@@ -38,7 +38,7 @@ class RefreshPackagesCommand extends Command
         $fs->createDirectory(dirname($outputPath));
         $fs->writeFile($outputPath, $content);
 
-        Console::info('Package discovery completed');
+        Console::info(_l('Package discovery completed'));
     }
 
 

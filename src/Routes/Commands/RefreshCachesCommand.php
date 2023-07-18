@@ -2,7 +2,7 @@
 
 namespace Magpie\Routes\Commands;
 
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -10,7 +10,7 @@ use Magpie\Facades\Console;
 use Magpie\Routes\RouteRegistry;
 
 #[CommandSignature('route:refresh-caches')]
-#[CommandDescription('Refresh route caches')]
+#[CommandDescriptionL('Refresh route caches')]
 class RefreshCachesCommand extends Command
 {
     /**
@@ -18,9 +18,9 @@ class RefreshCachesCommand extends Command
      */
     protected function onRun(Request $request) : void
     {
-        Console::info('Refreshing route caches...');
+        Console::info(_l('Refreshing route caches...'));
         RouteRegistry::saveSourceCache();
 
-        Console::info('Done');
+        Console::info(_l('Done'));
     }
 }

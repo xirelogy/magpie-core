@@ -1,4 +1,5 @@
 {
+  "Run scheduler in foreground": "在前臺中運行定時任務調度器",
   "Starting scheduler...": "調度器啓動中…",
   "Scheduler exit with code {{0}}": "調度器執行完畢：{{0}}",
   "Scheduler exit": "調度器執行完畢",

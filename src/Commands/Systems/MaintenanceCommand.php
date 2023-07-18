@@ -5,7 +5,7 @@ namespace Magpie\Commands\Systems;
 use Magpie\Codecs\Parsers\ClosureParser;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Parsers\StringParser;
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -17,7 +17,7 @@ use Magpie\System\Kernel\Kernel;
  * Check or change system maintenance status
  */
 #[CommandSignature('sys:maintenance {set?}')]
-#[CommandDescription('Check system maintenance state or change system maintenance state')]
+#[CommandDescriptionL('Check system maintenance state or change system maintenance state')]
 class MaintenanceCommand extends Command
 {
     /**

@@ -2,7 +2,7 @@
 
 namespace Magpie\Commands\Systems;
 
-use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
@@ -14,7 +14,7 @@ use Magpie\System\Kernel\Kernel;
  * Refresh and maintain source cache
  */
 #[CommandSignature('sys:refresh-caches')]
-#[CommandDescription('Refresh and maintain source cache')]
+#[CommandDescriptionL('Refresh and regenerate source cache')]
 class RefreshCachesCommand extends Command
 {
     /**
