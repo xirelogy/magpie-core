@@ -5,6 +5,9 @@ namespace Magpie\Codecs\Parsers\Exceptions;
 use Magpie\Exceptions\ParseFailedException;
 use Throwable;
 
+/**
+ * Exception due to failure to be handled like a string
+ */
 class CannotBeHandledAsStringParseFailedException extends ParseFailedException
 {
     /**
