@@ -3,13 +3,13 @@
 namespace Magpie\Commands\Systems;
 
 use Magpie\Codecs\Parsers\ClosureParser;
+use Magpie\Codecs\Parsers\Exceptions\MustBeValuesParseFailedException;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
-use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\Facades\Console;
 use Magpie\System\Kernel\Kernel;
 
@@ -53,7 +53,7 @@ class MaintenanceCommand extends Command
             return match ($value) {
                 'up' => true,
                 'down' => false,
-                default => throw new UnsupportedValueException($value),
+                default => throw new MustBeValuesParseFailedException(['up', 'down']),
             };
         });
     }
