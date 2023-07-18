@@ -12,6 +12,7 @@ use Magpie\Exceptions\DuplicatedKeyException;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\UnexpectedException;
 use Magpie\General\Sugars\Quote;
+use Magpie\Locales\Concepts\Localizable;
 
 /**
  * Command signature
@@ -24,9 +25,9 @@ class CommandSignature
      */
     public readonly string $command;
     /**
-     * @var string|null The command description
+     * @var Localizable|string|null The command description
      */
-    public readonly ?string $description;
+    public readonly Localizable|string|null $description;
     /**
      * @var array<string, CommandOptionDefinition> Command options
      */
@@ -44,11 +45,11 @@ class CommandSignature
     /**
      * Constructor
      * @param string $command
-     * @param string|null $description
+     * @param Localizable|string|null $description
      * @param array<string, CommandOptionDefinition> $options
      * @param array<string, CommandArgumentDefinition> $arguments
      */
-    protected function __construct(string $command, ?string $description, array $options, array $arguments)
+    protected function __construct(string $command, Localizable|string|null $description, array $options, array $arguments)
     {
         $this->command = $command;
         $this->description = $description;
@@ -164,11 +165,11 @@ class CommandSignature
     /**
      * Parse from given signature text
      * @param string $signature
-     * @param string|null $description
+     * @param Localizable|string|null $description
      * @return static
      * @throws Exception
      */
-    public static function parse(string $signature, ?string $description) : static
+    public static function parse(string $signature, Localizable|string|null $description) : static
     {
         $tokens = static::tokenize($signature);
 

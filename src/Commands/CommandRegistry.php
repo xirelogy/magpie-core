@@ -4,12 +4,15 @@ namespace Magpie\Commands;
 
 use Exception;
 use Magpie\Commands\Attributes\CommandDescription;
+use Magpie\Commands\Attributes\CommandDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Concepts\CommandSchedulable;
 use Magpie\Commands\Exceptions\UnknownCommandException;
 use Magpie\Commands\Impls\CommandSignature as ImplCommandSignature;
 use Magpie\Exceptions\ConflictException;
 use Magpie\General\Traits\StaticClass;
+use Magpie\Locales\Concepts\Localizable;
+use Magpie\Locales\I18n;
 use Magpie\Schedules\ScheduleDefinition;
 use Magpie\System\HardCore\AutoloadReflection;
 use ReflectionClass;
@@ -161,10 +164,15 @@ class CommandRegistry
     /**
      * Find description
      * @param ReflectionClass $class
-     * @return string|null
+     * @return Localizable|string|null
      */
-    protected static function findDescriptionFromAttribute(ReflectionClass $class) : ?string
+    protected static function findDescriptionFromAttribute(ReflectionClass $class) : Localizable|string|null
     {
+        $localeAttribute = iter_first($class->getAttributes(CommandDescriptionL::class));
+        if ($localeAttribute !== null) {
+            return I18n::tag($localeAttribute->newInstance()->desc, $class->name);
+        }
+
         $attribute = iter_first($class->getAttributes(CommandDescription::class));
         return $attribute?->newInstance()?->desc ?? null;
     }
