@@ -8,7 +8,6 @@ use Magpie\Commands\Command;
 use Magpie\Commands\Request;
 use Magpie\Facades\Console;
 use Magpie\Models\ClosureModelCheckListener;
-use Magpie\Models\Concepts\ModelCheckListenable;
 use Magpie\Models\Model;
 use Magpie\Models\Schemas\Checks\TableSchemaSynchronizer;
 use Magpie\Models\Schemas\ModelDefinition;
