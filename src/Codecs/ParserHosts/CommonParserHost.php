@@ -2,10 +2,13 @@
 
 namespace Magpie\Codecs\ParserHosts;
 
+use Magpie\Codecs\Impls\ParserArgTypeContext;
 use Magpie\Codecs\Parsers\Parser;
+use Magpie\Commands\OptionsCollection;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\MissingArgumentException;
 use Magpie\General\Sugars\Excepts;
+use Magpie\Locales\Concepts\Localizable;
 
 /**
  * Common parser host
@@ -16,6 +19,10 @@ abstract class CommonParserHost implements ParserHost
      * @var string|null Prefix in current parser host
      */
     protected ?string $prefix;
+    /**
+     * @var Localizable|string|null Argument type
+     */
+    protected Localizable|string|null $argType = null;
     /**
      * @var bool If empty strings are treated as null
      */
@@ -120,17 +127,17 @@ abstract class CommonParserHost implements ParserHost
             // Null are treated differently
             if ($ret === null) {
                 // Additional mandatory check
-                if ($isMandatory) throw new MissingArgumentException($this->fullKey($key));
+                if ($isMandatory) throw new MissingArgumentException($this->fullKey($key), argType: $this->argType);
 
                 // Always return here (null are not parsed)
                 return null;
             }
 
             if ($parser !== null) {
-                $ret = $parser->parse($ret, $this->fullKey($key));
+                $ret = ParserArgTypeContext::parseUsingArgType($this->argType, $parser, $ret, $this->fullKey($key));
 
                 // Additional mandatory check
-                if ($ret === null && $isMandatory) throw new MissingArgumentException($this->fullKey($key));
+                if ($ret === null && $isMandatory) throw new MissingArgumentException($this->fullKey($key), argType: $this->argType);
             }
 
             return $ret;

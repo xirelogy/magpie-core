@@ -3,6 +3,7 @@
 namespace Magpie\Exceptions;
 
 use Exception;
+use Magpie\Locales\Concepts\Localizable;
 use Throwable;
 
 /**
@@ -14,11 +15,12 @@ class InvalidArgumentException extends ArgumentException
      * Constructor
      * @param string|null $argName
      * @param Exception|string|null $reason
+     * @param Localizable|string|null $argType
      * @param Throwable|null $previous
      */
-    public function __construct(?string $argName = null, Exception|string|null $reason = null, ?Throwable $previous = null)
+    public function __construct(?string $argName = null, Exception|string|null $reason = null, Localizable|string|null $argType = null, ?Throwable $previous = null)
     {
-        $message = static::formatMessage($argName, $reason);
+        $message = static::formatMessage($argName, $reason, $argType);
 
         parent::__construct($argName, $message, $previous);
     }
@@ -28,28 +30,35 @@ class InvalidArgumentException extends ArgumentException
      * Format message
      * @param string|null $argName
      * @param Exception|string|null $reason
+     * @param Localizable|string|null $argType
      * @return string
      */
-    protected static function formatMessage(?string $argName, Exception|string|null $reason) : string
+    protected static function formatMessage(?string $argName, Exception|string|null $reason, Localizable|string|null $argType) : string
     {
         $defaultMessage = _l('Invalid argument');
 
-        // When reason provided, show the reason
-        if ($reason instanceof Exception) {
-            $reason = $reason->getMessage();
-        }
+        try {
+            $argType = $argType ?? _l('argument');
 
-        if (!empty($reason)) {
-            if (!empty($argName)) {
-                return _format_safe(_l('Invalid argument \'{{0}}\': {{1}}'), $argName, $reason) ?? $defaultMessage;
-            } else {
-                return _format_safe(_l('Invalid argument: {{0}}'), $reason) ?? $defaultMessage;
+            // When reason provided, show the reason
+            if ($reason instanceof Exception) {
+                $reason = $reason->getMessage();
             }
-        }
 
-        if (!empty($argName)) {
-            return _format_safe(_l('Invalid argument \'{{0}}\''), $argName) ?? $defaultMessage;
-        } else {
+            if (!empty($reason)) {
+                if (!empty($argName)) {
+                    return _format(_l('Invalid {{0}} \'{{1}}\': {{2}}'), $argType, $argName, $reason);
+                } else {
+                    return _format(_l('Invalid {{0}}: {{1}}'), $argType, $reason);
+                }
+            }
+
+            if (!empty($argName)) {
+                return _format(_l('Invalid {{0}} \'{{1}}\''), $argType, $argName);
+            } else {
+                return $defaultMessage;
+            }
+        } catch (Throwable) {
             return $defaultMessage;
         }
     }

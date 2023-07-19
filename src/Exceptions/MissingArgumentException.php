@@ -2,6 +2,7 @@
 
 namespace Magpie\Exceptions;
 
+use Magpie\Locales\Concepts\Localizable;
 use Throwable;
 
 /**
@@ -12,11 +13,12 @@ class MissingArgumentException extends ArgumentException
     /**
      * Constructor
      * @param string|null $argName
+     * @param Localizable|string|null $argType
      * @param Throwable|null $previous
      */
-    public function __construct(?string $argName = null, ?Throwable $previous = null)
+    public function __construct(?string $argName = null, Localizable|string|null $argType = null, ?Throwable $previous = null)
     {
-        $message = static::formatMessage($argName);
+        $message = static::formatMessage($argName, $argType);
 
         parent::__construct($argName, $message, $previous);
     }
@@ -25,12 +27,17 @@ class MissingArgumentException extends ArgumentException
     /**
      * Format message
      * @param string|null $argName
+     * @param Localizable|string|null $argType
      * @return string
      */
-    protected static function formatMessage(?string $argName) : string
+    protected static function formatMessage(?string $argName, Localizable|string|null $argType) : string
     {
-        if (empty($argName)) return _l('Missing argument');
-
-        return _format_safe(_l('Missing argument \'{{0}}\''), $argName) ?? _l('Missing argument');
+        try {
+            $argType = $argType ?? _l('argument');
+            if (empty($argName)) return _format(_l('Missing {{0}}'), $argType);
+            return _format(_l('Missing {{0}} \'{{1}}\''), $argType, $argName);
+        } catch (Throwable) {
+            return _l('Missing argument');
+        }
     }
 }

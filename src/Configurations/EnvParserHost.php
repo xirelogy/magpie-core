@@ -37,7 +37,7 @@ class EnvParserHost extends CommonParserHost
         if ($value === '') $value = null;
         if ($value !== null) return $value;
 
-        if ($isMandatory) throw new MissingArgumentException($this->fullKey($key));
+        if ($isMandatory) throw new MissingArgumentException($this->fullKey($key), argType: $this->argType);
         return $default;
     }
 

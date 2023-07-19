@@ -45,7 +45,7 @@ class ObjectParserHost extends CommonParserHost
     protected function obtainRaw(int|string $key, int|string $inKey, bool $isMandatory, mixed $default) : mixed
     {
         if (!property_exists($this->obj, $inKey)) {
-            if ($isMandatory) throw new MissingArgumentException($this->fullKey($key));
+            if ($isMandatory) throw new MissingArgumentException($this->fullKey($key), argType: $this->argType);
             return $default;
         }
 

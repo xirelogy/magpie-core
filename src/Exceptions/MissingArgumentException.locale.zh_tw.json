@@ -1,5 +1,7 @@
 {
   "Missing argument": "參數缺失",
-  "Missing argument '{{0}}'": "參數'{{0}}'缺失",
+  "Missing {{0}}": "{{0}}缺失",
+  "Missing {{0}} '{{1}}'": "{{0}}'{{1}}'缺失",
+  "argument": "參數",
   "": ""
 }

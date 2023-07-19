@@ -3,6 +3,7 @@
 namespace Magpie\Codecs\Traits;
 
 use Exception;
+use Magpie\Codecs\Impls\ParserArgTypeContext;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\InvalidArgumentException;
 use Magpie\Exceptions\ParseFailedException;
@@ -27,9 +28,9 @@ trait CommonParser
         } catch (ArgumentException $ex) {
             throw $ex;
         } catch (ParseFailedException $ex) {
-            throw new InvalidArgumentException($hintName, $ex, previous: $ex);
+            throw new InvalidArgumentException($hintName, $ex, argType: ParserArgTypeContext::getArgType(), previous: $ex);
         } catch (Exception $ex) {
-            throw new InvalidArgumentException($hintName, previous: $ex);
+            throw new InvalidArgumentException($hintName, argType: ParserArgTypeContext::getArgType(), previous: $ex);
         }
     }
 

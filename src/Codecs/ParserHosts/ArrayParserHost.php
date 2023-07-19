@@ -44,7 +44,7 @@ class ArrayParserHost extends CommonParserHost
     protected function obtainRaw(int|string $key, int|string $inKey, bool $isMandatory, mixed $default) : mixed
     {
         if (!array_key_exists($inKey, $this->arr)) {
-            if ($isMandatory) throw new MissingArgumentException($this->fullKey($key));
+            if ($isMandatory) throw new MissingArgumentException($this->fullKey($key), argType: $this->argType);
             return $default;
         }
 
