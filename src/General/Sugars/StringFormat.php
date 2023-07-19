@@ -9,7 +9,10 @@ use Magpie\Exceptions\IndexOutOfRangeException;
 use Magpie\Exceptions\StringFormatException;
 use Magpie\General\Str;
 use Magpie\General\Traits\StaticClass;
+use Magpie\Locales\Concepts\Localizable;
+use Magpie\Locales\I18n;
 use Stringable;
+use Throwable;
 
 /**
  * Support for applying arguments to a format string, then providing the final
@@ -70,6 +73,81 @@ final class StringFormat
         } catch (Exception $ex) {
             throw new InvalidFormatStringException(previous: $ex);
         }
+    }
+
+
+    /**
+     * Apply arguments to given format string, but resolve the localization only when required.
+     * @param Localizable $fallback
+     * @param Localizable $format
+     * @param mixed ...$args
+     * @return Localizable
+     */
+    public static function localizedFormat(Localizable $fallback, Localizable $format, mixed ...$args) : Localizable
+    {
+        return new class($fallback, $format, $args) implements Localizable {
+            /**
+             * Constructor
+             * @param Localizable $fallback
+             * @param Localizable $format
+             * @param array $args
+             */
+            public function __construct(
+                protected readonly Localizable $fallback,
+                protected readonly Localizable $format,
+                protected readonly array $args,
+            ) {
+
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function getDefaultTranslation() : string
+            {
+                try {
+                    $outArgs = [];
+                    foreach ($this->args as $arg) {
+                        $outArgs[] = $arg instanceof Localizable ? $arg->getDefaultTranslation() : $arg;
+                    }
+
+                    $format = $this->format->getDefaultTranslation();
+                    return StringFormat::format($format, ...$outArgs);
+                } catch (Throwable) {
+                    return $this->fallback->getDefaultTranslation();
+                }
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function getTranslation(string $locale) : string
+            {
+                try {
+                    $outArgs = [];
+                    foreach ($this->args as $arg) {
+                        $outArgs[] = $arg instanceof Localizable ? $arg->getTranslation($locale) : $arg;
+                    }
+
+                    $format = $this->format->getTranslation($locale);
+                    return StringFormat::format($format, ...$outArgs);
+                } catch (Throwable) {
+                    return $this->fallback->getTranslation($locale);
+                }
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function __toString() : string
+            {
+                $locale = I18n::getCurrentLocale();
+                return $this->getTranslation($locale);
+            }
+        };
     }
 
 

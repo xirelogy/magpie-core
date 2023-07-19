@@ -70,6 +70,24 @@ function _format(string $format, mixed ...$args) : string
 
 
 /**
+ * Apply arguments to given format string, but resolve the localization only when required.
+ * A fallback must be provided because localization is not allowed to fail.
+ * @param Localizable|string $fallbackSpec The localized fallback string
+ * @param Localizable|string $formatSpec The localized format string, refer to `_format()`
+ * @param mixed ...$args Arguments
+ * @return Localizable
+ */
+function _format_l(Localizable|string $fallbackSpec, Localizable|string $formatSpec, mixed ...$args) : Localizable
+{
+    $className = $className ?? StackTraversal::getLastClassName(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
+    $fallback = $fallbackSpec instanceof Localizable ? $fallbackSpec : I18n::tag($fallbackSpec, $className);
+    $format = $formatSpec instanceof Localizable ? $formatSpec : I18n::tag($formatSpec, $className);
+
+    return StringFormat::localizedFormat($fallback, $format, ...$args);
+}
+
+
+/**
  * Apply arguments to given format string, returning null when exception occurs
  * @param string $format Format string, where each placement is marked
  *                      around two brace brackets (`{{n}}`) with a zero-based
