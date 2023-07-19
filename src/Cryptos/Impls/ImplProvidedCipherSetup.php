@@ -5,10 +5,8 @@ namespace Magpie\Cryptos\Impls;
 use Magpie\Cryptos\Algorithms\SymmetricCryptos\Cipher;
 use Magpie\Cryptos\Algorithms\SymmetricCryptos\CipherSetup;
 use Magpie\Cryptos\Concepts\SymmetricCipherSetupServiceable;
-use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Paddings\Padding;
 use Magpie\Exceptions\MissingArgumentException;
-use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnexpectedException;
 
 /**
@@ -27,8 +25,6 @@ class ImplProvidedCipherSetup extends CipherSetup
      * Constructor
      * @param string $algoTypeClass
      * @param SymmetricCipherSetupServiceable $service
-     * @throws SafetyCommonException
-     * @throws CryptoException
      */
     public function __construct(string $algoTypeClass, SymmetricCipherSetupServiceable $service)
     {
