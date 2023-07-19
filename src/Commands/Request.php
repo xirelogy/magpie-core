@@ -2,6 +2,8 @@
 
 namespace Magpie\Commands;
 
+use Magpie\HttpServer\ServerCollection;
+
 /**
  * Representation of a console request
  */
@@ -20,6 +22,10 @@ abstract class Request
      */
     public readonly ArgumentsCollection $arguments;
     /**
+     * @var ServerCollection Server variables
+     */
+    public readonly ServerCollection $serverVars;
+    /**
      * @var array<string, string|bool> Options (raw)
      */
     protected readonly array $rawOptions;
@@ -34,8 +40,9 @@ abstract class Request
      * @param string $command
      * @param array<string, string|bool> $options
      * @param array<string, string> $arguments
+     * @param ServerCollection $serverVars
      */
-    protected function __construct(string $command, array $options, array $arguments)
+    protected function __construct(string $command, array $options, array $arguments, ServerCollection $serverVars)
     {
         $this->command = $command;
         $this->rawOptions = $options;
@@ -43,6 +50,7 @@ abstract class Request
 
         $this->options = static::createOptionsCollection($options);
         $this->arguments = static::createArgumentsCollection($arguments);
+        $this->serverVars = $serverVars;
     }
 
 

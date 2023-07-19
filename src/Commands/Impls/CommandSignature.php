@@ -16,6 +16,7 @@ use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\UnexpectedException;
 use Magpie\General\Str;
 use Magpie\General\Sugars\Quote;
+use Magpie\HttpServer\ServerCollection;
 use Magpie\Locales\Concepts\Localizable;
 use Magpie\Locales\I18n;
 use ReflectionClass;
@@ -66,13 +67,14 @@ class CommandSignature
 
     /**
      * Create request from console arguments
+     * @param ServerCollection $serverVars
      * @param int $argc
      * @param array $argv
      * @param int $commandIndex
      * @return ImplRequest
      * @throws Exception
      */
-    public function createRequest(int $argc, array $argv, int $commandIndex) : ImplRequest
+    public function createRequest(ServerCollection $serverVars, int $argc, array $argv, int $commandIndex) : ImplRequest
     {
         $command = $argv[$commandIndex] ?? throw new UnexpectedException();
 
@@ -120,7 +122,7 @@ class CommandSignature
             $outOptions[$optionKey] = false;
         }
 
-        return new ImplRequest($command, $outOptions, $outArguments);
+        return new ImplRequest($command, $outOptions, $outArguments, $serverVars);
     }
 
 

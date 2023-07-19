@@ -3,6 +3,7 @@
 namespace Magpie\Commands\Impls;
 
 use Magpie\Commands\Request;
+use Magpie\HttpServer\ServerCollection;
 
 /**
  * Implementation of console request
@@ -15,10 +16,11 @@ class ImplRequest extends Request
      * @param string $command
      * @param array<string, string|bool> $options
      * @param array<string, string> $arguments
+     * @param ServerCollection $serverVars
      */
-    public function __construct(string $command, array $options, array $arguments)
+    public function __construct(string $command, array $options, array $arguments, ServerCollection $serverVars)
     {
-        parent::__construct($command, $options, $arguments);
+        parent::__construct($command, $options, $arguments, $serverVars);
     }
 
 

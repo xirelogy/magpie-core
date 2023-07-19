@@ -3,6 +3,9 @@
 namespace Magpie\System\RunContexts;
 
 use Exception;
+use Magpie\Codecs\Parsers\ArrayParser;
+use Magpie\Codecs\Parsers\IntegerParser;
+use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Command;
 use Magpie\Commands\CommandRegistry;
 use Magpie\Commands\Impls\ImplRequest;
@@ -11,6 +14,7 @@ use Magpie\Consoles\Concepts\Consolable;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\UnexpectedException;
 use Magpie\Facades\Console;
+use Magpie\HttpServer\ServerCollection;
 use Magpie\Locales\I18n;
 use Magpie\System\Kernel\Kernel;
 
@@ -28,6 +32,23 @@ class ConsoleRunContext extends RunContext
      */
     protected static int $lastExitCode = 0;
 
+    /**
+     * @var ServerCollection Server variables
+     */
+    protected readonly ServerCollection $serverVars;
+
+
+    /**
+     * Constructor
+     * @param ServerCollection $serverVars
+     */
+    protected function __construct(ServerCollection $serverVars)
+    {
+        parent::__construct();
+
+        $this->serverVars = $serverVars;
+    }
+
 
     /**
      * Return the last exit code
@@ -44,23 +65,22 @@ class ConsoleRunContext extends RunContext
      */
     public function run() : void
     {
-        // Handle the arguments
-        $argc = $_SERVER['argc'];
-        $argv = $_SERVER['argv'];
-
-        static::$lastExitCode = $this->runProtected($argc, $argv);
+        static::$lastExitCode = $this->runProtected();
     }
 
 
     /**
      * Run protected
-     * @param int $argc
-     * @param array<string> $argv
      * @return int
      */
-    protected function runProtected(int $argc, array $argv) : int
+    protected function runProtected() : int
     {
         try {
+            /** @var int $argc */
+            $argc = $this->serverVars->requires('argc', IntegerParser::create()->withMin(0));
+            /** @var array<string> $argv */
+            $argv = $this->serverVars->requires('argv', ArrayParser::create()->withChain(StringParser::create()));
+
             if ($argc < 2) {
                 return $this->runWithoutCommand($argc, $argv);
             } else {
@@ -84,7 +104,7 @@ class ConsoleRunContext extends RunContext
     {
         _used($argc, $argv);
 
-        $request = new ImplRequest('', [], []);
+        $request = new ImplRequest('', [], [], $this->serverVars);
 
         $commandInstance = new DefaultCommand();
         return $commandInstance->run($request);
@@ -103,7 +123,7 @@ class ConsoleRunContext extends RunContext
         $command = $argv[static::COMMAND_INDEX] ?? throw new UnexpectedException();
 
         $handler = CommandRegistry::_route($command);
-        $request = $handler->createRequest($argc, $argv, static::COMMAND_INDEX);
+        $request = $handler->createRequest($this->serverVars, $argc, $argv, static::COMMAND_INDEX);
 
         $commandClass = $handler->payloadClassName;
         if (!is_subclass_of($commandClass, Command::class)) throw new ClassNotOfTypeException($commandClass, Command::class);
@@ -123,14 +143,17 @@ class ConsoleRunContext extends RunContext
         // Prepare the registry
         CommandRegistry::_boot();
 
+        // Capture server variables
+        $serverVars = ServerCollection::capture();
+
         // Register the console
         $kernel = Kernel::current();
         $kernel->registerProvider(Consolable::class, $kernel->getConfig()->createDefaultConsolable());
 
         // Handle LANG environment variable
-        $lang = $_SERVER['LANG'] ?? null;
+        $lang = $serverVars->optional('LANG', StringParser::createTrimEmptyAsNull());
         if ($lang !== null) I18n::setCurrentLocale($lang);
 
-        return new static();
+        return new static($serverVars);
     }
 }
