@@ -2,13 +2,13 @@
 
 namespace Magpie\Facades\Http;
 
+use Magpie\Codecs\Concepts\Collectable;
 use Magpie\Codecs\ParserHosts\CommonParserHost;
 use Magpie\Exceptions\MissingArgumentException;
 use Magpie\General\Concepts\Packable;
 use Magpie\General\Packs\PackContext;
 use Magpie\General\Sugars\Quote;
 use Magpie\General\Traits\CommonPackable;
-use Magpie\HttpServer\Concepts\Collectable;
 
 /**
  * HTTP client response headers

@@ -2,13 +2,12 @@
 
 namespace Magpie\HttpServer;
 
-use Magpie\Codecs\ParserHosts\ArrayParserHost;
-use Magpie\HttpServer\Concepts\Collectable;
+use Magpie\Codecs\ParserHosts\ArrayCollection;
 
 /**
- * Common collection
+ * Common collection for HTTP server
  */
-abstract class Collection extends ArrayParserHost implements Collectable
+abstract class Collection extends ArrayCollection
 {
     /**
      * Constructor
@@ -18,27 +17,5 @@ abstract class Collection extends ArrayParserHost implements Collectable
     protected function __construct(iterable $keyValues, ?string $prefix = null)
     {
         parent::__construct(iter_flatten($keyValues), $prefix);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getKeys() : iterable
-    {
-        foreach (array_keys($this->arr) as $inKey) {
-            yield $this->formatKey($inKey);
-        }
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function all() : iterable
-    {
-        foreach ($this->arr as $inKey => $value) {
-            yield $this->formatKey($inKey) => $value;
-        }
     }
 }

@@ -1,12 +1,11 @@
 <?php
 
-namespace Magpie\HttpServer\Concepts;
+namespace Magpie\Codecs\Concepts;
 
 use Magpie\Codecs\ParserHosts\ParserHost;
 
 /**
  * General collection
- * @deprecated Replaced by \Magpie\Codecs\ParserHosts\ParserHost\Collectable
  */
 interface Collectable extends ParserHost
 {
