@@ -2,6 +2,7 @@
 
 namespace Magpie\HttpServer;
 
+use Magpie\HttpServer\Concepts\CookieSpecifiable;
 use Magpie\HttpServer\Concepts\Renderable;
 
 /**
@@ -61,5 +62,19 @@ abstract class CommonRenderable implements Renderable
     protected static function sendHeader(string $headerName, string $value, bool $isReplace = true) : void
     {
         header("$headerName: $value", $isReplace);
+    }
+
+
+    /**
+     * Send cookies in response
+     * @param iterable<CookieSpecifiable> $cookies
+     * @param Request|null $request
+     * @return void
+     */
+    protected static function sendCookies(iterable $cookies, ?Request $request) : void
+    {
+        foreach ($cookies as $cookie) {
+            $cookie->_render($request);
+        }
     }
 }

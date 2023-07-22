@@ -3,18 +3,22 @@
 namespace Magpie\HttpServer;
 
 use Magpie\General\Names\CommonHttpStatusCode;
+use Magpie\HttpServer\Concepts\CookieSpecifiable;
 use Magpie\HttpServer\Concepts\WithContentSpecifiable;
+use Magpie\HttpServer\Concepts\WithCookieSpecifiable;
 use Magpie\HttpServer\Concepts\WithHeaderSpecifiable;
 use Magpie\HttpServer\Concepts\WithHttpStatusCodeSpecifiable;
+use Magpie\HttpServer\Traits\CommonCookieSpecifiable;
 use Magpie\HttpServer\Traits\CommonHeaderSpecifiable;
 use Magpie\Objects\Uri;
 
 /**
  * Representation of a response
  */
-class Response extends CommonRenderable implements WithHttpStatusCodeSpecifiable, WithHeaderSpecifiable, WithContentSpecifiable
+class Response extends CommonRenderable implements WithHttpStatusCodeSpecifiable, WithHeaderSpecifiable, WithCookieSpecifiable, WithContentSpecifiable
 {
     use CommonHeaderSpecifiable;
+    use CommonCookieSpecifiable;
 
 
     /**
@@ -33,6 +37,10 @@ class Response extends CommonRenderable implements WithHttpStatusCodeSpecifiable
      * @var array<string, string|array> Headers values
      */
     protected array $headerValues = [];
+    /**
+     * @var array<CookieSpecifiable> Cookies
+     */
+    protected array $cookies = [];
 
 
     /**
@@ -90,6 +98,7 @@ class Response extends CommonRenderable implements WithHttpStatusCodeSpecifiable
         if ($this->httpStatusCode !== null) http_response_code($this->httpStatusCode);
 
         static::sendHeaders($this->headerNames, $this->headerValues);
+        static::sendCookies($this->cookies, $request);
 
         echo $this->content;
     }

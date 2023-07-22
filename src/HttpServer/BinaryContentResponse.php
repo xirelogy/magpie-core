@@ -9,16 +9,20 @@ use Magpie\General\Concepts\PrimitiveBinaryContentable;
 use Magpie\General\Contents\BinaryContent;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Sugars\Quote;
+use Magpie\HttpServer\Concepts\CookieSpecifiable;
+use Magpie\HttpServer\Concepts\WithCookieSpecifiable;
 use Magpie\HttpServer\Concepts\WithHeaderSpecifiable;
+use Magpie\HttpServer\Traits\CommonCookieSpecifiable;
 use Magpie\HttpServer\Traits\CommonHeaderSpecifiable;
 use Magpie\System\Kernel\ExceptionHandler;
 
 /**
  * A response which is a binary content
  */
-class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecifiable
+class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecifiable, WithCookieSpecifiable
 {
     use CommonHeaderSpecifiable;
+    use CommonCookieSpecifiable;
 
 
     /**
@@ -41,6 +45,10 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
      * @var array<string, string|array> Headers values
      */
     protected array $headerValues = [];
+    /**
+     * @var array<CookieSpecifiable> Cookies
+     */
+    protected array $cookies = [];
 
 
     /**
@@ -85,6 +93,7 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
         }
 
         static::sendHeaders($this->headerNames, $this->headerValues);
+        static::sendCookies($this->cookies, $request);
 
         try {
             if ($this->content instanceof FileSystemAccessible) {
