@@ -70,7 +70,7 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
     /**
      * @inheritDoc
      */
-    protected function onRender() : void
+    protected function onRender(?Request $request) : void
     {
         $mimeType = $this->content->getMimeType();
         if ($mimeType !== null) {

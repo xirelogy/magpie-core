@@ -12,17 +12,18 @@ abstract class CommonRenderable implements Renderable
     /**
      * @inheritDoc
      */
-    public final function render() : void
+    public final function render(?Request $request) : void
     {
-        $this->onRender();
+        $this->onRender($request);
     }
 
 
     /**
      * Render the response
+     * @param Request|null $request
      * @return void
      */
-    protected abstract function onRender() : void;
+    protected abstract function onRender(?Request $request) : void;
 
 
     /**

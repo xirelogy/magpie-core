@@ -85,7 +85,7 @@ class Response extends CommonRenderable implements WithHttpStatusCodeSpecifiable
     /**
      * @inheritDoc
      */
-    protected function onRender() : void
+    protected function onRender(?Request $request) : void
     {
         if ($this->httpStatusCode !== null) http_response_code($this->httpStatusCode);
 

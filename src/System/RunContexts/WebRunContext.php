@@ -51,7 +51,7 @@ class WebRunContext extends RunContext
         try {
             $this->onRun($appConfig, $routeDomain, $this->request);
         } catch (HttpResponseException $ex) {
-            $appConfig->getHttpResponseExceptionRenderer()->createExceptionRenderer($ex)->render();
+            $appConfig->getHttpResponseExceptionRenderer()->createExceptionRenderer($ex)->render($this->request);
             return;
         }
     }
@@ -74,7 +74,7 @@ class WebRunContext extends RunContext
 
         $response = $this->onRoute($handler, $request);
 
-        $this->getResponseRenderer($appConfig, $response)->render();
+        $this->getResponseRenderer($appConfig, $response)->render($request);
     }
 
 

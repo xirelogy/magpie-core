@@ -3,6 +3,7 @@
 namespace Magpie\HttpServer\Renderers;
 
 use Magpie\HttpServer\CommonRenderable;
+use Magpie\HttpServer\Request;
 
 /**
  * A renderer that treats string as HTML content (ad verbatim)
@@ -28,7 +29,7 @@ class StringRenderer extends CommonRenderable
     /**
      * @inheritDoc
      */
-    protected function onRender() : void
+    protected function onRender(?Request $request) : void
     {
         echo $this->text;
     }
