@@ -6,12 +6,13 @@ use Magpie\General\Sugars\Excepts;
 use Magpie\Routes\Concepts\RouteHandleable;
 use Magpie\Routes\Handlers\ControllerMethodRouteHandler;
 use Magpie\System\Concepts\SourceCacheTranslatable;
+use Stringable;
 
 /**
  * Route landing
  * @internal
  */
-class RouteLanding implements SourceCacheTranslatable
+class RouteLanding implements SourceCacheTranslatable, Stringable
 {
     /**
      * @var string Type class
@@ -61,6 +62,18 @@ class RouteLanding implements SourceCacheTranslatable
     /**
      * @inheritDoc
      */
+    public function __toString() : string
+    {
+        return match ($this->typeClass) {
+            ControllerMethodRouteHandler::TYPECLASS => static::formatControllerMethodRouteHandler($this->arguments),
+            default => '?',
+        };
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function sourceCacheExport() : array
     {
         return [
@@ -85,6 +98,24 @@ class RouteLanding implements SourceCacheTranslatable
             if (is_empty_string($controllerClassName) || is_empty_string($methodName)) return null;
             return new ControllerMethodRouteHandler($controllerClassName, $methodName);
         });
+    }
+
+
+    /**
+     * Format route handler for controller-method
+     * @param array $arguments
+     * @return string
+     */
+    protected static function formatControllerMethodRouteHandler(array $arguments) : string
+    {
+        $errorReturn = '<err>';
+
+        return Excepts::noThrow(function() use($arguments, $errorReturn) {
+            $controllerClassName = $arguments['class'] ?? null;
+            $methodName = $arguments['method'] ?? null;
+            if (is_empty_string($controllerClassName) || is_empty_string($methodName)) return $errorReturn;
+            return "$controllerClassName::$methodName";
+        }, $errorReturn);
     }
 
 

@@ -135,6 +135,46 @@ class RouteNode implements SourceCacheTranslatable
 
 
     /**
+     * Expand the routes
+     * @param string|null $domain
+     * @param string $path
+     * @return iterable<RouteInfo>
+     */
+    public function expandRoute(?string $domain, string $path) : iterable
+    {
+        // Land if allowed
+        if ($this->isLanding()) {
+            foreach ($this->methods as $method => $landing) {
+                yield new RouteInfo($domain, $path, $method, $landing);
+            }
+            return;
+        }
+
+        if ($this->text == '.') {
+            // Root is preserved
+            $newPath = $path;
+        } else {
+            // Cleanup trailing slashes
+            while (str_ends_with($path, '/')) {
+                $path = substr($path, 0, -1);
+            }
+
+            if ($this->text == '/') {
+                // Variable
+                $newPath = $path . '/' . RouteInfo::VARIABLE;
+            } else {
+                // Normal path (default)
+                $newPath = $path . '/' . $this->text;
+            }
+        }
+
+        foreach ($this->subNodes as $subNode) {
+            yield from $subNode->expandRoute($domain, $newPath);
+        }
+    }
+
+
+    /**
      * @inheritDoc
      */
     public function sourceCacheExport() : array

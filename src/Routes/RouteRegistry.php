@@ -4,11 +4,14 @@ namespace Magpie\Routes;
 
 use Exception;
 use Magpie\Exceptions\DuplicatedKeyException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Routes\Impls\RegExRouteDomainMatch;
 use Magpie\Routes\Impls\RouteDomainMatch;
+use Magpie\Routes\Impls\RouteInfo;
 use Magpie\Routes\Impls\VariableRouteDomainMatch;
 use Magpie\System\HardCore\SourceCache;
+use ReflectionException;
 
 /**
  * Route definition and discovery
@@ -133,5 +136,20 @@ class RouteRegistry
         }
 
         return null;
+    }
+
+
+    /**
+     * All active route landing points
+     * @return iterable<RouteInfo>
+     * @throws SafetyCommonException
+     * @throws ReflectionException
+     * @internal
+     */
+    public static function _all() : iterable
+    {
+        foreach (static::$domains as $domain) {
+            yield from $domain->_all();
+        }
     }
 }

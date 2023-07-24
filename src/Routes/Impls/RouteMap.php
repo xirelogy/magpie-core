@@ -139,6 +139,17 @@ class RouteMap implements SourceCacheTranslatable
 
 
     /**
+     * All routes
+     * @param string|null $domain
+     * @return iterable<RouteInfo>
+     */
+    public function all(?string $domain) : iterable
+    {
+        yield from $this->root->expandRoute($domain, '/');
+    }
+
+
+    /**
      * Obtain the route variables for given class
      * @param string $className
      * @return array<string, mixed>|null

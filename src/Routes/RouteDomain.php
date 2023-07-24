@@ -18,12 +18,14 @@ use Magpie\Routes\Handlers\ClosureRouteHandler;
 use Magpie\Routes\Handlers\ControllerMethodRouteHandler;
 use Magpie\Routes\Handlers\MethodFallbackRouteHandler;
 use Magpie\Routes\Impls\ActualRouteContext;
+use Magpie\Routes\Impls\RouteInfo;
 use Magpie\Routes\Impls\RouteLanding;
 use Magpie\Routes\Impls\RouteMap;
 use Magpie\Routes\Impls\RouteMiddlewareCollection;
 use Magpie\System\HardCore\SourceCache;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 
 /**
  * Routing domain
@@ -233,6 +235,22 @@ abstract class RouteDomain
         // Fallback when no route is matched
         $fallbackHandler = $this->getFallbackRouteHandler();
         return $this->middlewares->createRouteHandler($fallbackHandler);
+    }
+
+
+    /**
+     * All active routes
+     * @return iterable<RouteInfo>
+     * @throws SafetyCommonException
+     * @throws ReflectionException
+     * @internal
+     */
+    public final function _all() : iterable
+    {
+        // Ensure boot up
+        $this->ensureBoot();
+
+        yield from $this->map->all($this->domain);
     }
 
 
