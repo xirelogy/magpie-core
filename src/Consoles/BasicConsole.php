@@ -13,6 +13,33 @@ abstract class BasicConsole implements Consolable
     /**
      * @inheritDoc
      */
+    public function emergency(Stringable|string|null $text) : void
+    {
+        $this->output($text, DisplayStyle::EMERGENCY);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function alert(Stringable|string|null $text) : void
+    {
+        $this->output($text, DisplayStyle::ALERT);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function critical(Stringable|string|null $text) : void
+    {
+        $this->output($text, DisplayStyle::CRITICAL);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function error(Stringable|string|null $text) : void
     {
         $this->output($text, DisplayStyle::ERROR);
@@ -25,6 +52,15 @@ abstract class BasicConsole implements Consolable
     public function warning(Stringable|string|null $text) : void
     {
         $this->output($text, DisplayStyle::WARNING);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function notice(Stringable|string|null $text) : void
+    {
+        $this->output($text, DisplayStyle::NOTICE);
     }
 
 

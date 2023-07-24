@@ -12,6 +12,30 @@ use Stringable;
 interface Consolable extends TypeClassable
 {
     /**
+     * Output a text to console with 'emergency' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public function emergency(Stringable|string|null $text) : void;
+
+
+    /**
+     * Output a text to console with 'alert' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public function alert(Stringable|string|null $text) : void;
+
+
+    /**
+     * Output a text to console with 'critical' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public function critical(Stringable|string|null $text) : void;
+
+
+    /**
      * Output a text to console with 'error' style
      * @param Stringable|string|null $text
      * @return void
@@ -25,6 +49,14 @@ interface Consolable extends TypeClassable
      * @return void
      */
     public function warning(Stringable|string|null $text) : void;
+
+
+    /**
+     * Output a text to console with 'notice' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public function notice(Stringable|string|null $text) : void;
 
 
     /**

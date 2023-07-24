@@ -34,6 +34,39 @@ abstract class StructuredText implements Stringable
 
 
     /**
+     * Create single unit text with emergency format
+     * @param string $text
+     * @return self
+     */
+    public static function emergency(string $text) : self
+    {
+        return static::from($text, DisplayStyle::EMERGENCY);
+    }
+
+
+    /**
+     * Create single unit text with alert format
+     * @param string $text
+     * @return self
+     */
+    public static function alert(string $text) : self
+    {
+        return static::from($text, DisplayStyle::ALERT);
+    }
+
+
+    /**
+     * Create single unit text with critical format
+     * @param string $text
+     * @return self
+     */
+    public static function critical(string $text) : self
+    {
+        return static::from($text, DisplayStyle::CRITICAL);
+    }
+
+
+    /**
      * Create single unit text with error format
      * @param string $text
      * @return self
@@ -56,6 +89,17 @@ abstract class StructuredText implements Stringable
 
 
     /**
+     * Create single unit text with notice format
+     * @param string $text
+     * @return self
+     */
+    public static function notice(string $text) : self
+    {
+        return static::from($text, DisplayStyle::NOTICE);
+    }
+
+
+    /**
      * Create single unit text with info format
      * @param string $text
      * @return self
@@ -70,6 +114,7 @@ abstract class StructuredText implements Stringable
      * Create single unit text with note format
      * @param string $text
      * @return self
+     * @deprecated use debug() instead
      */
     public static function note(string $text) : self
     {
@@ -81,6 +126,7 @@ abstract class StructuredText implements Stringable
      * Create single unit text with strong format
      * @param string $text
      * @return self
+     * @deprecated use notice() instead
      */
     public static function strong(string $text) : self
     {

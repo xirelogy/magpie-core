@@ -17,6 +17,39 @@ class Console
 
 
     /**
+     * Output a text to console with 'emergency' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public static function emergency(Stringable|string|null $text) : void
+    {
+        static::output($text, DisplayStyle::EMERGENCY);
+    }
+
+
+    /**
+     * Output a text to console with 'alert' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public static function alert(Stringable|string|null $text) : void
+    {
+        static::output($text, DisplayStyle::ALERT);
+    }
+
+
+    /**
+     * Output a text to console with 'critical' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public static function critical(Stringable|string|null $text) : void
+    {
+        static::output($text, DisplayStyle::CRITICAL);
+    }
+
+
+    /**
      * Output a text to console with 'error' style
      * @param Stringable|string|null $text
      * @return void
@@ -35,6 +68,17 @@ class Console
     public static function warning(Stringable|string|null $text) : void
     {
         static::output($text, DisplayStyle::WARNING);
+    }
+
+
+    /**
+     * Output a text to console with 'notice' style
+     * @param Stringable|string|null $text
+     * @return void
+     */
+    public static function notice(Stringable|string|null $text) : void
+    {
+        static::output($text, DisplayStyle::NOTICE);
     }
 
 

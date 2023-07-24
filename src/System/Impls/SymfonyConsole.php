@@ -40,8 +40,8 @@ class SymfonyConsole extends BasicConsole
         $this->backend = new SymfonyConsoleOutput();
 
         $formatter = $this->backend->getFormatter();
-        $formatter->setStyle('strong', new SymfonyOutputFormatterStyle('bright-white'));
-        $formatter->setStyle('note', new SymfonyOutputFormatterStyle('gray'));
+        $formatter->setStyle('notice', new SymfonyOutputFormatterStyle('bright-white'));
+        $formatter->setStyle('debug', new SymfonyOutputFormatterStyle('gray'));
     }
 
 
@@ -144,12 +144,23 @@ class SymfonyConsole extends BasicConsole
         if ($style instanceof DisplayStyle) $style = $style->value;
 
         $backendStyle = match ($style) {
-            DisplayStyle::ERROR->value => 'error',
-            DisplayStyle::WARNING->value => 'comment',
-            DisplayStyle::INFO->value => 'info',
-            DisplayStyle::NOTE->value => 'note',
-            DisplayStyle::STRONG->value => 'strong',
-            default => null,
+            DisplayStyle::EMERGENCY->value,
+            DisplayStyle::ALERT->value,
+            DisplayStyle::CRITICAL->value,
+            DisplayStyle::ERROR->value,
+                => 'error',
+            DisplayStyle::WARNING->value,
+                => 'comment',
+            DisplayStyle::NOTICE->value,
+            DisplayStyle::STRONG->value,
+                => 'notice',
+            DisplayStyle::INFO->value,
+                => 'info',
+            DisplayStyle::DEBUG->value,
+            DisplayStyle::NOTE->value,
+                => 'debug',
+            default,
+                => null,
         };
 
         return $backendStyle ? "<$backendStyle>$escapedText</$backendStyle>" : $escapedText;
