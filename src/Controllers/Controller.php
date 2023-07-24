@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Magpie\Controllers\Concepts\ControllerCallable;
 use Magpie\Exceptions\MethodNotFoundException;
+use Magpie\General\Traits\StaticCreatable;
 use Magpie\HttpServer\Request;
 
 /**
@@ -13,6 +14,9 @@ use Magpie\HttpServer\Request;
  */
 abstract class Controller
 {
+    use StaticCreatable;
+
+
     /**
      * Call and route from given method
      * @param string $methodName
