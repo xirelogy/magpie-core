@@ -32,7 +32,7 @@ class HelpCommand extends Command
 
         $signature = CommandRegistry::_route($command);
 
-        Console::output(StructuredText::strong(_l('Description:')));
+        Console::output(StructuredText::notice(_l('Description:')));
         Console::output('  ' . $signature->description);
         Console::output('');
 
@@ -40,7 +40,7 @@ class HelpCommand extends Command
             '  ',
             StructuredText::warning($signature->command),
             ' ',
-            StructuredText::note('[options]'),
+            StructuredText::debug('[options]'),
         ];
 
         $maxPrefixLength = 0;
@@ -68,12 +68,12 @@ class HelpCommand extends Command
             $hasOptions = true;
         }
 
-        Console::output(StructuredText::strong(_l('Usage:')));
+        Console::output(StructuredText::notice(_l('Usage:')));
         Console::output(StructuredText::compound(...$outSignatures));
         Console::output('');
 
         if ($hasArgument) {
-            Console::output(StructuredText::strong(_l('Arguments:')));
+            Console::output(StructuredText::notice(_l('Arguments:')));
             foreach ($outArguments as $argument => $desc) {
                 $spaceLength = $maxPrefixLength - strlen($argument);
 
@@ -88,7 +88,7 @@ class HelpCommand extends Command
         }
 
         if ($hasOptions) {
-            Console::output(StructuredText::strong(_l('Options:')));
+            Console::output(StructuredText::notice(_l('Options:')));
             foreach ($outOptions as $option => $desc) {
                 $spaceLength = $maxPrefixLength - strlen($option);
 
