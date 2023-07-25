@@ -11,6 +11,7 @@ use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\UserCollectable;
 use Magpie\Objects\Uri;
 use Magpie\Routes\Impls\ActualRouteContext;
+use Magpie\Routes\Impls\ForwardingUserCollection;
 use Magpie\Routes\RouteContext;
 use Magpie\Routes\RouteDomain;
 use Magpie\System\Concepts\Capturable;
@@ -33,11 +34,11 @@ class Request implements Capturable
     /**
      * @var UserCollectable Domain arguments
      */
-    public UserCollectable $domainArguments;
+    public readonly UserCollectable $domainArguments;
     /**
      * @var UserCollectable Route arguments
      */
-    public UserCollectable $routeArguments;
+    public readonly UserCollectable $routeArguments;
     /**
      * @var string|null The resolved hostname
      */
@@ -85,9 +86,9 @@ class Request implements Capturable
      */
     protected function __construct(UserCollectable $queries, UserCollectable $posts, UserCollectable $cookies, ServerCollection $serverVars)
     {
-        $this->routeContext = new ActualRouteContext();
-        $this->domainArguments = static::_createRouteArgumentsCollectionFrom([]);
-        $this->routeArguments = static::_createRouteArgumentsCollectionFrom([]);
+        $this->domainArguments = new ForwardingUserCollection();
+        $this->routeArguments = new ForwardingUserCollection();
+        $this->routeContext = ActualRouteContext::_create($this->domainArguments, $this->routeArguments);
         $this->queries = $queries;
         $this->posts = $posts;
         $this->cookies = $cookies;
@@ -274,37 +275,6 @@ class Request implements Capturable
             public function __construct(array $keyValues)
             {
                 parent::__construct($keyValues);
-            }
-        };
-    }
-
-    
-    /**
-     * Create route arguments collection
-     * @param array<string, mixed> $vars
-     * @return UserCollectable
-     * @internal
-     */
-    public static final function _createRouteArgumentsCollectionFrom(array $vars) : UserCollectable
-    {
-        return new class($vars) extends Collection implements UserCollectable {
-            /**
-             * Constructor
-             * @param array<string, mixed> $keyValues
-             */
-            public function __construct(array $keyValues)
-            {
-                parent::__construct($keyValues);
-            }
-
-
-            /**
-             * @inheritDoc
-             */
-            public function fullKey(int|string $key) : string
-            {
-                $prefix = !is_empty_string($this->prefix) ? ($this->prefix . '.') : '';
-                return $prefix . ":$key";
             }
         };
     }

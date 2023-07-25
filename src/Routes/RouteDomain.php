@@ -10,7 +10,6 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Names\CommonHttpMethod;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
-use Magpie\HttpServer\Concepts\UserCollectable;
 use Magpie\HttpServer\Exceptions\HttpNotFoundException;
 use Magpie\HttpServer\Request;
 use Magpie\Routes\Concepts\RouteHandleable;
@@ -295,7 +294,9 @@ abstract class RouteDomain
      */
     private static function landRouteHandler(Request $request, array $routeArguments, RouteLanding $landing, ?RouteMap $map) : RouteHandleable
     {
-        $request->routeArguments = static::createRouteArgumentsCollection($landing->argumentNames, $routeArguments);
+        if ($request->routeContext instanceof ActualRouteContext) {
+            $request->routeContext->_setRouteArguments(array_combine($landing->argumentNames, $routeArguments));
+        }
 
         $handler = $landing->createHandler();
         if ($handler === null) throw new OperationFailedException();
@@ -356,18 +357,5 @@ abstract class RouteDomain
         } catch (Exception) {
             return false;
         }
-    }
-
-
-    /**
-     * Create route arguments collection
-     * @param array $argumentNames
-     * @param array $argumentValues
-     * @return UserCollectable
-     */
-    private static function createRouteArgumentsCollection(array $argumentNames, array $argumentValues) : UserCollectable
-    {
-        $arr = array_combine($argumentNames, $argumentValues);
-        return Request::_createRouteArgumentsCollectionFrom($arr);
     }
 }

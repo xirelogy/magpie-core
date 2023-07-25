@@ -10,6 +10,7 @@ use Magpie\HttpServer\Concepts\Renderable;
 use Magpie\HttpServer\Exceptions\HttpResponseException;
 use Magpie\HttpServer\Request;
 use Magpie\Routes\Concepts\RouteHandleable;
+use Magpie\Routes\Impls\ActualRouteContext;
 use Magpie\Routes\RouteDomain;
 use Magpie\Routes\RouteRegistry;
 use Magpie\System\Kernel\Kernel;
@@ -44,8 +45,8 @@ class WebRunContext extends RunContext
         $hostname = $this->request->hostname ?? '';
         $routeDomain = RouteRegistry::_route($hostname, $domainArguments);
 
-        if ($domainArguments !== null) {
-            $this->request->domainArguments = Request::_createRouteArgumentsCollectionFrom($domainArguments);
+        if ($this->request->routeContext instanceof ActualRouteContext && $domainArguments !== null) {
+            $this->request->routeContext->_setDomainArguments($domainArguments);
         }
 
         try {
