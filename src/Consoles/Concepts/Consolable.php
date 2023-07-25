@@ -2,7 +2,11 @@
 
 namespace Magpie\Consoles\Concepts;
 
+use Magpie\Codecs\Parsers\Parser;
 use Magpie\Consoles\DisplayStyle;
+use Magpie\Consoles\Inputs\PromptWithOption;
+use Magpie\Exceptions\ArgumentException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\TypeClassable;
 use Stringable;
 
@@ -90,4 +94,58 @@ interface Consolable extends TypeClassable
      * @return void
      */
     public function display(?ConsoleDisplayable $target) : void;
+
+
+    /**
+     * A value is required (mandatory) from console input
+     * @param PromptWithOption|Stringable|string|null $prompt
+     * @param Parser<T>|null $parser
+     * @return T
+     * @template T
+     * @throws SafetyCommonException
+     * @throws ArgumentException
+     */
+    public function requires(PromptWithOption|Stringable|string|null $prompt, ?Parser $parser = null) : mixed;
+
+
+    /**
+     * A value is optionally required from console input
+     * @param PromptWithOption|Stringable|string|null $prompt
+     * @param Parser<T>|null $parser
+     * @param T|null $default
+     * @return T|null
+     * @template T
+     * @throws SafetyCommonException
+     * @throws ArgumentException
+     */
+    public function optional(PromptWithOption|Stringable|string|null $prompt, ?Parser $parser = null, mixed $default = null) : mixed;
+
+
+    /**
+     * A value is required (mandatory) from console input.
+     * Loop and retry until valid or maximum number of tries exceeded.
+     * @param PromptWithOption|Stringable|string|null $prompt
+     * @param int|null $maxTries
+     * @param Parser<T>|null $parser
+     * @return T
+     * @template T
+     * @throws SafetyCommonException
+     * @throws ArgumentException
+     */
+    public function requiresLoop(PromptWithOption|Stringable|string|null $prompt, ?int $maxTries = null, ?Parser $parser = null) : mixed;
+
+
+    /**
+     * A value is optionally required from console input.
+     * Loop and retry until valid or maximum number of tries exceeded.
+     * @param PromptWithOption|Stringable|string|null $prompt
+     * @param int|null $maxTries
+     * @param Parser|null $parser
+     * @param T|null $default
+     * @return T|null
+     * @template T
+     * @throws SafetyCommonException
+     * @throws ArgumentException
+     */
+    public function optionalLoop(PromptWithOption|Stringable|string|null $prompt, ?int $maxTries = null, ?Parser $parser = null, mixed $default = null) : mixed;
 }
