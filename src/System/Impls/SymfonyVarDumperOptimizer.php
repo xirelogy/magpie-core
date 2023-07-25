@@ -8,6 +8,7 @@ use Closure;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Models\Schemas\Configs\SchemaPreference;
 use Magpie\Models\Schemas\TableSchema;
+use Magpie\Routes\Impls\ForwardingUserCollection;
 use Magpie\Routes\Impls\RouteMap;
 use Magpie\Routes\RouteContext;
 use Magpie\Routes\RouteDomain;
@@ -54,6 +55,16 @@ class SymfonyVarDumperOptimizer
 
         VarCloner::$defaultCasters[RouteContext::class] = static::createCaster([
             SymfonyVarDumperDropProtectedPatch::create(),
+        ]);
+
+        VarCloner::$defaultCasters[ForwardingUserCollection::class] = static::createCaster([
+            SymfonyVarDumperDropProtectedPatch::create(),
+            SymfonyVarDumperInsertValuePatch::for([
+                static::protectedKeyOf('~arr') => function(mixed $object) {
+                    if (!$object instanceof ForwardingUserCollection) return null;
+                    return iter_flatten($object->all());
+                },
+            ]),
         ]);
 
         VarCloner::$defaultCasters[SchemaPreference::class] = static::createCaster([
