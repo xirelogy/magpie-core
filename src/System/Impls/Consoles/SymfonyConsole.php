@@ -1,10 +1,9 @@
 <?php
 
-namespace Magpie\System\Impls;
+namespace Magpie\System\Impls\Consoles;
 
 use Magpie\Consoles\BasicConsole;
 use Magpie\Consoles\Concepts\ConsoleDisplayable;
-use Magpie\Consoles\ConsoleTable;
 use Magpie\Consoles\DisplayStyle;
 use Magpie\Consoles\Inputs\PromptWithHiddenInput;
 use Magpie\Consoles\Inputs\PromptWithOption;
@@ -16,7 +15,6 @@ use Stringable;
 use Symfony\Component\Console\Formatter\OutputFormatter as SymfonyOutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle as SymfonyOutputFormatterStyle;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
-use Symfony\Component\Console\Helper\Table as SymfonyTable;
 use Symfony\Component\Console\Input\ArgvInput as SymfonyArgvInput;
 use Symfony\Component\Console\Input\InputInterface as SymfonyConsoleInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsoleOutput;
@@ -88,22 +86,7 @@ class SymfonyConsole extends BasicConsole
     {
         if ($target === null) return;
 
-        switch ($target::getTypeClass()) {
-            case ConsoleTable::TYPECLASS:
-                // Console table
-                $exported = $target->_export();
-
-                $outTable = new SymfonyTable($this->outputBackend);
-                $outTable->setHeaders($exported->headers);
-                $outTable->setRows($exported->rows);
-                $outTable->setStyle('default');
-                $outTable->render();
-                break;
-
-            default:
-                // Unsupported
-                break;
-        }
+        SymfonyConsoleDisplay::display($target, $this->outputBackend);
     }
 
 

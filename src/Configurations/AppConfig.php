@@ -32,7 +32,7 @@ use Magpie\Routes\Handlers\ClosureRouteHandler;
 use Magpie\Schedules\Impls\ScheduleRegistry;
 use Magpie\System\Concepts\SourceCacheable;
 use Magpie\System\Concepts\SystemBootable;
-use Magpie\System\Impls\SymfonyConsole;
+use Magpie\System\Impls\Consoles\SymfonyConsole;
 use Magpie\System\Kernel\ExceptionHandler;
 use Magpie\System\Kernel\Kernel;
 use Stringable;
