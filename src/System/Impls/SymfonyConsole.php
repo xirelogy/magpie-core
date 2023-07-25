@@ -57,6 +57,8 @@ class SymfonyConsole extends BasicConsole
         $formatter = $this->outputBackend->getFormatter();
         $formatter->setStyle('notice', new SymfonyOutputFormatterStyle('bright-white'));
         $formatter->setStyle('debug', new SymfonyOutputFormatterStyle('gray'));
+
+        $this->outputBackend->setFormatter($formatter);
     }
 
 
