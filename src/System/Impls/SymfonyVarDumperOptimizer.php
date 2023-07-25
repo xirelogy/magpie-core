@@ -16,6 +16,7 @@ use Magpie\System\Impls\Patches\SymfonyVarDumperCutStubPatch;
 use Magpie\System\Impls\Patches\SymfonyVarDumperDropPrivatePatch;
 use Magpie\System\Impls\Patches\SymfonyVarDumperDropPropertiesPatch;
 use Magpie\System\Impls\Patches\SymfonyVarDumperDropProtectedPatch;
+use Magpie\System\Impls\Patches\SymfonyVarDumperInsertValuePatch;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -93,6 +94,10 @@ class SymfonyVarDumperOptimizer
                 }
 
                 $ret[$arrKey] = $arrValue;
+            }
+
+            foreach ($patches as $patch) {
+                $patch->patchReturnArray($object, $ret);
             }
 
             return $ret;

@@ -46,6 +46,15 @@ class SymfonyVarDumperDropPropertiesPatch implements SymfonyVarDumperArrayPatcha
 
 
     /**
+     * @inheritDoc
+     */
+    public function patchReturnArray(mixed $object, array &$values) : void
+    {
+        // MOP
+    }
+
+
+    /**
      * Create instance for given target properties
      * @param string ...$properties
      * @return static

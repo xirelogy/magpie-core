@@ -45,6 +45,15 @@ class SymfonyVarDumperDropPrivatePatch implements SymfonyVarDumperArrayPatchable
 
 
     /**
+     * @inheritDoc
+     */
+    public function patchReturnArray(mixed $object, array &$values) : void
+    {
+        // MOP
+    }
+
+
+    /**
      * Create instance for given target class
      * @param string $targetClassName
      * @return static

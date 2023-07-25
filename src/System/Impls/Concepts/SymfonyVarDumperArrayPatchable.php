@@ -23,4 +23,13 @@ interface SymfonyVarDumperArrayPatchable
      * @return void
      */
     public function patchArrayItem(string $key, mixed &$value) : void;
+
+
+    /**
+     * Patch the return array
+     * @param mixed $object
+     * @param array $values
+     * @return void
+     */
+    public function patchReturnArray(mixed $object, array &$values) : void;
 }

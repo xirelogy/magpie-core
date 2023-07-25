@@ -31,4 +31,13 @@ class SymfonyVarDumperDropProtectedPatch implements SymfonyVarDumperArrayPatchab
     {
         // NOP
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function patchReturnArray(mixed $object, array &$values) : void
+    {
+        // MOP
+    }
 }

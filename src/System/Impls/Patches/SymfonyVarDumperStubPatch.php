@@ -56,6 +56,15 @@ abstract class SymfonyVarDumperStubPatch implements SymfonyVarDumperArrayPatchab
 
 
     /**
+     * @inheritDoc
+     */
+    public function patchReturnArray(mixed $object, array &$values) : void
+    {
+        // MOP
+    }
+
+
+    /**
      * Create instance for given target key
      * @param string $targetKey
      * @return static
