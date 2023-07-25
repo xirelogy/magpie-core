@@ -20,6 +20,13 @@ class NumericRangeCheck
      */
     public static function checkRange(int|float $value, int|float|null $min, int|float|null $max) : void
     {
+        if ($min !== null && $max !== null) {
+            if ($value < $min || $value > $max) {
+                throw new ParseFailedException(_format_safe(_l('Must be within {{0}} and {{1}}'), $min, $max) ?? '');
+            }
+            return;
+        }
+
         if ($min !== null && $value < $min) {
             throw new ParseFailedException(_format_safe(_l('Must not be less than {{0}}'), $min) ?? '');
         }
