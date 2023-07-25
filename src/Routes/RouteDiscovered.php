@@ -57,12 +57,41 @@ abstract class RouteDiscovered implements Stringable
 
 
     /**
-     * Replace route argument with given value
+     * Replace domain/route argument with given value
      * @param string $name
      * @param string $value
      * @return $this
      */
     public function setArgument(string $name, string $value) : static
+    {
+        return $this
+            ->setDomainArgument($name, $value)
+            ->setRouteArgument($name, $value)
+            ;
+    }
+
+
+    /**
+     * Replace domain argument with given value
+     * @param string $name
+     * @param string $value
+     * @return $this
+     */
+    public function setDomainArgument(string $name, string $value) : static
+    {
+        $this->host = str_replace(Quote::brace($name), $value, $this->host);
+
+        return $this;
+    }
+
+
+    /**
+     * Replace route argument with given value
+     * @param string $name
+     * @param string $value
+     * @return $this
+     */
+    public function setRouteArgument(string $name, string $value) : static
     {
         $this->path = str_replace(Quote::brace($name), $value, $this->path);
 
