@@ -93,7 +93,7 @@ class SymfonyConsole extends BasicConsole
     /**
      * @inheritDoc
      */
-    protected function obtain(PromptWithOption|Stringable|string|null $prompt, ?string $default) : string
+    protected function obtain(PromptWithOption|Stringable|string|null $prompt, ?string $default) : ?string
     {
         $prompt = static::flattenInputPromptOptions($prompt, $options);
 

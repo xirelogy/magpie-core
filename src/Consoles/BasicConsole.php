@@ -162,8 +162,8 @@ abstract class BasicConsole implements Consolable
      * Obtain input from console
      * @param PromptWithOption|Stringable|string|null $prompt
      * @param string|null $default
-     * @return string
+     * @return string|null
      * @throws SafetyCommonException
      */
-    protected abstract function obtain(PromptWithOption|Stringable|string|null $prompt, ?string $default) : string;
+    protected abstract function obtain(PromptWithOption|Stringable|string|null $prompt, ?string $default) : ?string;
 }
