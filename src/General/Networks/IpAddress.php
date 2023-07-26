@@ -16,6 +16,18 @@ use Magpie\Objects\BinaryData;
 abstract class IpAddress implements PreferStringable, TypeClassable
 {
     /**
+     * Create a subnet with current address
+     * @param int $prefix
+     * @return IpAddressSubnet
+     * @throws SafetyCommonException
+     */
+    public final function createSubnet(int $prefix) : IpAddressSubnet
+    {
+        return IpAddressSubnet::create($this, $prefix);
+    }
+
+
+    /**
      * Obtain the corresponding binary representation of the address
      * @return BinaryData
      * @throws SafetyCommonException
