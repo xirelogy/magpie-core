@@ -3,9 +3,11 @@
 namespace Magpie\General\Networks;
 
 use Exception;
+use Magpie\Exceptions\InvalidArgumentException;
 use Magpie\Exceptions\InvalidDataException;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Locales\Concepts\Localizable;
 use Magpie\Objects\BinaryData;
 use Magpie\System\HardCore\NumberCodecs\BinaryUint16Codec;
 
@@ -202,5 +204,66 @@ class Ipv6Address extends IpAddress
     public static function loopback() : static
     {
         return new static([0, 0, 0, 0, 0, 0, 0, 1]);
+    }
+
+
+    /**
+     * Create an IPv6 ULA of specific global ID
+     * @param BinaryData|string $globalId 40-bit global ID, normally randomly generated
+     * @return IpAddressSubnet
+     * @throws SafetyCommonException
+     */
+    public static function createGlobalUlaSubnet(BinaryData|string $globalId) : IpAddressSubnet
+    {
+        $globalId = BinaryData::acceptBinary($globalId)->asLowerHex();
+        if (strlen($globalId) !== 10) throw new InvalidArgumentException('globalId', static::formatNumberBitsReason(40));
+
+        $ret = 'fd' . substr($globalId, 0, 2) . ':'
+            . substr($globalId, 2, 4) . ':'
+            . substr($globalId, 6, 4) . '::';
+
+        $retAddress = IpAddress::parse($ret);
+        return $retAddress->createSubnet(48);
+    }
+
+
+    /**
+     * Create an IPv6 ULA of specific global ID and subnet ID
+     * @param BinaryData|string $globalId
+     * @param BinaryData|string|int $subnetId
+     * @return IpAddressSubnet
+     * @throws SafetyCommonException
+     */
+    public static function createSpecificUlaSubnet(BinaryData|string $globalId, BinaryData|string|int $subnetId) : IpAddressSubnet
+    {
+        $globalId = BinaryData::acceptBinary($globalId)->asLowerHex();
+        if (strlen($globalId) !== 10) throw new InvalidArgumentException('globalId', static::formatNumberBitsReason(40));
+
+        if (is_int($subnetId)) {
+            if ($subnetId < 0 || $subnetId > 65535) throw new InvalidArgumentException('subnetId', _l('out of range'));
+            $subnetId = BinaryUint16Codec::encodeBigEndian($subnetId);
+        }
+
+        $subnetId = BinaryData::acceptBinary($subnetId)->asLowerHex();
+        if (strlen($subnetId) !== 4) throw new InvalidArgumentException('subnetId', static::formatNumberBitsReason(16));
+
+        $ret = 'fd' . substr($globalId, 0, 2) . ':'
+            . substr($globalId, 2, 4) . ':'
+            . substr($globalId, 6, 4) . ':'
+            . $subnetId . '::';
+
+        $retAddress = IpAddress::parse($ret);
+        return $retAddress->createSubnet(64);
+    }
+
+
+    /**
+     * @param int $numBits
+     * @return Localizable|string
+     */
+    private static function formatNumberBitsReason(int $numBits) : Localizable|string
+    {
+        return _format_safe(_l('must be {{0}}-bits'), $numBits)
+            ?? _l('must be of specific number of bits');
     }
 }

@@ -3,5 +3,8 @@
   "group must be hexadecimal": "组别必须为十六进制",
   "group value out of range": "组别超出范围",
   "overflow": "溢出",
+  "out of range": "超出范围",
+  "must be {{0}}-bits": "必须为{{0}}比特",
+  "must be of specific number of bits": "必须为指定比特数",
   "": ""
 }
