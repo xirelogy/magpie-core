@@ -51,6 +51,20 @@ class FloatParser extends CreatableParser
 
 
     /**
+     * With value in range checked
+     * @param float $min Minimum allowed value (inclusive)
+     * @param float $max Maximum allowed value (inclusive)
+     * @return $this
+     */
+    public function withRange(float $min, float $max) : static
+    {
+        $this->min = $min;
+        $this->max = $max;
+        return $this;
+    }
+
+
+    /**
      * With specific precision to be rounded to
      * @param int $precision
      * @return $this

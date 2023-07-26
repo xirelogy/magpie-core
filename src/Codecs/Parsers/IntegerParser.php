@@ -52,6 +52,20 @@ class IntegerParser extends CreatableParser
 
 
     /**
+     * With value in range checked
+     * @param int $min Minimum allowed value (inclusive)
+     * @param int $max Maximum allowed value (inclusive)
+     * @return $this
+     */
+    public function withRange(int $min, int $max) : static
+    {
+        $this->min = $min;
+        $this->max = $max;
+        return $this;
+    }
+
+
+    /**
      * With specific strictness (floating point numbers will be rejected)
      * @param bool $isStrict
      * @return $this
