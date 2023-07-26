@@ -98,8 +98,8 @@ class Request implements Capturable
         $this->requestUri = Uri::safeParse($this->serverVars->safeOptional('REQUEST_URI', default: '/'));
 
         $scheme = static::resolveSchemeIsHttps($this->headers, $this->serverVars) ? 'https' : 'http';
-        $this->hostname = static::resolveHostname($this->headers, $this->serverVars);
-        $this->fullUri = static::createFullUri($scheme, $this->hostname, $this->requestUri);
+        $this->hostname = static::resolveHostname($this->headers, $this->serverVars, $port);
+        $this->fullUri = static::createFullUri($scheme, $this->hostname, $port, $this->requestUri);
 
         $this->state = new RequestState();
     }
@@ -229,11 +229,24 @@ class Request implements Capturable
      * Resolve for request hostname in order
      * @param HeaderCollection $headers
      * @param ServerCollection $serverVars
+     * @param int|null $port
      * @return string|null
      */
-    protected static function resolveHostname(HeaderCollection $headers, ServerCollection $serverVars) : ?string
+    protected static function resolveHostname(HeaderCollection $headers, ServerCollection $serverVars, ?int &$port = null) : ?string
     {
-        $parser = StringParser::create()->withEmptyAsNull();
+        $port = null;
+
+        $parser = StringParser::create()
+            ->withEmptyAsNull()
+            ->withPreprocessor(function (string $value) use (&$port) : string {
+                $colonPos = strpos($value, ':');
+                if ($colonPos !== false) {
+                    $port = IntegerParser::create()->parse(substr($value, $colonPos + 1));
+                    $value = substr($value, 0, $colonPos);
+                }
+                return $value;
+            })
+            ;
 
         return $headers->safeOptional(CommonHttpHeader::HOST, $parser)
             ?? $serverVars->safeOptional('SERVER_NAME', $parser)
@@ -246,13 +259,15 @@ class Request implements Capturable
      * Create a full URI
      * @param string $scheme
      * @param string|null $hostname
+     * @param int|null $port
      * @param Uri $requestUri
      * @return Uri
      */
-    protected static function createFullUri(string $scheme, ?string $hostname, Uri $requestUri) : Uri
+    protected static function createFullUri(string $scheme, ?string $hostname, ?int $port, Uri $requestUri) : Uri
     {
         $ret = new Uri($requestUri->path);
         $ret->host = $hostname;
+        $ret->port = $port;
         if ($hostname !== null) $ret->scheme = $scheme;
         $ret->query = $requestUri->query;
 
