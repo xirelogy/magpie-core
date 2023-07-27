@@ -21,6 +21,7 @@ use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process as SymfonyProcessInterface;
+use Throwable;
 
 /**
  * Process representation using Symfony backend
@@ -47,7 +48,10 @@ class SymfonyProcess extends Process
     {
         parent::__construct();
 
-        $this->backend = new SymfonyProcessInterface($commandLine->arguments);
+        $cwd = $commandLine->getWorkDir();
+        $environment = $commandLine->getEnvironment();
+
+        $this->backend = new SymfonyProcessInterface($commandLine->arguments, $cwd, $environment);
     }
 
 
@@ -111,6 +115,21 @@ class SymfonyProcess extends Process
         $backendTimeout = static::translateDuration($timeout);
 
         $this->backend->setTimeout($backendTimeout);
+
+        return $this;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function withTty(bool $isTty = true) : static
+    {
+        try {
+            $this->backend->setTty($isTty);
+        } catch (Throwable $ex) {
+            throw new OperationFailedException(previous: $ex);
+        }
 
         return $this;
     }

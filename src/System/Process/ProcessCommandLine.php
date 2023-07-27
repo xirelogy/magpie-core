@@ -14,6 +14,14 @@ class ProcessCommandLine
      * @var array<string> Arguments
      */
     public readonly array $arguments;
+    /**
+     * @var string|null Specific working directory to be used (if not inherited)
+     */
+    protected ?string $workDir = null;
+    /**
+     * @var array<string, string>|null Specific environment variables to be used (if not inherited)
+     */
+    protected ?array $env = null;
 
 
     /**
@@ -23,6 +31,50 @@ class ProcessCommandLine
     public function __construct(string ...$arguments)
     {
         $this->arguments = $arguments;
+    }
+
+
+    /**
+     * Specify the specific working directory
+     * @param string $workDir
+     * @return $this
+     */
+    public function withWorkDir(string $workDir) : static
+    {
+        $this->workDir = $workDir;
+        return $this;
+    }
+
+
+    /**
+     * Access to the specific working directory
+     * @return string|null
+     */
+    public function getWorkDir() : ?string
+    {
+        return $this->workDir;
+    }
+
+
+    /**
+     * Specify the specific environment variables
+     * @param iterable<string, string> $vars
+     * @return $this
+     */
+    public function withEnvironment(iterable $vars) : static
+    {
+        $this->env = iter_flatten($vars);
+        return $this;
+    }
+
+
+    /**
+     * Access to the specific environment variables
+     * @return string[]|null
+     */
+    public function getEnvironment() : ?array
+    {
+        return $this->env;
     }
 
 

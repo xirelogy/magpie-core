@@ -6,6 +6,7 @@ use Exception;
 use Fiber;
 use Magpie\Exceptions\InvalidStateException;
 use Magpie\Exceptions\OperationFailedException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\Releasable;
 use Magpie\General\Concepts\StreamReadable;
 use Magpie\General\Concepts\StreamReadConvertible;
@@ -95,6 +96,15 @@ abstract class Process implements Releasable
      * @return $this
      */
     public abstract function withTimeout(?Duration $timeout) : static;
+
+
+    /**
+     * Specify the process to enable TTY mode
+     * @param bool $isTty
+     * @return $this
+     * @throws SafetyCommonException
+     */
+    public abstract function withTty(bool $isTty = true) : static;
 
 
     /**
