@@ -79,6 +79,18 @@ class ProcessCommandLine
 
 
     /**
+     * Create a new command line to run from specific binary
+     * @param string $binaryPath
+     * @param string ...$arguments
+     * @return static
+     */
+    public static function fromBinary(string $binaryPath, string ...$arguments) : static
+    {
+        return new static($binaryPath, ...$arguments);
+    }
+
+
+    /**
      * Create a new command line to run a specific PHP script
      * @param string $scriptName
      * @param string ...$scriptArguments
