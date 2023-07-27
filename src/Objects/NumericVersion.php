@@ -6,6 +6,8 @@ use Exception;
 use Magpie\Codecs\Parsers\IntegerParser;
 use Magpie\Exceptions\InvalidDataException;
 use Magpie\Exceptions\NullException;
+use Magpie\Exceptions\SafetyCommonException;
+use Throwable;
 
 /**
  * Representation of simple numeric based version
@@ -40,7 +42,7 @@ class NumericVersion extends Version
     /**
      * Major version
      * @return int
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public function getMajor() : int
     {
@@ -83,7 +85,7 @@ class NumericVersion extends Version
      * Create version from parsing text
      * @param string $text
      * @return static
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public static function parse(string $text) : static
     {
@@ -95,7 +97,7 @@ class NumericVersion extends Version
             }
 
             return new static($ret);
-        } catch (Exception) {
+        } catch (Throwable) {
             throw new InvalidDataException();
         }
     }
