@@ -112,9 +112,9 @@ class ClassFactory implements SourceCacheable
      * @param string $featureTypeClass
      * @param string $subjectTypeClass
      * @param class-string $assocClassName
-     * @return class-string
+     * @return class-string|null
      */
-    public static function safeResolveFeature(string $featureTypeClass, string $subjectTypeClass, string $assocClassName) : string
+    public static function safeResolveFeature(string $featureTypeClass, string $subjectTypeClass, string $assocClassName) : ?string
     {
         return Excepts::noThrow(fn () => static::resolveFeature($featureTypeClass, $subjectTypeClass, $assocClassName));
     }
