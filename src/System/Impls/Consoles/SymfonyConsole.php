@@ -3,7 +3,7 @@
 namespace Magpie\System\Impls\Consoles;
 
 use Magpie\Consoles\BasicConsole;
-use Magpie\Consoles\Concepts\ConsoleDisplayable;
+use Magpie\Consoles\Concepts\ConsoleServiceable;
 use Magpie\Consoles\DisplayStyle;
 use Magpie\Consoles\Inputs\PromptWithHiddenInput;
 use Magpie\Consoles\Inputs\PromptWithOption;
@@ -82,11 +82,9 @@ class SymfonyConsole extends BasicConsole
     /**
      * @inheritDoc
      */
-    public function display(?ConsoleDisplayable $target) : void
+    protected function createService() : ConsoleServiceable
     {
-        if ($target === null) return;
-
-        SymfonyConsoleDisplay::display($target, $this->outputBackend);
+        return new SymfonyConsoleService($this->outputBackend);
     }
 
 

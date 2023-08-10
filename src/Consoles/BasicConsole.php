@@ -5,10 +5,14 @@ namespace Magpie\Consoles;
 use Magpie\Codecs\Impls\ParserArgTypeContext;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Consoles\Concepts\Consolable;
+use Magpie\Consoles\Concepts\ConsoleDisplayable;
+use Magpie\Consoles\Concepts\ConsoleDisplayRealizable;
+use Magpie\Consoles\Concepts\ConsoleServiceable;
 use Magpie\Consoles\Inputs\PromptWithOption;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\MissingArgumentException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Str;
 use Stringable;
 
@@ -87,6 +91,29 @@ abstract class BasicConsole implements Consolable
     {
         $this->output($text, DisplayStyle::DEBUG);
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function display(?ConsoleDisplayable $target) : void
+    {
+        if ($target === null) return;
+
+        $realizeClass = ClassFactory::safeResolveFeature($target::getTypeClass(), static::getTypeClass(), ConsoleDisplayRealizable::class);
+        if ($realizeClass === null) return;
+        if (!is_subclass_of($realizeClass, ConsoleDisplayRealizable::class)) return;
+
+        $service = $this->createService();
+        $realizeClass::realize($service, $target);
+    }
+
+
+    /**
+     * Create service interface
+     * @return ConsoleServiceable
+     */
+    protected abstract function createService() : ConsoleServiceable;
 
 
     /**
