@@ -29,8 +29,28 @@ class SymfonyConsoleTableDisplayRealizer implements ConsoleDisplayRealizable
 
         $outTable = new SymfonyTable($service->outputBackend);
         $outTable->setHeaders($exported->headers);
-        $outTable->setRows($exported->rows);
-        $outTable->setStyle('default');
+        $outTable->setRows(static::filterRows($exported->rows));
+        $outTable->setStyle('box-double'); // default, borderless, box, box-double
         $outTable->render();
+    }
+
+
+    /**
+     * Filter row items and flatten style as necessary
+     * @param array<array> $rows
+     * @return array<array>
+     */
+    protected static function filterRows(iterable $rows) : array
+    {
+        $ret = [];
+        foreach ($rows as $row) {
+            $newRow = [];
+            foreach ($row as $col) {
+                $newRow[] = SymfonyConsole::flattenText($col);
+            }
+            $ret[] = $newRow;
+        }
+
+        return $ret;
     }
 }
