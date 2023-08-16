@@ -2,6 +2,7 @@
 
 namespace Magpie\General\Factories;
 
+use BackedEnum;
 use Magpie\Exceptions\DuplicatedException;
 use Magpie\Exceptions\DuplicatedKeyException;
 use Magpie\Exceptions\MissingArgumentException;
@@ -47,12 +48,13 @@ class NamedLabelProvider
 
     /**
      * Get the localized label for given value
-     * @param string|int $value
+     * @param BackedEnum|string|int $value
      * @param Localizable|string $defaultText
      * @return Localizable
      */
-    public function getLabel(string|int $value, Localizable|string $defaultText = '') : Localizable
+    public function getLabel(BackedEnum|string|int $value, Localizable|string $defaultText = '') : Localizable
     {
+        if ($value instanceof BackedEnum) $value = $value->value;
         $value = "$value";
         if (array_key_exists($value, $this->labels)) return $this->labels[$value];
 
@@ -80,6 +82,7 @@ class NamedLabelProvider
             $class = new ReflectionClass($className);
             foreach ($class->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $constant) {
                 $constantValue = $constant->getValue();
+                if ($constantValue instanceof BackedEnum) $constantValue = $constantValue->value;
                 if (!is_int($constantValue) && !is_string($constantValue)) continue;
 
                 $constantValue = "$constantValue";

@@ -59,9 +59,10 @@ abstract class NamedPayloadMap
 
             /** @var string|int|BackedEnum $constantValue */
             $constantValue = $reflectConstant->getValue();
+            $payloadValue = static::flatten($attr->payload);
 
-            $fwdMap[static::flatten($constantValue)] = $attr->payload;
-            $revMap[$attr->payload] = $constantValue;
+            $fwdMap[static::flatten($constantValue)] = $payloadValue;
+            $revMap[$payloadValue] = $constantValue;
         }
 
         $this->fwdMap = $fwdMap;

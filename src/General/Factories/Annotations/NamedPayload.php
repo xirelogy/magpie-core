@@ -3,6 +3,8 @@
 namespace Magpie\General\Factories\Annotations;
 
 use Attribute;
+use BackedEnum;
+use StringBackedEnum;
 
 /**
  * Declare a mappable payload associated to given constant
@@ -11,9 +13,9 @@ use Attribute;
 class NamedPayload
 {
     /**
-     * @var string Payload
+     * @var BackedEnum|string|int Payload
      */
-    public readonly string $payload;
+    public readonly BackedEnum|string|int $payload;
     /**
      * @var string|null Associated tag type for the given payload
      */
@@ -22,10 +24,10 @@ class NamedPayload
 
     /**
      * Constructor
-     * @param string $payload
+     * @param BackedEnum|string|int $payload
      * @param string|null $tag
      */
-    public function __construct(string $payload, ?string $tag = null)
+    public function __construct(BackedEnum|string|int $payload, ?string $tag = null)
     {
         $this->payload = $payload;
         $this->tag = $tag;
