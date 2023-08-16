@@ -4,6 +4,7 @@ namespace Magpie\System\Impls\Consoles;
 
 use Magpie\Consoles\BasicConsole;
 use Magpie\Consoles\Concepts\ConsoleServiceable;
+use Magpie\Consoles\ConsoleCustomization;
 use Magpie\Consoles\DisplayStyle;
 use Magpie\Consoles\Inputs\PromptWithHiddenInput;
 use Magpie\Consoles\Inputs\PromptWithOption;
@@ -33,6 +34,10 @@ class SymfonyConsole extends BasicConsole
      */
     public const TYPECLASS = 'symfony';
     /**
+     * @var ConsoleCustomization Console customization
+     */
+    protected ConsoleCustomization $custom;
+    /**
      * @var SymfonyConsoleInputInterface Input backend
      */
     protected SymfonyConsoleInputInterface $inputBackend;
@@ -44,9 +49,11 @@ class SymfonyConsole extends BasicConsole
 
     /**
      * Constructor
+     * @param ConsoleCustomization $custom
      */
-    public function __construct()
+    public function __construct(ConsoleCustomization $custom)
     {
+        $this->custom = $custom;
         $this->inputBackend = new SymfonyArgvInput();
         $this->outputBackend = new SymfonyConsoleOutput();
 
@@ -55,6 +62,10 @@ class SymfonyConsole extends BasicConsole
         $formatter = $this->outputBackend->getFormatter();
         $formatter->setStyle('notice', new SymfonyOutputFormatterStyle('bright-white'));
         $formatter->setStyle('debug', new SymfonyOutputFormatterStyle('gray'));
+
+        foreach ($custom->getConsoleStyles() as $name => $color) {
+            $formatter->setStyle($name, new SymfonyOutputFormatterStyle($color));
+        }
 
         $this->outputBackend->setFormatter($formatter);
     }
@@ -144,7 +155,7 @@ class SymfonyConsole extends BasicConsole
      * @param DisplayStyle|null $style
      * @return string
      */
-    protected static function flattenText(Stringable|string|null $text, ?DisplayStyle $style = null) : string
+    public static function flattenText(Stringable|string|null $text, ?DisplayStyle $style = null) : string
     {
         if ($text === null) return '';
 
@@ -208,7 +219,7 @@ class SymfonyConsole extends BasicConsole
             DisplayStyle::NOTE->value,
                 => 'debug',
             default,
-                => null,
+                => $style,
         };
 
         return $backendStyle ? "<$backendStyle>$escapedText</$backendStyle>" : $escapedText;

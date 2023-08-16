@@ -4,6 +4,7 @@ namespace Magpie\Configurations;
 
 use Exception;
 use Magpie\Consoles\Concepts\Consolable;
+use Magpie\Consoles\ConsoleCustomization;
 use Magpie\Events\EventDelivery;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\DateTimes\SystemTimezone;
@@ -237,10 +238,35 @@ abstract class AppConfig
 
     /**
      * Create default console provider
+     * @param callable(ConsoleCustomization):void|null $customizingFn
+     * @return Consolable
+     * @noinspection PhpDocSignatureInspection
+     */
+    public final function createDefaultConsolable(?callable $customizingFn = null) : Consolable
+    {
+        $custom = static::getDefaultConsoleCustomization();
+        if ($customizingFn !== null) $customizingFn($custom);
+        return $this->onCreateDefaultConsolable($custom);
+    }
+
+
+    /**
+     * Actually creating default console provider
+     * @param ConsoleCustomization $custom
      * @return Consolable
      */
-    public function createDefaultConsolable() : Consolable
+    protected function onCreateDefaultConsolable(ConsoleCustomization $custom) : Consolable
     {
-        return new SymfonyConsole();
+        return new SymfonyConsole($custom);
+    }
+
+
+    /**
+     * Create default console customization
+     * @return ConsoleCustomization
+     */
+    protected function getDefaultConsoleCustomization() : ConsoleCustomization
+    {
+        return ConsoleCustomization::default();
     }
 }
