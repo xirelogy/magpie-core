@@ -21,6 +21,10 @@ class Env
      * @var RepositoryInterface|null Current repository
      */
     protected static ?RepositoryInterface $repository = null;
+    /**
+     * @var string|null Specific env file to be used
+     */
+    protected static ?string $usingEnvFilename = null;
 
 
     /**
@@ -75,6 +79,17 @@ class Env
 
 
     /**
+     * Specified the env file to be preferred
+     * @param string $filename
+     * @return void
+     */
+    public static function usingEnv(string $filename) : void
+    {
+        static::$usingEnvFilename = $filename;
+    }
+
+
+    /**
      * Boot up using given project directory
      * @param string $projectPath
      * @return void
@@ -85,11 +100,18 @@ class Env
         $repository = static::getRepository();
         $names = null;
 
-        // Use .env.example when .env does not exist
+        // Establish the base path for env files
         $envFilename = $projectPath;
         if (!str_ends_with($envFilename, '/')) $envFilename .= '/';
-        $envFilename .= '.env';
-        if (!file_exists($envFilename)) $names = ['.env.example'];
+
+        if (static::$usingEnvFilename !== null && file_exists($envFilename . static::$usingEnvFilename)) {
+            // Use the specific environment file if found
+            $names = [static::$usingEnvFilename];
+        } else {
+            // Use .env.example when .env does not exist
+            $envFilename .= '.env';
+            if (!file_exists($envFilename)) $names = ['.env.example'];
+        }
 
         $dotEnv = Dotenv::create($repository, $projectPath, $names);
         $dotEnv->load();
