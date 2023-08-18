@@ -4,7 +4,6 @@ namespace Magpie\General\Factories\Annotations;
 
 use Attribute;
 use BackedEnum;
-use StringBackedEnum;
 
 /**
  * Declare a mappable payload associated to given constant

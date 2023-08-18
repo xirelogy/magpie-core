@@ -4,7 +4,6 @@ namespace Magpie\Codecs\ParserHosts;
 
 use Magpie\Codecs\Impls\ParserArgTypeContext;
 use Magpie\Codecs\Parsers\Parser;
-use Magpie\Commands\OptionsCollection;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\MissingArgumentException;
 use Magpie\General\Sugars\Excepts;
