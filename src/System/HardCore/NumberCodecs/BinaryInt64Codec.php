@@ -14,7 +14,7 @@ class BinaryInt64Codec extends BinaryIntCodec
      */
     public static function getBitSize() : int
     {
-        return 32;
+        return 64;
     }
 
 
@@ -32,7 +32,7 @@ class BinaryInt64Codec extends BinaryIntCodec
      */
     protected static function getPackFormatString(?Endian $endian) : string
     {
-        if ($endian === null) return 'l';
+        if ($endian === null) return 'q';
 
         throw new UnsupportedValueException($endian);
     }
