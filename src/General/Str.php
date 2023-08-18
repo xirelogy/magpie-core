@@ -15,13 +15,14 @@ class Str
     /**
      * Trim the string and treat empty string as null
      * @param string|null $value
+     * @param string $characters
      * @return string|null
      */
-    public static function trimWithEmptyAsNull(?string $value) : ?string
+    public static function trimWithEmptyAsNull(?string $value, string $characters = " \t\n\r\0\x0B") : ?string
     {
         if ($value === null) return null;
 
-        $value = trim($value);
+        $value = trim($value, $characters);
         return $value !== '' ? $value : null;
     }
 
