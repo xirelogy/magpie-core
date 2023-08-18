@@ -48,6 +48,6 @@ class Str
      */
     public static function isInteger(string $text) : bool
     {
-        return preg_match('/^(0|-?[1-9][0-9]*)$/', $text) === 1;
+        return preg_match('/^(0|-?[1-9]\d*)$/', $text) === 1;
     }
 }
