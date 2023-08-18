@@ -38,6 +38,33 @@ abstract class HttpClientResponseHeaders extends CommonParserHost implements Pac
 
 
     /**
+     * Add a header into collection
+     * @param string $name
+     * @param string $value
+     * @param bool $isAllowDuplicates
+     * @return void
+     */
+    protected function addHeader(string $name, string $value, bool $isAllowDuplicates = false) : void
+    {
+        $key = $this->acceptKey($name);
+
+        // Save header names
+        if (!array_key_exists($key, $this->formattedHeaderNames)) $this->formattedHeaderNames[$key] = $name;
+
+        if ($isAllowDuplicates && array_key_exists($key, $this->headers)) {
+            $store = &$this->headers[$key];
+            if (is_array($store)) {
+                $store[] = $value;
+            } else if (is_string($store)) {
+                $store = [ $store, $value ];
+            }
+        } else {
+            $this->headers[$key] = $value;
+        }
+    }
+
+
+    /**
      * @inheritDoc
      */
     protected function hasInternal(string|int $inKey) : bool
