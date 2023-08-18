@@ -2,6 +2,7 @@
 
 namespace Magpie\HttpServer\Cookies;
 
+use Magpie\HttpServer\PhpResponse;
 use Magpie\HttpServer\Request;
 
 /**
@@ -17,7 +18,7 @@ class DeleteCookie extends CookieSpec
         $options = $this->_createCookieOptions($request);
         $options['expires'] = 1;
 
-        setrawcookie($this->name, '0', $options);
+        PhpResponse::setRawCookie($this->name, '0', $options);
     }
 
 

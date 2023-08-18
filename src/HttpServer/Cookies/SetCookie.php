@@ -4,6 +4,7 @@ namespace Magpie\HttpServer\Cookies;
 
 use Carbon\CarbonInterface;
 use Magpie\General\DateTimes\Duration;
+use Magpie\HttpServer\PhpResponse;
 use Magpie\HttpServer\Request;
 
 /**
@@ -69,7 +70,7 @@ class SetCookie extends CookieSpec
         $expires = $this->getExpiresForOptions();
         if ($expires !== null) $options['expires'] = $expires;
 
-        setrawcookie($this->name, rawurlencode($this->value), $options);
+        PhpResponse::setRawCookie($this->name, rawurlencode($this->value), $options);
     }
 
 

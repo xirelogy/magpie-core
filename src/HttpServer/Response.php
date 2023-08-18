@@ -95,7 +95,7 @@ class Response extends CommonRenderable implements WithHttpStatusCodeSpecifiable
      */
     protected function onRender(?Request $request) : void
     {
-        if ($this->httpStatusCode !== null) http_response_code($this->httpStatusCode);
+        if ($this->httpStatusCode !== null) PhpResponse::httpResponseCode($this->httpStatusCode);
 
         static::sendHeaders($this->headerNames, $this->headerValues);
         static::sendCookies($this->cookies, $request);

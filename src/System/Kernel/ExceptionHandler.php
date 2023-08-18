@@ -5,8 +5,10 @@ namespace Magpie\System\Kernel;
 use ErrorException;
 use Exception;
 use Magpie\General\Concepts\Releasable;
+use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\General\Traits\ReleaseOnDestruct;
 use Magpie\General\Traits\StaticClass;
+use Magpie\HttpServer\PhpResponse;
 use Magpie\System\Concepts\AbnormalExitHandleable;
 use Magpie\System\Impls\DefaultAbnormalExitHandle;
 use Throwable;
@@ -147,7 +149,7 @@ class ExceptionHandler
     protected static function abnormalExit(?Throwable $ex = null) : never
     {
         if (Kernel::getEntranceContext() === 'web') {
-            http_response_code(500);
+            PhpResponse::httpResponseCode(CommonHttpStatusCode::INTERNAL_SERVER_ERROR);
         }
 
         $handle = static::$abnormalHandle ?? new DefaultAbnormalExitHandle();

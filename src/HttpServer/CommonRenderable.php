@@ -61,7 +61,7 @@ abstract class CommonRenderable implements Renderable
      */
     protected static function sendHeader(string $headerName, string $value, bool $isReplace = true) : void
     {
-        header("$headerName: $value", $isReplace);
+        PhpResponse::header("$headerName: $value", $isReplace);
     }
 
 
