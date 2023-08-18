@@ -277,19 +277,19 @@ class Request implements Capturable
 
     /**
      * Create user inputs collection from given super global
-     * @param array<string, mixed> $vars
+     * @param iterable<string, mixed> $vars
      * @return UserCollectable
      */
-    protected static function createUserCollectionFrom(array $vars) : UserCollectable
+    protected static function createUserCollectionFrom(iterable $vars) : UserCollectable
     {
         return new class($vars) extends Collection implements UserCollectable {
             /**
              * Constructor
-             * @param array<string, mixed> $keyValues
+             * @param iterable<string, mixed> $keyValues
              */
-            public function __construct(array $keyValues)
+            public function __construct(iterable $keyValues)
             {
-                parent::__construct($keyValues);
+                parent::__construct(iter_flatten($keyValues));
             }
         };
     }
