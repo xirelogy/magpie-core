@@ -3,6 +3,7 @@
 namespace Magpie\HttpServer;
 
 use Magpie\General\Traits\StaticClass;
+use Magpie\Routes\Concepts\RouteResponseListenable;
 
 /**
  * Expose standard PHP response handlers that supports extensibility
@@ -10,6 +11,24 @@ use Magpie\General\Traits\StaticClass;
 final class PhpResponse
 {
     use StaticClass;
+
+    /**
+     * @var RouteResponseListenable|null A specific listener to be notified on calls
+     */
+    protected static ?RouteResponseListenable $listener = null;
+
+
+    /**
+     * Specify a listener to be notified on calls
+     * @param RouteResponseListenable|null $listener
+     * @return RouteResponseListenable|null The previous listener
+     */
+    public static function listen(?RouteResponseListenable $listener) : ?RouteResponseListenable
+    {
+        $previousListener = static::$listener;
+        static::$listener = $listener;
+        return $previousListener;
+    }
 
 
     /**
@@ -20,6 +39,7 @@ final class PhpResponse
     public static function httpResponseCode(int $code) : void
     {
         http_response_code($code);
+        static::$listener?->onHttpResponseCode($code);
     }
 
 
@@ -33,6 +53,7 @@ final class PhpResponse
     public static function header(string $headerLine, bool $isReplacePrevious = true, int $responseCode = 0) : void
     {
         header($headerLine, $isReplacePrevious, $responseCode);
+        static::$listener?->onHeader($headerLine, $isReplacePrevious, $responseCode);
     }
 
 
@@ -45,6 +66,8 @@ final class PhpResponse
      */
     public static function setRawCookie(string $name, string $value = '', array $options = []) : bool
     {
-        return setrawcookie($name, $value, $options);
+        $ret = setrawcookie($name, $value, $options);
+        static::$listener?->onSetRawCookie($name, $value, $options, $ret);
+        return $ret;
     }
 }
