@@ -25,14 +25,14 @@ final class PhpResponse
 
     /**
      * Set response header
-     * @param string $header
-     * @param bool $replace
+     * @param string $headerLine
+     * @param bool $isReplacePrevious
      * @param int $responseCode
      * @return void
      */
-    public static function header(string $header, bool $replace = true, int $responseCode = 0) : void
+    public static function header(string $headerLine, bool $isReplacePrevious = true, int $responseCode = 0) : void
     {
-        header($header, $replace, $responseCode);
+        header($headerLine, $isReplacePrevious, $responseCode);
     }
 
 
