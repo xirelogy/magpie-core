@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Magpie\Codecs\Formats\CookieDateTimeFormatter;
 use Magpie\General\Contexts\ClosureScoped;
 use Magpie\General\Contexts\Scoped;
+use Magpie\General\Str;
 use Magpie\HttpServer\PhpResponse;
 use Magpie\Routes\Concepts\RouteResponseListenable;
 
@@ -117,7 +118,11 @@ class CommonRouteResponseListener implements RouteResponseListenable
 
         $components = [];
         foreach (static::getCookieComponents($name, $value, $options) as $cookieKey => $cookieValue) {
-            $components[] = "$cookieKey=$cookieValue";
+            if (!Str::isNullOrEmpty($cookieValue)) {
+                $components[] = "$cookieKey=$cookieValue";
+            } else {
+                $components[] = $cookieKey;
+            }
         }
         $ret .= implode('; ', $components);
 
@@ -144,6 +149,26 @@ class CommonRouteResponseListener implements RouteResponseListenable
             $maxAge = $expires - time();
             if ($maxAge < 0) $maxAge = 0;
             yield 'Max-Age' => $maxAge;
+        }
+
+        if (array_key_exists('path', $options)) {
+            yield 'path' => $options['path'];
+        }
+
+        if (array_key_exists('domain', $options)) {
+            yield 'domain' => $options['domain'];
+        }
+
+        if (array_key_exists('secure', $options) && $options['secure'] === true) {
+            yield 'secure' => '';
+        }
+
+        if (array_key_exists('httponly', $options) && $options['httponly'] === true) {
+            yield 'HttpOnly' => '';
+        }
+
+        if (array_key_exists('samesite', $options)) {
+            yield 'SameSite' => $options['samesite'];
         }
     }
 }
