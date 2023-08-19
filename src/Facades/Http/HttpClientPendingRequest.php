@@ -72,11 +72,16 @@ abstract class HttpClientPendingRequest implements TypeClassable
     {
         $key = static::normalizeHeader($name);
         if (array_key_exists($key, $this->headers)) {
+            $oldValue = $this->headers[$key];
+            if (!is_array($oldValue)) $oldValue = [$oldValue];
+
             if (is_array($value)) {
-                $this->headers[$key] = array_merge($this->headers[$key], $value);
+                $oldValue = array_merge($oldValue, $value);
             } else {
-                $this->headers[$key][] = $value;
+                $oldValue[] = $value;
             }
+
+            $this->headers[$key] = $oldValue;
         } else {
             $this->headers[$key] = $value;
         }
