@@ -5,6 +5,8 @@ namespace Magpie\HttpServer;
 use Exception;
 use Magpie\Codecs\Parsers\IntegerParser;
 use Magpie\Codecs\Parsers\StringParser;
+use Magpie\General\Concepts\PrimitiveBinaryContentable;
+use Magpie\General\Contents\PrimitiveFileBinaryContent;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpMethod;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
@@ -190,11 +192,51 @@ class Request implements Capturable
     protected static function onCapture() : static
     {
         $queries = static::createUserCollectionFrom($_GET);
-        $posts = static::createUserCollectionFrom($_POST);
+        $posts = static::createUserCollectionFrom(static::getPosts());
         $cookies = static::createUserCollectionFrom($_COOKIE);
         $serverVars = ServerCollection::capture();
 
         return new static($queries, $posts, $cookies, $serverVars);
+    }
+
+
+    /**
+     * All post variables and files
+     * @return iterable<string, array<string|PrimitiveBinaryContentable>|string|PrimitiveBinaryContentable>
+     */
+    private static function getPosts() : iterable
+    {
+        yield from $_POST;
+
+        foreach ($_FILES as $fileKey => $fileDesc) {
+            $fileName = $fileDesc['full_path'];
+            $fileType = $fileDesc['type'];
+            $filePath = $fileDesc['tmp_name'];
+
+            if (is_array($fileName)) {
+                $count = count($fileName);
+                $outFiles = [];
+                for ($i = 0; $i < $count; ++$i) {
+                    $outFiles[] = static::wrapPostFile($fileName[$i], $fileType[$i], $filePath[$i]);
+                }
+                yield $fileKey => $outFiles;
+            } else {
+                yield $fileKey => static::wrapPostFile($fileName, $fileType, $filePath);
+            }
+        }
+    }
+
+
+    /**
+     * Wrap a post file
+     * @param string $filename
+     * @param string $type
+     * @param string $path
+     * @return PrimitiveBinaryContentable
+     */
+    private static function wrapPostFile(string $filename, string $type, string $path) : PrimitiveBinaryContentable
+    {
+        return new PrimitiveFileBinaryContent($path, $type, $filename);
     }
 
 
