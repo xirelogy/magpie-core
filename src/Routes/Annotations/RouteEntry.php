@@ -3,7 +3,6 @@
 namespace Magpie\Routes\Annotations;
 
 use Attribute;
-use Magpie\HttpServer\CommonMethod;
 
 /**
  * Route entry
@@ -16,17 +15,17 @@ class RouteEntry
      */
     public readonly string $path;
     /**
-     * @var string|CommonMethod|array<string|CommonMethod>|null Supported method(s)
+     * @var string|array<string>|null Supported method(s)
      */
-    public readonly string|CommonMethod|array|null $method;
+    public readonly string|array|null $method;
 
 
     /**
      * Constructor
      * @param string $path Entry path
-     * @param string|CommonMethod|array|null $method Supported method(s)
+     * @param string|array<string>|null $method Supported method(s)
      */
-    public function __construct(string $path, string|CommonMethod|array|null $method = null)
+    public function __construct(string $path, string|array|null $method = null)
     {
         $this->path = $path;
         $this->method = $method;

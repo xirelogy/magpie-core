@@ -6,7 +6,7 @@ use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\InvalidStateException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\Facades\Log;
-use Magpie\HttpServer\CommonMethod;
+use Magpie\General\Names\CommonHttpMethod;
 use Magpie\Routes\Annotations\RouteEntry;
 use Magpie\Routes\Annotations\RouteIf;
 use Magpie\Routes\Annotations\RoutePrefix;
@@ -236,10 +236,10 @@ class RouteMap implements SourceCacheTranslatable
 
     /**
      * Flatten request method specification
-     * @param string|CommonMethod|array<string|CommonMethod>|null $methodSpec
+     * @param string|array<string>|null $methodSpec
      * @return array
      */
-    public static function flattenRequestMethods(string|CommonMethod|array|null $methodSpec) : array
+    public static function flattenRequestMethods(string|array|null $methodSpec) : array
     {
         $ret = [];
         foreach (static::expandRequestMethods($methodSpec) as $method) {
@@ -255,17 +255,17 @@ class RouteMap implements SourceCacheTranslatable
 
     /**
      * Expand request method specification
-     * @param string|CommonMethod|array<string|CommonMethod>|null $methodSpec
+     * @param string|array<string>|null $methodSpec
      * @return iterable<string>
      */
-    protected static function expandRequestMethods(string|CommonMethod|array|null $methodSpec) : iterable
+    protected static function expandRequestMethods(string|array|null $methodSpec) : iterable
     {
         if ($methodSpec === null) {
-            yield static::methodStringOf(CommonMethod::GET);
+            yield static::methodStringOf(CommonHttpMethod::GET);
             return;
         }
 
-        if (is_string($methodSpec) || $methodSpec instanceof CommonMethod) {
+        if (is_string($methodSpec)) {
             yield static::methodStringOf($methodSpec);
             return;
         }
@@ -278,13 +278,12 @@ class RouteMap implements SourceCacheTranslatable
 
     /**
      * Convert to string
-     * @param string|CommonMethod $method
+     * @param string $method
      * @return string
      */
-    protected static function methodStringOf(string|CommonMethod $method) : string
+    protected static function methodStringOf(string $method) : string
     {
-        if ($method instanceof CommonMethod) return $method->value;
-        return $method;
+        return strtoupper($method);
     }
 
 
