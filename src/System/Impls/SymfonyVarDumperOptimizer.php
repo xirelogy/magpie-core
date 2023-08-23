@@ -5,6 +5,7 @@ namespace Magpie\System\Impls;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Closure;
+use Magpie\General\Contents\SimpleBinaryContent;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Models\Schemas\Configs\SchemaPreference;
 use Magpie\Models\Schemas\TableSchema;
@@ -65,6 +66,10 @@ class SymfonyVarDumperOptimizer
                     return iter_flatten($object->all());
                 },
             ]),
+        ]);
+
+        VarCloner::$defaultCasters[SimpleBinaryContent::class] = static::createCaster([
+            SymfonyVarDumperCutStubPatch::for('data'),
         ]);
 
         VarCloner::$defaultCasters[SchemaPreference::class] = static::createCaster([
