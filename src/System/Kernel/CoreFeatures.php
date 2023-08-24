@@ -33,6 +33,7 @@ class CoreFeatures implements SystemBootable
         CommandRegistry::includeDirectory(__DIR__ . '/../../Routes/Commands');
 
         ClassFactory::includeDirectory(__DIR__ . '/../../Logs/Relays');
+        ClassFactory::includeDirectory(__DIR__ . '/../../HttpServer/Contents');
         ClassFactory::includeDirectory(__DIR__ . '/../Impls/Consoles');
     }
 }

@@ -11,6 +11,7 @@ use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpMethod;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\UserCollectable;
+use Magpie\HttpServer\Contents\PostBodyContent;
 use Magpie\Objects\Uri;
 use Magpie\Routes\Impls\ActualRouteContext;
 use Magpie\Routes\Impls\ForwardingUserCollection;
@@ -77,6 +78,10 @@ class Request implements Capturable
      * @var RequestState Associated request state
      */
     public readonly RequestState $state;
+    /**
+     * @var bool If POST body should be suppressed
+     */
+    protected readonly bool $isSuppressBody;
 
 
     /**
@@ -85,8 +90,9 @@ class Request implements Capturable
      * @param UserCollectable $posts
      * @param UserCollectable $cookies
      * @param ServerCollection $serverVars
+     * @param bool $isSuppressBody
      */
-    protected function __construct(UserCollectable $queries, UserCollectable $posts, UserCollectable $cookies, ServerCollection $serverVars)
+    protected function __construct(UserCollectable $queries, UserCollectable $posts, UserCollectable $cookies, ServerCollection $serverVars, bool $isSuppressBody = false)
     {
         $this->domainArguments = new ForwardingUserCollection();
         $this->routeArguments = new ForwardingUserCollection();
@@ -95,6 +101,7 @@ class Request implements Capturable
         $this->posts = $posts;
         $this->cookies = $cookies;
         $this->serverVars = $serverVars;
+        $this->isSuppressBody = $isSuppressBody;
         $this->headers = $this->serverVars->getHeaders();
 
         $this->requestUri = Uri::safeParse($this->serverVars->safeOptional('REQUEST_URI', default: '/'));
@@ -123,6 +130,8 @@ class Request implements Capturable
      */
     public function getBody() : string
     {
+        if ($this->isSuppressBody) return '';
+
         return file_get_contents('php://input');
     }
 
@@ -191,21 +200,33 @@ class Request implements Capturable
      */
     protected static function onCapture() : static
     {
-        $queries = static::createUserCollectionFrom($_GET);
-        $posts = static::createUserCollectionFrom(static::getPosts());
-        $cookies = static::createUserCollectionFrom($_COOKIE);
         $serverVars = ServerCollection::capture();
+        $queries = static::createUserCollectionFrom($_GET);
+        $posts = static::createUserCollectionFrom(static::getPosts($serverVars, $isSuppressBody));
+        $cookies = static::createUserCollectionFrom($_COOKIE);
 
-        return new static($queries, $posts, $cookies, $serverVars);
+        return new static($queries, $posts, $cookies, $serverVars, $isSuppressBody);
     }
 
 
     /**
      * All post variables and files
+     * @param ServerCollection $serverVars
+     * @param bool|null $isSuppressBody
      * @return iterable<string, array<string|PrimitiveBinaryContentable>|string|PrimitiveBinaryContentable>
      */
-    private static function getPosts() : iterable
+    private static function getPosts(ServerCollection $serverVars, ?bool &$isSuppressBody) : iterable
     {
+        $requestMethod = $serverVars->safeOptional('REQUEST_METHOD', StringParser::createTrimEmptyAsNull());
+        if ($requestMethod !== 'POST') {
+            $body = @file_get_contents('php://input');
+            if ($body === false) $body = '';
+            yield from static::getPostsFromBody($serverVars, $body, $isSuppressBody);
+            return;
+        }
+
+        $isSuppressBody = true;
+
         yield from $_POST;
 
         foreach ($_FILES as $fileKey => $fileDesc) {
@@ -224,6 +245,26 @@ class Request implements Capturable
                 yield $fileKey => static::wrapPostFile($fileName, $fileType, $filePath);
             }
         }
+    }
+
+
+    /**
+     * All post variables and files from body
+     * @param ServerCollection $serverVars
+     * @param string $body
+     * @param bool|null $isSuppressBody
+     * @return iterable<string, array<string|PrimitiveBinaryContentable>|string|PrimitiveBinaryContentable>
+     */
+    private static function getPostsFromBody(ServerCollection $serverVars, string $body, ?bool &$isSuppressBody) : iterable
+    {
+        $isSuppressBody = false;
+
+        $content = PostBodyContent::create($serverVars, $body);
+        if ($content === null) return;
+
+        $isSuppressBody = true;
+
+        yield from $content->getVariables();
     }
 
 
