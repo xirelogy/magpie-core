@@ -3,7 +3,7 @@
 namespace Magpie\Routes;
 
 use Carbon\Carbon;
-use Magpie\Codecs\Formats\CookieDateTimeFormatter;
+use Magpie\Codecs\Formats\HttpDateTimeFormatter;
 use Magpie\General\Contexts\ClosureScoped;
 use Magpie\General\Contexts\Scoped;
 use Magpie\General\Str;
@@ -144,7 +144,7 @@ class CommonRouteResponseListener implements RouteResponseListenable
         if (array_key_exists('expires', $options)) {
             $expires = $options['expires'];
             $expiryTime = Carbon::createFromTimestamp($expires);
-            yield 'expires' => CookieDateTimeFormatter::create()->format($expiryTime);
+            yield 'expires' => HttpDateTimeFormatter::create()->format($expiryTime);
 
             $maxAge = $expires - time();
             if ($maxAge < 0) $maxAge = 0;
