@@ -6,12 +6,11 @@ use Carbon\CarbonInterface;
 use Magpie\General\Traits\StaticCreatable;
 
 /**
- * Format date/time according to cookie format
+ * Format date/time according to HTTP-date format
  * @link https://www.rfc-editor.org/rfc/rfc7234#section-5.3
  * @link https://www.rfc-editor.org/rfc/rfc7231#section-7.1.1.1
- * @deprecated Should be replaced with HttpDateTimeFormatter
  */
-class CookieDateTimeFormatter implements Formatter
+class HttpDateTimeFormatter implements Formatter
 {
     use StaticCreatable;
 
@@ -23,8 +22,8 @@ class CookieDateTimeFormatter implements Formatter
     {
         if ($value instanceof CarbonInterface) {
             return $value->toImmutable()
-                ->setTimezone('UTC')
-                ->format('D, d-M-Y H:i:s') . ' GMT';
+                    ->setTimezone('UTC')
+                    ->format('D, d M Y H:i:s') . ' GMT';
         }
 
         return $value;
