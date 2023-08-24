@@ -1,0 +1,14 @@
+{
+  "invalid data": "数据错误",
+  "invalid {{0}}": "{{0}}错误",
+  "timezone": "时区",
+  "day of week": "星期几",
+  "day": "日",
+  "month": "月份",
+  "year/month combination": "年月组合",
+  "hour": "小时",
+  "minute": "分钟",
+  "second": "秒",
+  "wrong day of week": "错误的星期几",
+  "": ""
+}
