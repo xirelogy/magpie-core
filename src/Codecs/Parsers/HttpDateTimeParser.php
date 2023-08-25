@@ -66,13 +66,13 @@ class HttpDateTimeParser extends CreatableParser
      */
     protected static function parseImfDateTime(string $value) : ?CarbonInterface
     {
-        $result = preg_match('/([A-Z][a-z][a-z]), (\d{2})[\- ]([A-Z][a-z][a-z])[\- ](\d{4}) (\d{2}):(\d{2}):(\d{2}) (GMT)$/', $value, $matches);
+        $result = preg_match('/([A-Z][a-z][a-z]), (\d{2})[\- ]([A-Z][a-z][a-z])[\- ](\d{4}) (\d{2}):(\d{2}):(\d{2}) (.+)$/', $value, $matches);
         if ($result !== 1) return null;
 
         [$dummy, $dayOfWeek, $day, $month, $year, $hour, $minute, $second, $timezone] = $matches;
         _used($dummy);
 
-        if ($timezone !== 'GMT') throw new ParseFailedException(static::formatInvalidMessage(_l('timezone')));
+        if ($timezone !== 'GMT' && $timezone !== 'UTC') throw new ParseFailedException(static::formatInvalidMessage(_l('timezone')));
 
         $dayOfWeek = static::translateDayOfWeek3($dayOfWeek);
         if ($dayOfWeek === null) throw new ParseFailedException(static::formatInvalidMessage(_l('day of week')));
@@ -95,13 +95,13 @@ class HttpDateTimeParser extends CreatableParser
      */
     protected static function parseRfc850DateTime(string $value) : ?CarbonInterface
     {
-        $result = preg_match('/([A-Z][a-z]*), (\d{2})-([A-Z][a-z][a-z])-(\d{2}) (\d{2}):(\d{2}):(\d{2}) (GMT)$/', $value, $matches);
+        $result = preg_match('/([A-Z][a-z]*), (\d{2})-([A-Z][a-z][a-z])-(\d{2}) (\d{2}):(\d{2}):(\d{2}) (.+)$/', $value, $matches);
         if ($result !== 1) return null;
 
         [$dummy, $dayOfWeek, $day, $month, $year, $hour, $minute, $second, $timezone] = $matches;
         _used($dummy);
 
-        if ($timezone !== 'GMT') throw new ParseFailedException(static::formatInvalidMessage(_l('timezone')));
+        if ($timezone !== 'GMT' && $timezone !== 'UTC') throw new ParseFailedException(static::formatInvalidMessage(_l('timezone')));
 
         $dayOfWeek = static::translateDayOfWeekFull($dayOfWeek);
         if ($dayOfWeek === null) throw new ParseFailedException(static::formatInvalidMessage(_l('day of week')));
