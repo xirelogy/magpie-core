@@ -132,7 +132,7 @@ class Request implements Capturable
     {
         if ($this->isSuppressBody) return '';
 
-        return file_get_contents('php://input');
+        return static::readPostBody();
     }
 
 
@@ -219,8 +219,7 @@ class Request implements Capturable
     {
         $requestMethod = $serverVars->safeOptional('REQUEST_METHOD', StringParser::createTrimEmptyAsNull());
         if ($requestMethod !== 'POST') {
-            $body = @file_get_contents('php://input');
-            if ($body === false) $body = '';
+            $body = static::readPostBody();
             yield from static::getPostsFromBody($serverVars, $body, $isSuppressBody);
             return;
         }
@@ -265,6 +264,18 @@ class Request implements Capturable
         $isSuppressBody = true;
 
         yield from $content->getVariables();
+    }
+
+
+    /**
+     * Read the post body
+     * @return string
+     */
+    private static function readPostBody() : string
+    {
+        $ret = @file_get_contents('php://input');
+        if ($ret === false) $ret = '';
+        return $ret;
     }
 
 
