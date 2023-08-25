@@ -2,13 +2,14 @@
 
 namespace Magpie\HttpServer\Headers;
 
+use Magpie\Codecs\Concepts\PreferStringable;
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Exceptions\ArgumentException;
 
 /**
  * A value with quality (priority) in comma separated HTTP header value
  */
-class QualityValue
+class QualityValue implements PreferStringable
 {
     /**
      * Default quality value
@@ -40,6 +41,36 @@ class QualityValue
         $this->value = $value;
         $this->quality = $quality;
         $this->options = $options;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function __toString() : string
+    {
+        $ret = [ $this->value ];
+
+        foreach ($this->options as $optKey => $optValue) {
+            $ret[] = "$optKey=$optValue";
+        }
+
+        $ret[] = "q=" . static::formatQuality($this->quality);
+
+        return implode('; ', $ret);
+    }
+
+
+    /**
+     * Format the quality value like how they are commonly expressed
+     * @param float $v
+     * @return string
+     */
+    protected static function formatQuality(float $v) : string
+    {
+        $ret = '' . $v;
+        if (!str_contains($ret, '.')) return number_format($v, 1);
+        return $ret;
     }
 
 
