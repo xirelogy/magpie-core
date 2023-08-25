@@ -2,15 +2,15 @@
 
 namespace Magpie\HttpServer\Headers;
 
-use Magpie\Codecs\Parsers\CreatableParser;
+use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Traits\CommonParser;
 use Magpie\General\Concepts\ArraySortable;
 
 /**
  * Parser for CommaSeparatedQualityHeaderValue
- * @extends CreatableParser<CommaSeparatedQualityHeaderValue>
+ * @implements Parser<CommaSeparatedQualityHeaderValue>
  */
-abstract class CommaSeparatedQualityHeaderValueParser extends CreatableParser
+abstract class CommaSeparatedQualityHeaderValueParser implements Parser
 {
     use CommonParser;
 
@@ -18,6 +18,15 @@ abstract class CommaSeparatedQualityHeaderValueParser extends CreatableParser
      * @var ArraySortable<ColonSeparatedHeaderValue>|null Specific sorter to be used
      */
     protected ?ArraySortable $sorter = null;
+
+
+    /**
+     * Constructor
+     */
+    protected function __construct()
+    {
+
+    }
 
 
     /**
