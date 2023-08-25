@@ -2,10 +2,9 @@
 
 namespace Magpie\HttpServer\Headers;
 
+use Closure;
 use Magpie\Codecs\Concepts\ObjectParseable;
 use Magpie\Codecs\ParserHosts\ArrayCollection;
-use Magpie\Codecs\Parsers\ClosureParser;
-use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Parsers\StringParser;
 
 /**
@@ -15,34 +14,87 @@ use Magpie\Codecs\Parsers\StringParser;
 class ColonSeparatedHeaderValue extends ArrayCollection implements ObjectParseable
 {
     /**
+     * @var bool If keys are case-sensitive
+     */
+    protected readonly bool $isCaseSensitive;
+
+
+    /**
      * Constructor
      * @param array $arr
+     * @param bool $isCaseSensitive
      * @param string|null $prefix
      */
-    protected function __construct(array $arr, ?string $prefix = null)
+    protected function __construct(array $arr, bool $isCaseSensitive, ?string $prefix = null)
     {
         parent::__construct($arr, $prefix);
+
+        $this->isCaseSensitive = $isCaseSensitive;
     }
 
 
     /**
      * @inheritDoc
      */
-    public static final function createParser() : Parser
+    protected function acceptKey(int|string $key) : string|int
     {
-        return ClosureParser::create(function (mixed $value, ?string $hintName) : static {
+        if (!$this->isCaseSensitive && is_string($key)) return strtolower($key);
+
+        return parent::acceptKey($key);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function formatKey(int|string $key) : string|int
+    {
+        if (!$this->isCaseSensitive && is_string($key)) return strtolower($key);
+
+        return parent::formatKey($key);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public static final function createParser() : ColonSeparatedHeaderValueParser
+    {
+        $fn = function (mixed $value, ?string $hintName, bool $isCaseSensitive) : static {
             $value = StringParser::create()->parse($value, $hintName);
-            return new static(static::explodeValues($value), $hintName);
-        });
+            return new static(static::explodeValues($value, $isCaseSensitive), $isCaseSensitive, $hintName);
+        };
+
+        return new class($fn) extends ColonSeparatedHeaderValueParser {
+            /**
+             * Constructor
+             * @param Closure $fn
+             */
+            public function __construct(
+                protected Closure $fn,
+            ) {
+                parent::__construct();
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            protected function onParse(mixed $value, ?string $hintName) : ColonSeparatedHeaderValue
+            {
+                return ($this->fn)($value, $hintName, $this->isCaseSensitive);
+            }
+        };
     }
 
 
     /**
      * Explode the values
      * @param string $line
+     * @param bool $isCaseSensitive
      * @return array<string, string>
      */
-    private static function explodeValues(string $line) : array
+    private static function explodeValues(string $line, bool $isCaseSensitive) : array
     {
         $ret = [
             '' => '',
@@ -60,7 +112,7 @@ class ColonSeparatedHeaderValue extends ArrayCollection implements ObjectParseab
                 // With equal sign, normal key value
                 $key = substr($keyValue, 0, $equalPos);
                 $value = substr($keyValue, $equalPos + 1);
-                $ret[static::decodeKey($key)] = static::decodeValue($value);
+                $ret[static::decodeKey($key, $isCaseSensitive)] = static::decodeValue($value);
             }
         }
 
@@ -72,11 +124,14 @@ class ColonSeparatedHeaderValue extends ArrayCollection implements ObjectParseab
     /**
      * Decode a key
      * @param string $key
+     * @param bool $isCaseSensitive
      * @return string
      */
-    protected static function decodeKey(string $key) : string
+    protected static function decodeKey(string $key, bool $isCaseSensitive) : string
     {
-        return trim($key);
+        $ret = trim($key);
+        if (!$isCaseSensitive) $ret = strtolower($ret);
+        return $ret;
     }
 
 
