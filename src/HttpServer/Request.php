@@ -224,7 +224,7 @@ class Request implements Capturable
             return;
         }
 
-        $isSuppressBody = true;
+        $isSuppressBody = false;
 
         yield from $_POST;
 
