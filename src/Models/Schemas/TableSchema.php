@@ -228,7 +228,7 @@ class TableSchema implements Packable
 
         if ($schemaAtDb === null) {
             // Create new table
-            $creator = $connection->prepareTableCreator($tableName);
+            $creator = $connection->prepareTableCreator($tableName, $this->getColumns());
             foreach ($this->getColumns() as $column) {
                 $listener?->notifyCheckColumn($modelClassName, $tableName, $column->getName(), $column->getDefinitionType(), false);
                 $creator->addColumnFromSchema($column);
@@ -236,7 +236,7 @@ class TableSchema implements Packable
             return $creator->compile();
         } else {
             // Alter table
-            $editor = $connection->prepareTableEditor($tableName);
+            $editor = $connection->prepareTableEditor($tableName, $this->getColumns());
             $lastColumn = null;
             foreach ($this->getColumns() as $column) {
                 $columnEditor = $editor->addCheckedColumnFromSchema($column, $schemaAtDb, $lastColumn, $columnAtDb);

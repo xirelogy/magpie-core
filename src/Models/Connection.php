@@ -21,6 +21,7 @@ use Magpie\Models\Exceptions\ModelSafetyException;
 use Magpie\Models\Exceptions\ModelWriteException;
 use Magpie\Models\Impls\ConnectionsCache;
 use Magpie\Models\Providers\QueryGrammar;
+use Magpie\Models\Schemas\ColumnSchema;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
 use Magpie\Models\Schemas\DatabaseEdits\TableEditor;
 use Magpie\Models\Schemas\TableSchemaAtDatabase;
@@ -118,17 +119,19 @@ abstract class Connection implements Identifiable, TypeClassable, SystemBootable
     /**
      * Prepare a table creator
      * @param string $tableName
+     * @param iterable<ColumnSchema> $columns
      * @return TableCreator
      */
-    public abstract function prepareTableCreator(string $tableName) : TableCreator;
+    public abstract function prepareTableCreator(string $tableName, iterable $columns) : TableCreator;
 
 
     /**
      * Prepare a table editor
      * @param string $tableName
+     * @param iterable<ColumnSchema> $columns
      * @return TableEditor
      */
-    public abstract function prepareTableEditor(string $tableName) : TableEditor;
+    public abstract function prepareTableEditor(string $tableName, iterable $columns) : TableEditor;
 
 
     /**

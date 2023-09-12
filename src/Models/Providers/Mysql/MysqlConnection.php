@@ -104,7 +104,7 @@ class MysqlConnection extends PdoConnection
     /**
      * @inheritDoc
      */
-    public function prepareTableCreator(string $tableName) : TableCreator
+    public function prepareTableCreator(string $tableName, iterable $columns) : TableCreator
     {
         return new MysqlTableCreator($this, $tableName);
     }
@@ -115,7 +115,7 @@ class MysqlConnection extends PdoConnection
      * @param string $tableName
      * @return TableEditor
      */
-    public function prepareTableEditor(string $tableName) : TableEditor
+    public function prepareTableEditor(string $tableName, iterable $columns) : TableEditor
     {
         return new MysqlTableEditor($this, $tableName);
     }
