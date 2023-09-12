@@ -48,7 +48,7 @@ abstract class CommonTableEditable implements StatementCompilable
      * @param ColumnSchema $column
      * @return void
      */
-    protected function mergeColumnFromSchema(ColumnDatabaseSpecifiable $columnSpec, ColumnSchema $column) : void
+    protected static function mergeColumnFromSchema(ColumnDatabaseSpecifiable $columnSpec, ColumnSchema $column) : void
     {
         $columnSpec->withDefinitionType($column->getDefinitionType());
         if ($column->isNonNull()) $columnSpec->withNonNull();
