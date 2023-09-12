@@ -209,15 +209,16 @@ class TableSchema implements Packable
 
 
     /**
-     * Compile a statement to synchronize
+     * Compile statements to synchronize
      * @param Connection $connection
+     * @param bool $isUseTransaction
      * @param ModelCheckListenable|null $listener
-     * @return Statement|null
+     * @return iterable<Statement>
      * @throws SafetyCommonException
      * @throws ModelReadException
      * @throws ModelWriteException
      */
-    public function compileStatementAtDatabase(Connection $connection, ?ModelCheckListenable $listener = null) : ?Statement
+    public function compileStatementsAtDatabase(Connection $connection, bool &$isUseTransaction, ?ModelCheckListenable $listener = null) : iterable
     {
         $schemaAtDb = $this->getSchemaAtDatabase($connection);
 
@@ -225,6 +226,7 @@ class TableSchema implements Packable
         $tableName = $this->getName();
 
         $listener?->notifyCheckTable($modelClassName, $tableName, $schemaAtDb !== null);
+        $isUseTransaction = false;
 
         if ($schemaAtDb === null) {
             // Create new table
@@ -233,6 +235,7 @@ class TableSchema implements Packable
                 $listener?->notifyCheckColumn($modelClassName, $tableName, $column->getName(), $column->getDefinitionType(), false);
                 $creator->addColumnFromSchema($column);
             }
+            $isUseTransaction = $creator->isUseTransaction();
             return $creator->compile();
         } else {
             // Alter table
@@ -245,8 +248,13 @@ class TableSchema implements Packable
                 }
                 $lastColumn = $column;
             }
-            return $editor->hasColumn() ? $editor->compile() : null;
+            if ($editor->hasColumn()) {
+                $isUseTransaction = $editor->isUseTransaction();
+                return $editor->compile();
+            }
         }
+
+        return [];
     }
 
 

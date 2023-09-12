@@ -3,6 +3,7 @@
 namespace Magpie\Models\Schemas\Checks;
 
 use Magpie\Models\Concepts\ModelCheckListenable;
+use Magpie\Models\Impls\ModelTransactionScoped;
 use Magpie\Models\Model;
 use Magpie\Models\Schemas\TableSchema;
 
@@ -28,7 +29,22 @@ class TableSchemaSynchronizer extends TableSchemaChecker
         $tableSchema = TableSchema::fromNative($model);
 
         $connection = $model->connect();
-        $statement = $tableSchema->compileStatementAtDatabase($connection, $listener);
-        $statement?->execute();
+        $isUseTransaction = false;
+        $statements = $tableSchema->compileStatementsAtDatabase($connection, $isUseTransaction, $listener);
+
+        // Create the transaction scope if necessary
+        $scoped = $isUseTransaction ? new ModelTransactionScoped($connection) : null;
+
+        try {
+            // Execute statements
+            foreach ($statements as $statement) {
+                $statement->execute();
+            }
+
+            // Scope considered successful at this point
+            $scoped?->succeeded();
+        } finally {
+            $scoped?->release();
+        }
     }
 }

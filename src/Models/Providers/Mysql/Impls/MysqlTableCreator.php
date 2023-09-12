@@ -7,7 +7,6 @@ use Magpie\Models\Concepts\ColumnDatabaseSpecifiable;
 use Magpie\Models\Impls\SqlFormat;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
-use Magpie\Models\Statement;
 
 /**
  * MySQL table creator
@@ -64,7 +63,7 @@ class MysqlTableCreator extends TableCreator
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
      */
-    public function compile() : Statement
+    public function compile() : iterable
     {
         $database = $this->connection->getDatabase();
 
@@ -99,7 +98,7 @@ class MysqlTableCreator extends TableCreator
 
         // Finalize
         $sql .= ' ' . Quote::bracket(implode(', ', $declarations));
-        return $this->connection->prepare($sql);
+        yield $this->connection->prepare($sql);
     }
 
 

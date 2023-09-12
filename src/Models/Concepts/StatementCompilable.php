@@ -14,10 +14,10 @@ interface StatementCompilable
 {
     /**
      * Compile as statement
-     * @return Statement
+     * @return iterable<Statement>
      * @throws SafetyCommonException
      * @throws ModelReadException
      * @throws ModelWriteException
      */
-    public function compile() : Statement;
+    public function compile() : iterable;
 }

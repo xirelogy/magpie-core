@@ -7,7 +7,6 @@ use Magpie\Models\Concepts\ColumnDatabaseEditSpecifiable;
 use Magpie\Models\Impls\SqlFormat;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
 use Magpie\Models\Schemas\DatabaseEdits\TableEditor;
-use Magpie\Models\Statement;
 
 /**
  * MySQL table editor
@@ -64,7 +63,7 @@ class MysqlTableEditor extends TableEditor
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
      */
-    public function compile() : Statement
+    public function compile() : iterable
     {
         $database = $this->connection->getDatabase();
 
@@ -80,6 +79,6 @@ class MysqlTableEditor extends TableEditor
         // Finalize
         if (count($declarations) <= 0) throw new MissingArgumentException('declarations');
         $sql .= ' ' . implode(', ', $declarations);
-        return $this->connection->prepare($sql);
+        yield $this->connection->prepare($sql);
     }
 }

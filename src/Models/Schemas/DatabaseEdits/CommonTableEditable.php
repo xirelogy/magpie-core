@@ -43,6 +43,16 @@ abstract class CommonTableEditable implements StatementCompilable
 
 
     /**
+     * If the compiled statement requires transaction
+     * @return bool
+     */
+    public function isUseTransaction() : bool
+    {
+        return false;
+    }
+
+
+    /**
      * Merge column specification from given schema
      * @param ColumnDatabaseSpecifiable $columnSpec
      * @param ColumnSchema $column
