@@ -3,6 +3,7 @@
 namespace Magpie\System\HardCore;
 
 use Magpie\General\Traits\SingletonInstance;
+use Magpie\System\Concepts\AutoloadReflectionPathResolvable;
 use Magpie\System\Kernel\Kernel;
 use ReflectionClass;
 use ReflectionException;
@@ -25,6 +26,10 @@ class AutoloadReflection
      * @var array<string, array<string>>|null Autoload map
      */
     protected ?array $map = null;
+    /**
+     * @var array<AutoloadReflectionPathResolvable> Path resolvers
+     */
+    protected array $pathResolvers = [];
 
 
     /**
@@ -118,7 +123,7 @@ class AutoloadReflection
         if (!str_starts_with($realPath, $rootPath)) return null;
 
         $classPath = null;
-        $namespace = $this->getNamespacePrefix($realPath, $classPath);
+        $namespace = $this->getNamespacePrefix($rootPath, $realPath, $classPath);
 
         // Process the namespace and class paths
         if (!str_ends_with($namespace, '\\')) $namespace .= '\\';
@@ -133,13 +138,16 @@ class AutoloadReflection
 
     /**
      * Get namespace prefix
+     * @param string $rootPath Project's root path
      * @param string $realPath Target file's real path
      * @param string|null $outRelPath The relative path after extracting namespace prefix
      * @return string Namespace prefix extracted
      */
-    protected function getNamespacePrefix(string $realPath, ?string &$outRelPath) : string
+    protected function getNamespacePrefix(string $rootPath, string $realPath, ?string &$outRelPath) : string
     {
         $map = $this->resolveAutoloadMap();
+
+        $this->onResolvePath($rootPath, $realPath);
 
         foreach ($map ?? [] as $key => $values) {
             foreach ($values as $value) {
@@ -152,6 +160,20 @@ class AutoloadReflection
 
         $outRelPath = $realPath;
         return '';
+    }
+
+
+    /**
+     * Resolve paths before resolving namespace
+     * @param string $rootPath
+     * @param string $realPath
+     * @return void
+     */
+    protected function onResolvePath(string $rootPath, string& $realPath) : void
+    {
+        foreach ($this->pathResolvers as $pathResolver) {
+            $pathResolver->tryResolvePath($rootPath, $realPath);
+        }
     }
 
 
@@ -195,5 +217,17 @@ class AutoloadReflection
 
         // Not supported
         return null;
+    }
+
+
+    /**
+     * Add path resolver
+     * @param AutoloadReflectionPathResolvable $resolver
+     * @return $this
+     */
+    public function addPathResolver(AutoloadReflectionPathResolvable $resolver) : static
+    {
+        $this->pathResolvers[] = $resolver;
+        return $this;
     }
 }
