@@ -111,9 +111,7 @@ class MysqlConnection extends PdoConnection
 
 
     /**
-     * Prepare a table editor
-     * @param string $tableName
-     * @return TableEditor
+     * @inheritDoc
      */
     public function prepareTableEditor(string $tableName, iterable $columns) : TableEditor
     {
