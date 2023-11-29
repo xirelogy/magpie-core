@@ -47,7 +47,7 @@ abstract class HttpClientPendingRequest implements TypeClassable
     /**
      * Constructor
      * @param array<string, mixed> $parentHeaders
-     * @param array<HttpClientRequestOptionProcessor> $parentOptions
+     * @param array<HttpClientRequestOption> $parentOptions
      * @throws SafetyCommonException
      */
     protected function __construct(array $parentHeaders, array $parentOptions)
