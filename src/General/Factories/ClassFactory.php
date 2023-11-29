@@ -2,6 +2,7 @@
 
 namespace Magpie\General\Factories;
 
+use Closure;
 use Magpie\Exceptions\ConflictingTypeClassDefinitionException;
 use Magpie\Exceptions\NoDefaultTypeClassException;
 use Magpie\Exceptions\UnsupportedFeatureTypeClassException;
