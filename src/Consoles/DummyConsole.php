@@ -3,6 +3,7 @@
 namespace Magpie\Consoles;
 
 use Magpie\Consoles\Concepts\ConsoleDisplayable;
+use Magpie\Consoles\Concepts\ConsoleServiceable;
 use Magpie\Consoles\Inputs\PromptWithOption;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Traits\SingletonInstance;
@@ -30,12 +31,17 @@ class DummyConsole extends BasicConsole
     }
 
 
-    /**
-     * @inheritDoc
-     */
-    public function display(?ConsoleDisplayable $target) : void
+    protected function createService() : ConsoleServiceable
     {
-        // nop
+        return new class implements ConsoleServiceable {
+            /**
+             * @inheritDoc
+             */
+            public static function getTypeClass() : string
+            {
+                return DummyConsole::TYPECLASS;
+            }
+        };
     }
 
 
