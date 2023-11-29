@@ -89,7 +89,7 @@ abstract class PdoConnection extends Connection
 
             return $statement;
         } catch (PhpPdoException $ex) {
-            throw new PdoPrepareStatementFailedException($ex);
+            throw new PdoPrepareStatementFailedException($ex, $sql);
         }
     }
 

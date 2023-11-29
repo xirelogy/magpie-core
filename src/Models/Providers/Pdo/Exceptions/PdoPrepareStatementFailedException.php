@@ -19,18 +19,25 @@ class PdoPrepareStatementFailedException extends ModelOperationFailedException
      * @var PdoError PDO specific error
      */
     public readonly PdoError $error;
+    /**
+     * @var string|null Associated SQL statement
+     */
+    public readonly ?string $sql;
 
 
     /**
      * Constructor
      * @param PhpPdoException $ex
+     * @param string|null $sql
      */
-    public function __construct(PhpPdoException $ex)
+    public function __construct(PhpPdoException $ex, ?string $sql = null)
     {
         $this->error = PdoError::_from($ex);
 
         $message = static::formatMessage($this->error);
         parent::__construct($message, $ex);
+
+        $this->sql = $sql;
     }
 
 
