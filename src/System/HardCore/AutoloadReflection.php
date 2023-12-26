@@ -120,10 +120,12 @@ class AutoloadReflection
 
         $rootPath = realpath($rootPath);
         if ($rootPath === false) return null;
+
+        $this->onResolvePath($rootPath, $realPath);
         if (!str_starts_with($realPath, $rootPath)) return null;
 
         $classPath = null;
-        $namespace = $this->getNamespacePrefix($rootPath, $realPath, $classPath);
+        $namespace = $this->getNamespacePrefix($realPath, $classPath);
 
         // Process the namespace and class paths
         if (!str_ends_with($namespace, '\\')) $namespace .= '\\';
@@ -138,16 +140,13 @@ class AutoloadReflection
 
     /**
      * Get namespace prefix
-     * @param string $rootPath Project's root path
      * @param string $realPath Target file's real path
      * @param string|null $outRelPath The relative path after extracting namespace prefix
      * @return string Namespace prefix extracted
      */
-    protected function getNamespacePrefix(string $rootPath, string $realPath, ?string &$outRelPath) : string
+    protected function getNamespacePrefix(string $realPath, ?string &$outRelPath) : string
     {
         $map = $this->resolveAutoloadMap();
-
-        $this->onResolvePath($rootPath, $realPath);
 
         foreach ($map ?? [] as $key => $values) {
             foreach ($values as $value) {
