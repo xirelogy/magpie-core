@@ -8,6 +8,8 @@ use Magpie\Configurations\AppConfig;
 use Magpie\Configurations\Env;
 use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
 use Magpie\General\Concepts\TypeClassable;
+use Magpie\General\Contexts\ClosureScoped;
+use Magpie\General\Contexts\Scoped;
 use Magpie\General\Sugars\Excepts;
 use Magpie\Logs\Concepts\Loggable;
 use Magpie\Logs\Loggers\DefaultLogger;
@@ -134,6 +136,23 @@ final class Kernel
     {
         $this->logger = $logger;
         return $this;
+    }
+
+
+    /**
+     * Enter a scope by setting the logger interface, restoring to the previous logger when released
+     * @param Loggable $logger
+     * @return Scoped
+     */
+    public function scopeLogger(Loggable $logger) : Scoped
+    {
+        $oldLogger = $this->logger;
+
+        return ClosureScoped::create(function () use ($logger) {
+            $this->logger = $logger;
+        }, function () use ($oldLogger) {
+            $this->logger = $oldLogger;
+        });
     }
 
 
