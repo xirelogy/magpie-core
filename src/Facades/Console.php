@@ -2,6 +2,7 @@
 
 namespace Magpie\Facades;
 
+use Closure;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Consoles\Concepts\Consolable;
 use Magpie\Consoles\Concepts\ConsoleDisplayable;
@@ -12,6 +13,15 @@ use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Traits\StaticClass;
+use Magpie\Logs\Concepts\Loggable;
+use Magpie\Logs\Concepts\LogStringFormattable;
+use Magpie\Logs\Formats\SimpleConsoleLogStringFormat;
+use Magpie\Logs\LogConfig;
+use Magpie\Logs\LogEntry;
+use Magpie\Logs\Loggers\DefaultLogger;
+use Magpie\Logs\LogLevel;
+use Magpie\Logs\LogRelay;
+use Magpie\System\Kernel\Kernel;
 use Stringable;
 
 /**
@@ -196,6 +206,78 @@ class Console
     public static function optionalLoop(PromptWithOption|Stringable|string|null $prompt, ?int $maxTries = null, ?Parser $parser = null, mixed $default = null) : mixed
     {
         return static::ensureProvider()->optionalLoop($prompt, $maxTries, $parser, $default);
+    }
+
+
+    /**
+     * Create a logging target and redirect to console
+     * @param LogStringFormattable|null $logFormatter
+     * @param LogConfig|null $logConfig
+     * @return Loggable
+     */
+    public static function asLogger(?LogStringFormattable $logFormatter = null, ?LogConfig $logConfig = null) : Loggable
+    {
+        $logFormatter = $logFormatter ?? new SimpleConsoleLogStringFormat();
+        $logConfig = $logConfig ?? Kernel::current()->getConfig()->createDefaultLogConfig();
+
+        $relay = new class(static::output(...), $logFormatter, $logConfig) extends LogRelay {
+            /**
+             * @var Closure Output function
+             */
+            private readonly Closure $outputFn;
+            /**
+             * @var LogStringFormattable Associated formatter
+             */
+            private readonly LogStringFormattable $logFormatter;
+
+
+            /**
+             * Constructor
+             * @param callable(Stringable|string|null,DisplayStyle|null):void $outputFn
+             * @param LogStringFormattable $logFormatter
+             * @param LogConfig $logConfig
+             */
+            public function __construct(callable $outputFn, LogStringFormattable $logFormatter, LogConfig $logConfig)
+            {
+                parent::__construct($logConfig, null);
+                $this->outputFn = $outputFn;
+                $this->logFormatter = $logFormatter;
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function log(LogEntry $record) : void
+            {
+                $displayStyle = static::translateLevel($record->level);
+                $formatted = $this->logFormatter->format($record, $this->config);
+
+                ($this->outputFn)($formatted, $displayStyle);
+            }
+
+
+            /**
+             * Translate log level to display style
+             * @param LogLevel $level
+             * @return DisplayStyle
+             */
+            protected static function translateLevel(LogLevel $level) : DisplayStyle
+            {
+                return match ($level) {
+                    LogLevel::EMERGENCY => DisplayStyle::EMERGENCY,
+                    LogLevel::ALERT => DisplayStyle::ALERT,
+                    LogLevel::CRITICAL => DisplayStyle::CRITICAL,
+                    LogLevel::ERROR => DisplayStyle::ERROR,
+                    LogLevel::WARNING => DisplayStyle::WARNING,
+                    LogLevel::NOTICE => DisplayStyle::NOTICE,
+                    LogLevel::INFO => DisplayStyle::INFO,
+                    LogLevel::DEBUG => DisplayStyle::DEBUG,
+                };
+            }
+        };
+
+        return new DefaultLogger($relay);
     }
 
 
