@@ -2,6 +2,8 @@
 
 namespace Magpie\Logs\Relays;
 
+use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Logs\Concepts\LogStringFormattable;
 use Magpie\Logs\Formats\SimpleLogStringFormat;
 use Magpie\Logs\LogConfig;
@@ -73,7 +75,7 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
     protected static final function getLogFullPath(string $filename) : string
     {
         $logPath = project_path('/storage/logs');
-        //Excepts::noThrow(fn () => LocalRootFileSystem::instance()->createDirectory($logPath));
+        Excepts::noThrow(fn () => LocalRootFileSystem::instance()->createDirectory($logPath));
 
         return "$logPath/$filename";
     }
