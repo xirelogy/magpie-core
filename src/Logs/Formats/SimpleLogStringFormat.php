@@ -3,9 +3,6 @@
 namespace Magpie\Logs\Formats;
 
 use Carbon\Carbon;
-use Magpie\General\Simples\SimpleJSON;
-use Magpie\General\Sugars\Excepts;
-use Magpie\Logs\Concepts\LogStringFormattable;
 use Magpie\Logs\LogConfig;
 use Magpie\Logs\LogEntry;
 use Magpie\Logs\LogLevel;
@@ -13,7 +10,7 @@ use Magpie\Logs\LogLevel;
 /**
  * Simple implementation of `LogStringFormattable`
  */
-class SimpleLogStringFormat implements LogStringFormattable
+class SimpleLogStringFormat extends CommonLogStringFormat
 {
     /**
      * @inheritDoc
@@ -35,43 +32,6 @@ class SimpleLogStringFormat implements LogStringFormattable
         }
 
         return static::normalize($ret);
-    }
-
-
-    /**
-     * Normalize output
-     * @param string $text
-     * @return string
-     */
-    protected static function normalize(string $text) : string
-    {
-        // Trim at right end
-        $text = rtrim($text);
-
-        // All `\r\n` must be converted to plain `\n`
-        $text = str_replace("\r\n", "\n", $text);
-
-        // Plain `\r` leftover are converted to `\n`
-        $text = str_replace("\r", "\n", $text);
-
-        // Delete all trailing `\n`
-        while (str_ends_with("\n", $text)) {
-            $text = substr($text, 0, -1);
-        }
-
-        // Extend output into proper indentations
-        return str_replace("\n", "\n  ", $text);
-    }
-
-
-    /**
-     * Flatten context string
-     * @param array $context
-     * @return string
-     */
-    protected function flattenContext(array $context) : string
-    {
-        return Excepts::noThrow(fn () => SimpleJSON::encode($context), '<err>');
     }
 
 
