@@ -324,6 +324,19 @@ function iter_expand(mixed $target) : iterable
 
 
 /**
+ * Convert iterable into a cursor
+ * @param iterable $values
+ * @return Iterator
+ */
+function iter_cursor(iterable $values) : Iterator
+{
+    if ($values instanceof Traversable) return new IteratorIterator($values);
+
+    return new ArrayIterator([ ...$values ]);
+}
+
+
+/**
  * If string is null or empty
  * @param string|null $value
  * @return bool
