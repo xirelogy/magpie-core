@@ -93,6 +93,56 @@ class I18n
 
 
     /**
+     * Tag the target as a fake localizable, returning the text ad-verbatim
+     * @param Localizable|string $text
+     * @return Localizable
+     */
+    public static function verbatim(Localizable|string $text) : Localizable
+    {
+        if ($text instanceof Localizable) $text = $text->getDefaultTranslation();
+
+        return new class($text) implements Localizable {
+            /**
+             * Constructor
+             * @param string $text
+             */
+            public function __construct(
+                protected readonly string $text,
+            ) {
+
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function getTranslation(string $locale) : string
+            {
+                return $this->getDefaultTranslation();
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function getDefaultTranslation() : string
+            {
+                return $this->text;
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function __toString() : string
+            {
+                return $this->getDefaultTranslation();
+            }
+        };
+    }
+
+
+    /**
      * Translate text
      * @param Localizable|string $text Original text
      * @param string|null $className Class name (context) of the text

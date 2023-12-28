@@ -54,6 +54,17 @@ function _l(string $text, ?string $className = null) : Localizable
 
 
 /**
+ * Get the localized string for given text, but explicitly disable localization
+ * @param string $text
+ * @return Localizable
+ */
+function _l0(string $text) : Localizable
+{
+    return I18n::verbatim($text);
+}
+
+
+/**
  * Apply arguments to given format string.
  * @param string $format Format string, where each placement is marked
  *                      around two brace brackets (`{{n}}`) with a zero-based
