@@ -19,7 +19,7 @@ class ClosureLocaleResolver implements LocaleResolvable
 
     /**
      * Constructor
-     * @param callable(string,string):string|null $fn
+     * @param callable(string,string):(string|null) $fn
      */
     protected function __construct(callable $fn)
     {
@@ -38,7 +38,7 @@ class ClosureLocaleResolver implements LocaleResolvable
 
     /**
      * Create a new instance
-     * @param callable(string,string):string|null $fn
+     * @param callable(string,string):(string|null) $fn
      * @return static
      */
     public static function create(callable $fn) : static

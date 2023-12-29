@@ -307,7 +307,7 @@ function iter_first(iterable $target) : mixed
  * Return the filtered items, removing any items with resulting null
  * @template T
  * @param iterable<T> $target
- * @param callable(T):T|null $filterFn
+ * @param callable(T):(T|null) $filterFn
  * @return iterable<T>
  */
 function iter_filter(iterable $target, callable $filterFn) : iterable

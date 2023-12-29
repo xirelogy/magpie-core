@@ -220,7 +220,7 @@ class SpecSymmetricCipherAlgorithms
      * Check key size for those ciphers that accept key size within a given range
      * @param int $minSize
      * @param int $maxSize
-     * @return callable(int,int|null,string|null):bool|int
+     * @return callable(int,int|null,string|null):(bool|int)
      */
     protected static function checkKeySizeWithinRange(int $minSize, int $maxSize) : callable
     {
@@ -234,7 +234,7 @@ class SpecSymmetricCipherAlgorithms
     /**
      * Check key size for DES cipher where its 7-bit version and 8-bit version (parity included) is both supported
      * @param int $numBlocks
-     * @return callable(int,int|null,string|null):bool|int
+     * @return callable(int,int|null,string|null):(bool|int)
      */
     protected static function checkKeySizeForDes(int $numBlocks) : callable
     {

@@ -61,7 +61,7 @@ class ProcessAsyncHandle implements Dispatchable
     /**
      * Constructor
      * @param Process $process
-     * @param callable():int|null $checkTerminateFn
+     * @param callable():(int|null) $checkTerminateFn
      */
     public function __construct(Process $process, callable $checkTerminateFn)
     {

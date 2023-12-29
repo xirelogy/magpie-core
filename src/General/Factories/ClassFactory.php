@@ -245,7 +245,7 @@ class ClassFactory implements SourceCacheable
     /**
      * Set the default type class check condition for given base class
      * @param class-string $baseClassName
-     * @param callable():string|null $checkerFn
+     * @param callable():(string|null) $checkerFn
      * @param int|null $weight Specific weight
      * @return void
      */

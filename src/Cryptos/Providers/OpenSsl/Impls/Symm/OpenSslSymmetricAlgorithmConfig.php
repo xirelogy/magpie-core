@@ -43,7 +43,7 @@ class OpenSslSymmetricAlgorithmConfig
      * @param bool $hasOpenSslMulti
      * @param bool|int|OpenSslSymmetricAlgorithmFallbackBlockSize $expectBlockSizeSpec
      * @param bool $isExpectMode
-     * @param callable(int,int|null,string|null):bool|int $checkKeySizeFn
+     * @param callable(int,int|null,string|null):(bool|int) $checkKeySizeFn
      */
     public function __construct(string $algoTypeClass, string $openSslMethodPrefix, bool $hasOpenSslMulti, bool|int|OpenSslSymmetricAlgorithmFallbackBlockSize $expectBlockSizeSpec, bool $isExpectMode, callable $checkKeySizeFn)
     {
