@@ -8,7 +8,7 @@ use Throwable;
 /**
  * Exception for HTTP/429 Too many requests
  */
-class HttpBadRequestException extends HttpResponseException
+class HttpTooManyRequestsException extends HttpResponseException
 {
     /**
      * Associated HTTP response code
