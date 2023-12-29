@@ -8,6 +8,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use Magpie\Codecs\Concepts\PrettyFormattable;
 use Magpie\General\DateTimes\SystemTimezone;
+use Magpie\General\Sugars\Excepts;
 
 /**
  * The target is converted to an output format which is more readable to humans
@@ -64,9 +65,10 @@ class PrettyGeneralFormatter extends GeneralFormatter
         }
 
         if ($value instanceof DateTimeInterface) {
-            return DateTimeImmutable::createFromInterface($value)
+            return Excepts::noThrow(fn () => DateTimeImmutable::createFromInterface($value)
                 ->setTimezone(new DateTimeZone($this->timezone))
-                ->format(static::DATETIME_FORMAT);
+                ->format(static::DATETIME_FORMAT),
+                '<err>');
         }
 
         return parent::format($value);
