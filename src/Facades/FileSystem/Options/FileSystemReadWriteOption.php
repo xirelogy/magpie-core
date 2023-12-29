@@ -1,6 +1,6 @@
 <?php
 
-namespace Magpie\Facades\FileSystem;
+namespace Magpie\Facades\FileSystem\Options;
 
 use Magpie\General\Concepts\TypeClassable;
 

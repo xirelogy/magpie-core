@@ -6,6 +6,7 @@ use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
+use Magpie\Facades\FileSystem\Options\FileSystemReadWriteOption;
 use Magpie\Facades\Mime\Mime;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\TypeClassable;
