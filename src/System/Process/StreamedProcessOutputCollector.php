@@ -3,6 +3,8 @@
 namespace Magpie\System\Process;
 
 use Exception;
+use Magpie\Exceptions\OperationFailedException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
 use Magpie\General\Concepts\StreamReadable;
 use Magpie\General\Concepts\StreamWriteable;
@@ -116,13 +118,19 @@ class StreamedProcessOutputCollector implements ProcessOutputCollectable
      * Close a stream
      * @param StreamWriteable|null $stream
      * @return StreamReadable|null
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     protected static function closeStream(?StreamWriteable $stream) : ?StreamReadable
     {
         if ($stream === null) return null;
 
-        if ($stream instanceof StreamWriteFinalizable) return $stream->finalize();
+        if ($stream instanceof StreamWriteFinalizable) {
+            try {
+                return $stream->finalize();
+            } catch (StreamException $ex) {
+                throw new OperationFailedException(previous: $ex);
+            }
+        }
 
         // Default: close and nothing returned
         $stream->close();
