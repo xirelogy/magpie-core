@@ -2,7 +2,7 @@
 
 namespace Magpie\General\Concepts;
 
-use Exception;
+use Magpie\Exceptions\SafetyCommonException;
 
 /**
  * Anything that can be closed
@@ -12,7 +12,7 @@ interface Closeable
     /**
      * Close
      * @return void
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public function close() : void;
 }
