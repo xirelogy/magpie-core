@@ -28,6 +28,25 @@ abstract class Scoped implements Releasable
     protected bool $isReleased = false;
 
 
+    /**
+     * Run within scope
+     * @param callable():T $fn Target function
+     * @return T
+     * @template T
+     * @throws Throwable
+     */
+    public function run(callable $fn) : mixed
+    {
+        try {
+            $ret = $fn();
+            $this->succeeded();
+            return $ret;
+        } catch (Throwable $ex) {
+            $this->crash($ex);
+            throw $ex;
+        }
+    }
+    
 
     /**
      * @inheritDoc
