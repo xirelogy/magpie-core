@@ -74,9 +74,40 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
      */
     protected static final function getLogFullPath(string $filename) : string
     {
+        $prefix = null;
+        $lastSlash = strrpos($filename, '/');
+
+        if ($lastSlash !== false) {
+            $prefix = substr($filename, 0, $lastSlash);
+            while(str_starts_with($prefix, '/')) $prefix = substr($prefix, 1);
+            while(str_ends_with($prefix, '/')) $prefix = substr($prefix, 0, -1);
+            $filename = substr($filename, $lastSlash + 1);
+        }
+
+        $logPath = static::getLogBasePath($prefix);
+        return "$logPath/$filename";
+    }
+
+
+    /**
+     * Get log base (directory) path
+     * @param string|null $relDir Relative directory in related to the initial base path
+     * @return string
+     */
+    protected static function getLogBasePath(?string $relDir = null) : string
+    {
         $logPath = project_path('/storage/logs');
+
+        if (!is_empty_string($relDir)) {
+            if (!str_starts_with($relDir, '/')) $relDir = "/$relDir";
+            while (str_ends_with($relDir, '/')) {
+                $relDir = substr($relDir, 0, -1);
+            }
+            $logPath .= $relDir;
+        }
+
         Excepts::noThrow(fn () => LocalRootFileSystem::instance()->createDirectory($logPath));
 
-        return "$logPath/$filename";
+        return $logPath;
     }
 }
