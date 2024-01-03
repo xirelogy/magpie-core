@@ -5,11 +5,13 @@ namespace Magpie\System\Kernel;
 use ErrorException;
 use Exception;
 use Magpie\General\Concepts\Releasable;
+use Magpie\General\Contexts\ClosureScoped;
 use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\General\Traits\ReleaseOnDestruct;
 use Magpie\General\Traits\StaticClass;
 use Magpie\HttpServer\PhpResponse;
 use Magpie\System\Concepts\AbnormalExitHandleable;
+use Magpie\System\Concepts\SysErrorHandleable;
 use Magpie\System\Impls\DefaultAbnormalExitHandle;
 use Throwable;
 
@@ -24,6 +26,10 @@ class ExceptionHandler
      * @var bool If booted up
      */
     protected static bool $isBoot = false;
+    /**
+     * @var Releasable|null Old error handler
+     */
+    protected static ?Releasable $errorHandle = null;
     /**
      * @var AbnormalExitHandleable|null Specific abnormal handle
      */
@@ -40,20 +46,40 @@ class ExceptionHandler
         if (static::$isBoot) return;
         static::$isBoot = true;
 
-        try {
-            $previousHandler = set_error_handler(function (int $errLevel, string $errMessage, string $errFile = '', int $errLine = 0) use (&$previousHandler) {
-                if (error_reporting() & $errLevel) {
-                    throw new ErrorException($errMessage, 0, $errLevel, $errFile, $errLine);
+        static::$errorHandle = static::createSysErrorHandleInScope(new class implements SysErrorHandleable {
+            /**
+             * @inheritDoc
+             */
+            public function onError(int $errNo, string $errStr, string $errFile, int $errLine) : bool
+            {
+                if (error_reporting() & $errNo) {
+                    throw new ErrorException($errStr, 0, $errNo, $errFile, $errLine);
                 }
-            });
-        } catch (Exception) {
-            // This catch should not function, just to avoid some IDEs complaining about possible
-            // exceptions thrown or uncaught exceptions
-        }
+                return true;
+            }
+        });
 
         set_exception_handler(function (Throwable $ex) {
             restore_exception_handler();
             static::abnormalExit($ex);
+        });
+    }
+
+
+    /**
+     * Set the system error handler (PHP's native error handler) in scope
+     * @param SysErrorHandleable|null $handler
+     * @return Releasable
+     */
+    public static function createSysErrorHandleInScope(?SysErrorHandleable $handler) : Releasable
+    {
+        /** @var callable|null $previousHandler */
+        $previousHandler = null;
+
+        return ClosureScoped::create(function () use (&$previousHandler, $handler) {
+            $previousHandler = set_error_handler($handler ? $handler->onError(...) : null);
+        }, function () use (&$previousHandler) {
+            set_error_handler($previousHandler);
         });
     }
 
