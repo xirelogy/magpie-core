@@ -2,6 +2,7 @@
 
 namespace Magpie\Routes;
 
+use Closure;
 use Exception;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\InvalidStateException;
@@ -25,6 +26,7 @@ use Magpie\System\HardCore\SourceCache;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
+use Throwable;
 
 /**
  * Routing domain
@@ -88,6 +90,28 @@ abstract class RouteDomain
                 parent::__construct($hostname, $url);
             }
         };
+    }
+
+
+    /**
+     * Get the route for given callable
+     * @param Closure $fn
+     * @return RouteDiscovered|null
+     */
+    public final function routeOfCallable(Closure $fn) : ?RouteDiscovered
+    {
+        try {
+            $reflection = new ReflectionFunction($fn);
+
+            $methodName = $reflection->name;
+            if (str_contains($methodName, '{closure}')) return null;
+            $className = $reflection->getClosureScopeClass()?->name;
+            if ($className === null) return null;
+
+            return $this->routeOf($className, $methodName);
+        } catch (Throwable) {
+            return null;
+        }
     }
 
 
