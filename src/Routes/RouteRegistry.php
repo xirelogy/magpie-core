@@ -6,6 +6,8 @@ use Exception;
 use Magpie\Exceptions\DuplicatedKeyException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Traits\StaticClass;
+use Magpie\HttpServer\Request;
+use Magpie\Routes\Impls\ActualRouteContext;
 use Magpie\Routes\Impls\RegExRouteDomainMatch;
 use Magpie\Routes\Impls\RouteDomainMatch;
 use Magpie\Routes\Impls\RouteInfo;
@@ -109,12 +111,29 @@ class RouteRegistry
 
     /**
      * Find a domain to be routed
-     * @param string $hostname
-     * @param array|null $domainArguments
+     * @param string $hostname Specific hostname
+     * @param Request $request Incoming request
      * @return RouteDomain|null
      * @internal
      */
-    public static function _route(string $hostname, ?array &$domainArguments = null) : ?RouteDomain
+    public static function _route(string $hostname, Request $request) : ?RouteDomain
+    {
+        $routeDomain = static::tryRouteDomain($hostname, $domainArguments);
+        if ($request->routeContext instanceof ActualRouteContext && $domainArguments !== null) {
+            $request->routeContext->_setDomainArguments($domainArguments);
+        }
+
+        return $routeDomain;
+    }
+
+
+    /**
+     * Find a domain to be routed
+     * @param string $hostname
+     * @param array|null $domainArguments
+     * @return RouteDomain|null
+     */
+    private static function tryRouteDomain(string $hostname, ?array &$domainArguments = null) : ?RouteDomain
     {
         // Match for exact match
         if (array_key_exists($hostname, static::$exactDomains)) {

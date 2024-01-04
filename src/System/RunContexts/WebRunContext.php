@@ -2,17 +2,10 @@
 
 namespace Magpie\System\RunContexts;
 
-use Exception;
-use Magpie\Configurations\AppConfig;
-use Magpie\Exceptions\SystemUnderMaintenanceException;
-use Magpie\Exceptions\UnsupportedValueException;
-use Magpie\HttpServer\Concepts\Renderable;
 use Magpie\HttpServer\Exceptions\HttpResponseException;
 use Magpie\HttpServer\Request;
-use Magpie\Routes\Concepts\RouteHandleable;
-use Magpie\Routes\Impls\ActualRouteContext;
-use Magpie\Routes\RouteDomain;
 use Magpie\Routes\RouteRegistry;
+use Magpie\Routes\RouteRun;
 use Magpie\System\Kernel\Kernel;
 
 /**
@@ -43,75 +36,17 @@ class WebRunContext extends RunContext
         $appConfig = Kernel::current()->getConfig();
 
         $hostname = $this->request->hostname ?? '';
-        $routeDomain = RouteRegistry::_route($hostname, $domainArguments);
-
-        if ($this->request->routeContext instanceof ActualRouteContext && $domainArguments !== null) {
-            $this->request->routeContext->_setDomainArguments($domainArguments);
-        }
+        $routeDomain = RouteRegistry::_route($hostname, $this->request);
 
         try {
-            $this->onRun($appConfig, $routeDomain, $this->request);
+            RouteRun::create($appConfig)
+                ->run($routeDomain, $this->request)
+                ->render($this->request)
+                ;
         } catch (HttpResponseException $ex) {
             $appConfig->getHttpResponseExceptionRenderer()->createExceptionRenderer($ex)->render($this->request);
             return;
         }
-    }
-
-
-    /**
-     * Handle running a handler for web server request
-     * @param AppConfig $appConfig
-     * @param RouteDomain|null $routeDomain
-     * @param Request $request
-     * @return void
-     * @throws HttpResponseException
-     * @throws Exception
-     */
-    protected function onRun(AppConfig $appConfig, ?RouteDomain $routeDomain, Request $request) : void
-    {
-        $handler = $routeDomain !== null ?
-            $routeDomain->_route($request) :
-            $appConfig->getDefaultRouteHandler($request);
-
-        $response = $this->onRoute($handler, $request);
-
-        $this->getResponseRenderer($appConfig, $response)->render($request);
-    }
-
-
-    /**
-     * Handle routing using given route handler for web server request
-     * @param RouteHandleable $handler
-     * @param Request $request
-     * @return mixed
-     * @throws HttpResponseException
-     * @throws Exception
-     */
-    protected function onRoute(RouteHandleable $handler, Request $request) : mixed
-    {
-        if (Kernel::current()->isUnderMaintenance()) {
-            throw new SystemUnderMaintenanceException();
-        }
-
-        return $handler->route($request);
-    }
-
-
-    /**
-     * Get a renderer for given response
-     * @param AppConfig $appConfig
-     * @param mixed $response
-     * @return Renderable
-     * @throws Exception
-     */
-    protected function getResponseRenderer(AppConfig $appConfig, mixed $response) : Renderable
-    {
-        if ($response instanceof Renderable) return $response;
-
-        $renderer = $appConfig->getResponseRenderer($response);
-        if ($renderer !== null) return $renderer;
-
-        throw new UnsupportedValueException($response, _l('response'));
     }
 
 
