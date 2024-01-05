@@ -73,6 +73,9 @@ abstract class Scoped implements Releasable
      */
     public final function succeeded() : void
     {
+        // No longer successful after crashed
+        if ($this->ex !== null) return;
+
         $this->isSuccessful = true;
         $this->onSucceeded();
     }
