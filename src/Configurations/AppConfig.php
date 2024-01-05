@@ -240,7 +240,6 @@ abstract class AppConfig
      * Create default console provider
      * @param callable(ConsoleCustomization):void|null $customizingFn
      * @return Consolable
-     * @noinspection PhpDocSignatureInspection
      */
     public final function createDefaultConsolable(?callable $customizingFn = null) : Consolable
     {

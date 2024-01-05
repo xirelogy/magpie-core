@@ -20,7 +20,6 @@ abstract class LocalScopedTarget implements TargetScopeable
     /**
      * Constructor
      * @param callable():iterable<Scoped>|null $getScopesFn
-     * @noinspection PhpDocSignatureInspection
      */
     protected function __construct(?callable $getScopesFn)
     {

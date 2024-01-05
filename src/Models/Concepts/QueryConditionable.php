@@ -25,7 +25,6 @@ interface QueryConditionable
      *      Join type to the previous condition
      * @return $this
      * @throws SafetyCommonException
-     * @noinspection PhpDocSignatureInspection
      */
     public function where(callable|ColumnName|string $column, mixed $operator = null, mixed $value = null, WhereJoinType $joinPrevious = WhereJoinType::AND) : static;
 
@@ -44,7 +43,6 @@ interface QueryConditionable
      *      Join type to the previous condition
      * @return $this
      * @throws SafetyCommonException
-     * @noinspection PhpDocSignatureInspection
      */
     public function whereNot(callable|ColumnName|string $column, mixed $operator = null, mixed $value = null, WhereJoinType $joinPrevious = WhereJoinType::AND) : static;
 
@@ -61,7 +59,6 @@ interface QueryConditionable
      *      Condition value
      * @return $this
      * @throws SafetyCommonException
-     * @noinspection PhpDocSignatureInspection
      */
     public function orWhere(callable|ColumnName|string $column, mixed $operator = null, mixed $value = null) : static;
 
@@ -79,7 +76,6 @@ interface QueryConditionable
      *      Condition value
      * @return $this
      * @throws SafetyCommonException
-     * @noinspection PhpDocSignatureInspection
      */
     public function orWhereNot(callable|ColumnName|string $column, mixed $operator = null, mixed $value = null) : static;
 }

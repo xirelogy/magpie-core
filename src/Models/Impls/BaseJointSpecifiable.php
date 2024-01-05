@@ -70,7 +70,6 @@ abstract class BaseJointSpecifiable implements JointSpecifiable
      * @param WhereJoinType $joinPrevious
      * @return QueryCondition
      * @throws SafetyCommonException
-     * @noinspection PhpDocSignatureInspection
      */
     protected function _on(callable|ColumnName|string $lhs, ColumnName|string|null $rhs, WhereJoinType $joinPrevious) : QueryCondition
     {

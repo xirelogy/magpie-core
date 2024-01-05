@@ -25,7 +25,6 @@ class LocalFileReadTarget extends LocalScopedTarget implements PathTargetReadabl
      * Constructor
      * @param string $path
      * @param callable():iterable<Scoped>|null $getScopesFn
-     * @noinspection PhpDocSignatureInspection
      */
     public function __construct(string $path, ?callable $getScopesFn = null)
     {
