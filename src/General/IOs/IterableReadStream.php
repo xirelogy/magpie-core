@@ -85,13 +85,13 @@ class IterableReadStream implements StreamReadable
             // Max not specified or max not reached, returns everything
             $ret = $this->buffer;
             $this->buffer = null;
-            return $ret;
         } else {
             // Return partial
             $ret = substr($this->buffer, 0, $max);
             $this->buffer = substr($this->buffer, $max);
-            return $ret;
         }
+
+        return $ret;
     }
 
 
