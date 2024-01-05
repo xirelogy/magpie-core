@@ -2,7 +2,6 @@
 
 namespace Magpie\System\Process;
 
-use Exception;
 use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;

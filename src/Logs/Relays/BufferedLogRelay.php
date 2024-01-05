@@ -3,7 +3,6 @@
 namespace Magpie\Logs\Relays;
 
 use Carbon\Carbon;
-use Magpie\Logs\LogConfig;
 use Magpie\Logs\LogEntry;
 use Magpie\Logs\LogRelay;
 use Magpie\System\Kernel\Kernel;

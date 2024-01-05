@@ -2,7 +2,6 @@
 
 namespace Magpie\Consoles;
 
-use Magpie\Consoles\Concepts\ConsoleDisplayable;
 use Magpie\Consoles\Concepts\ConsoleServiceable;
 use Magpie\Consoles\Inputs\PromptWithOption;
 use Magpie\Exceptions\UnsupportedException;

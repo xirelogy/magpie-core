@@ -2,7 +2,6 @@
 
 namespace Magpie\General\IOs;
 
-use Magpie\Cryptos\Algorithms\AsymmetricCryptos\PrivateKey;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
 use Magpie\Exceptions\UnexpectedException;
