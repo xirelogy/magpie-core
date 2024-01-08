@@ -282,6 +282,21 @@ class LocalFileSystem extends FileSystem
 
 
     /**
+     * Initialize an instance from a specific path
+     * @param string $path
+     * @return static
+     * @throws SafetyCommonException
+     */
+    public static function initializeFromSpecificDir(string $path) : static
+    {
+        if (!is_dir($path)) throw new OperationFailedException();
+
+        $config = new LocalFileSystemConfig($path);
+        return static::specificInitialize($config);
+    }
+
+
+    /**
      * Initialize an instance with project root as base
      * @return static
      * @throws SafetyCommonException
