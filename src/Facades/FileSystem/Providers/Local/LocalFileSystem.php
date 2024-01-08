@@ -49,6 +49,24 @@ class LocalFileSystem extends FileSystem
 
 
     /**
+     * Get the real path for given path
+     * @param string $path
+     * @return string
+     * @throws SafetyCommonException
+     */
+    public function getRealPath(string $path) : string
+    {
+        $path = $this->checkPath($path);
+        if ($path === null) throw new OperationFailedException();
+
+        $realpath = @realpath($path);
+        if ($realpath === false) throw new OperationFailedException();
+
+        return $realpath;
+    }
+
+
+    /**
      * @inheritDoc
      */
     public function isFileExist(string $path) : bool
