@@ -336,8 +336,10 @@ function iter_expand(mixed $target) : iterable
 
 /**
  * Convert iterable into a cursor
- * @param iterable $values
- * @return Iterator
+ * @param iterable<K, T> $values
+ * @return Iterator<K, T>
+ * @template K
+ * @template T
  */
 function iter_cursor(iterable $values) : Iterator
 {
