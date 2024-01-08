@@ -2,6 +2,7 @@
 
 namespace Magpie\System\Impls\Patches;
 
+use Closure;
 use Magpie\System\Impls\Concepts\SymfonyVarDumperArrayPatchable;
 
 /**
