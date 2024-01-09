@@ -38,7 +38,7 @@ final class Kernel
     /**
      * Release version
      */
-    protected const VER_RELEASE = 820;
+    protected const VER_RELEASE = 822;
 
 
     /**
