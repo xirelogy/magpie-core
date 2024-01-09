@@ -1,0 +1,6 @@
+{
+  "Unexpected token while parsing": "解析到未知符記",
+  "Unexpected {{0}} while {{1}} is expected during parsing": "解析期望符記{{1}}卻得到未知符記{{0}}",
+  "<end of stream>": "<流斷開>",
+  "": ""
+}
