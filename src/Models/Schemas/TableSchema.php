@@ -11,6 +11,7 @@ use Magpie\General\Packs\PackContext;
 use Magpie\General\Traits\CommonPackable;
 use Magpie\Models\Annotations\Column as ColumnAttribute;
 use Magpie\Models\Annotations\Table as TableAttribute;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\ModelCheckListenable;
 use Magpie\Models\Connection;
 use Magpie\Models\Exceptions\ModelReadException;
@@ -378,11 +379,12 @@ class TableSchema implements Packable
 
     /**
      * Get schema preference for given connection
-     * @param string $connection
+     * @param ConnectionResolvable|string $connection
      * @return SchemaPreference
      */
-    protected static function getSchemaPreference(string $connection) : SchemaPreference
+    protected static function getSchemaPreference(ConnectionResolvable|string $connection) : SchemaPreference
     {
+        if ($connection instanceof ConnectionResolvable) return $connection->getSchemaPreference();
         return Kernel::current()->getConfig()->getModelSchemaPreference($connection) ?? SchemaPreference::default();
     }
 }

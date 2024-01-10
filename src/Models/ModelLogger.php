@@ -3,6 +3,7 @@
 namespace Magpie\Models;
 
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\StatementLogListenable;
 
 /**
@@ -12,9 +13,9 @@ abstract class ModelLogger
 {
     /**
      * Associated connection's name
-     * @return string
+     * @return ConnectionResolvable|string
      */
-    protected abstract static function getConnection() : string;
+    protected abstract static function getConnection() : ConnectionResolvable|string;
 
 
     /**
@@ -36,6 +37,6 @@ abstract class ModelLogger
      */
     private static function createConnection() : Connection
     {
-        return Connection::fromName(static::getConnection());
+        return Connection::from(static::getConnection());
     }
 }

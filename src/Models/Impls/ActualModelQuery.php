@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Closure;
 use Magpie\Exceptions\InvalidStateException;
 use Magpie\Models\AllColumns;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\QueryArgumentable;
 use Magpie\Models\Connection;
 use Magpie\Models\Impls\Traits\CommonActualModelQuery;
@@ -26,9 +27,9 @@ class ActualModelQuery extends ModelQuery
 
 
     /**
-     * @var string Model connection
+     * @var ConnectionResolvable|string Model connection
      */
-    protected string $connection;
+    protected ConnectionResolvable|string $connection;
     /**
      * @var TableSchema Associated table schema
      */
@@ -41,12 +42,12 @@ class ActualModelQuery extends ModelQuery
 
     /**
      * Constructor
-     * @param string $connection
+     * @param ConnectionResolvable|string $connection
      * @param TableSchema $tableSchema
      * @param callable(array,array):Model $hydrationFn
      * @param QuerySetupListener|null $listener
      */
-    public function __construct(string $connection, TableSchema $tableSchema, callable $hydrationFn, ?QuerySetupListener $listener)
+    public function __construct(ConnectionResolvable|string $connection, TableSchema $tableSchema, callable $hydrationFn, ?QuerySetupListener $listener)
     {
         parent::__construct($listener);
 
@@ -87,7 +88,7 @@ class ActualModelQuery extends ModelQuery
      */
     protected function prepareSelectStatement(FilterApplyMode $filterMode, ?ModelFinalizer &$modelFinalizer = null) : Statement
     {
-        $connection = ConnectionsCache::fromName($this->connection);
+        $connection = Connection::from($this->connection);
         $context = new QueryContext($connection, $this->tableSchema);
 
         $modelFinalizer = ClosureModelFinalizer::create(function(array $values, array $casts) : Model {
@@ -120,7 +121,7 @@ class ActualModelQuery extends ModelQuery
      */
     protected function prepareUpdateStatement(array $assignments) : Statement
     {
-        $connection = ConnectionsCache::fromName($this->connection);
+        $connection = Connection::from($this->connection);
         $context = new QueryContext($connection, $this->tableSchema);
 
         // Append update timestamp if needed
@@ -175,7 +176,7 @@ class ActualModelQuery extends ModelQuery
      */
     protected function prepareDeleteStatement() : Statement
     {
-        $connection = ConnectionsCache::fromName($this->connection);
+        $connection = Connection::from($this->connection);
         $context = new QueryContext($connection, $this->tableSchema);
 
         $query = new QueryStatement('DELETE FROM ' . $this->formatTable($connection));

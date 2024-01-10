@@ -6,7 +6,9 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\Models\ColumnExpressionSelect;
 use Magpie\Models\ColumnName;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\JointSpecifiable;
+use Magpie\Models\Connection;
 use Magpie\Models\Impls\Traits\CommonActualModelQuery;
 use Magpie\Models\Impls\Traits\WithQueryFilterService;
 use Magpie\Models\Query;
@@ -24,9 +26,9 @@ class ActualJointModelQuery extends Query
 
 
     /**
-     * @var string Model connection
+     * @var ConnectionResolvable|string Model connection
      */
-    protected string $connection;
+    protected ConnectionResolvable|string $connection;
     /**
      * @var array<string, TableSchema> All table schemas
      */
@@ -39,11 +41,11 @@ class ActualJointModelQuery extends Query
 
     /**
      * Constructor
-     * @param string $connection
+     * @param ConnectionResolvable|string $connection
      * @param array<string, TableSchema> $tableSchemas
      * @param array<ActualJointSpecification> $jointSpecs
      */
-    public function __construct(string $connection, array $tableSchemas, array $jointSpecs)
+    public function __construct(ConnectionResolvable|string $connection, array $tableSchemas, array $jointSpecs)
     {
         parent::__construct(null);
 
@@ -58,7 +60,7 @@ class ActualJointModelQuery extends Query
      */
     protected function prepareSelectStatement(FilterApplyMode $filterMode, ?ModelFinalizer &$modelFinalizer = null) : Statement
     {
-        $connection = ConnectionsCache::fromName($this->connection);
+        $connection = Connection::from($this->connection);
         $context = new QueryContext($connection, TableSchema::from(TemporaryModel::class));
 
         $selectionFinalized = $this->finalizeSelects($context, $modelFinalizer);

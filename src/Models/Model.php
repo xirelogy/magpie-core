@@ -17,6 +17,7 @@ use Magpie\General\Simples\SimpleJSON;
 use Magpie\General\Sugars\Excepts;
 use Magpie\General\Sugars\Quote;
 use Magpie\General\Traits\CommonPackable;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\Modelable;
 use Magpie\Models\Concepts\ModelStorageProvidable;
 use Magpie\Models\Exceptions\ModelCannotBeIdentifiedException;
@@ -170,7 +171,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
      */
     public final function connect() : Connection
     {
-        return ConnectionsCache::fromName(static::getConnectionName());
+        return Connection::from(static::getConnectionName());
     }
 
 
@@ -218,7 +219,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
 
         if ($this->_storage->isNew()) {
             // New model, invoke corresponding 'INSERT'
-            $connectionInstance = ConnectionsCache::fromName(static::getConnectionName());
+            $connectionInstance = Connection::from(static::getConnectionName());
             static::_onCreate($connectionInstance, $this->_storage->getTableSchema(), $changes);
 
             $this->_storage->resetChanges($changes);
@@ -354,7 +355,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
 
         $deferStorage = new ClosureDeferringModelStorageProvider($tableSchema, function(Model $instance, string $connection) use($tableSchema, $assignments) {
             // Create the connection and defer to _onCreate()
-            $connectionInstance = ConnectionsCache::fromName($connection);
+            $connectionInstance = Connection::from($connection);
             static::_onCreate($connectionInstance, $tableSchema, $assignments);
 
             // Hydrate the storage in-place
@@ -451,7 +452,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
         $tableSchema = TableSchema::from(static::class);
 
         $deferStorage = new ClosureDeferringModelStorageProvider($tableSchema, function(Model $instance, string $connection) use($tableSchema) {
-            $connectionInstance = ConnectionsCache::fromName($connection);
+            $connectionInstance = Connection::from($connection);
 
             $sql = 'TRUNCATE TABLE ' . SqlFormat::backTick($tableSchema->getName());
 
@@ -489,9 +490,9 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
 
     /**
      * Connection name that models based on current type will use
-     * @return string
+     * @return ConnectionResolvable|string
      */
-    public abstract static function getConnectionName() : string;
+    public abstract static function getConnectionName() : ConnectionResolvable|string;
 
 
     /**

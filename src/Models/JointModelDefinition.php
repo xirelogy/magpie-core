@@ -5,6 +5,7 @@ namespace Magpie\Models;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\DuplicatedKeyException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\JointSpecifiable;
 use Magpie\Models\Enums\JointType;
 use Magpie\Models\Exceptions\ModelJoinAcrossDifferentConnectionsException;
@@ -18,9 +19,9 @@ use Magpie\Models\Schemas\TableSchema;
 class JointModelDefinition
 {
     /**
-     * @var string Model connection
+     * @var ConnectionResolvable|string Model connection
      */
-    protected string $connection;
+    protected ConnectionResolvable|string $connection;
     /**
      * @var array<string, TableSchema> All table schemas in the join
      */
@@ -95,10 +96,10 @@ class JointModelDefinition
     /**
      * Retrieve connection name from table schema
      * @param TableSchema $schema
-     * @return string
+     * @return ConnectionResolvable|string
      * @throws ClassNotOfTypeException
      */
-    protected static function getConnectionNameFromSchema(TableSchema $schema) : string
+    protected static function getConnectionNameFromSchema(TableSchema $schema) : ConnectionResolvable|string
     {
         $modelClassName = $schema->getModelClassName();
         if (!is_subclass_of($modelClassName, Model::class)) throw new ClassNotOfTypeException($modelClassName, Model::class);

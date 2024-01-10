@@ -12,6 +12,7 @@ use Magpie\General\Concepts\Identifiable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Randoms\RandomCharset;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\DirectTransactionable;
 use Magpie\Models\Concepts\StatementLogListenable;
 use Magpie\Models\Configs\ConnectionConfig;
@@ -161,14 +162,15 @@ abstract class Connection implements Identifiable, TypeClassable, SystemBootable
 
 
     /**
-     * Get connection from given name
-     * @param string $name
+     * Get connection from given specification
+     * @param ConnectionResolvable|string $spec
      * @return static
      * @throws SafetyCommonException
      */
-    public final static function fromName(string $name) : static
+    public final static function from(ConnectionResolvable|string $spec) : static
     {
-        return ConnectionsCache::fromName($name);
+        if ($spec instanceof ConnectionResolvable) return $spec->resolve();
+        return ConnectionsCache::fromName($spec);
     }
 
 

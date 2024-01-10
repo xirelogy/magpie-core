@@ -7,6 +7,7 @@ use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Contexts\Scoped;
 use Magpie\General\Traits\StaticClass;
+use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\TransactionCompletedListenable;
 use Magpie\Models\Impls\ModelTransactionScoped;
 use Magpie\System\Kernel\ExceptionHandler;
@@ -22,9 +23,9 @@ abstract class ModelTransaction
 
     /**
      * Associated connection's name
-     * @return string
+     * @return ConnectionResolvable|string
      */
-    protected abstract static function getConnection() : string;
+    protected abstract static function getConnection() : ConnectionResolvable|string;
 
 
     /**
@@ -86,6 +87,6 @@ abstract class ModelTransaction
      */
     private static function createConnection() : Connection
     {
-        return Connection::fromName(static::getConnection());
+        return Connection::from(static::getConnection());
     }
 }
