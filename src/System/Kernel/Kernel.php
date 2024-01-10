@@ -266,7 +266,12 @@ final class Kernel
         $realProjectPath = static::getRealProjectPath($projectPath);
 
         // Environment boot up
-        Env::_boot($realProjectPath);
+        try {
+            Env::_boot($realProjectPath);
+        } catch (Exception $ex) {
+            $bootFailureException = new Exception('Env boot failure', previous: $ex);
+            ExceptionHandler::systemCritical($bootFailureException);
+        }
 
         // Boot up all registered items
         $registrations = static::registerBoots($realProjectPath, $config);

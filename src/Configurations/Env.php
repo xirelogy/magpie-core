@@ -7,6 +7,7 @@ use Dotenv\Repository\Adapter\AdapterInterface;
 use Dotenv\Repository\Adapter\EnvConstAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use Dotenv\Repository\RepositoryInterface;
+use Exception;
 use Magpie\General\Traits\StaticClass;
 
 /**
@@ -93,6 +94,7 @@ class Env
      * Boot up using given project directory
      * @param string $projectPath
      * @return void
+     * @throws Exception may be thrown by Dotenv
      * @internal
      */
     public static function _boot(string $projectPath) : void
