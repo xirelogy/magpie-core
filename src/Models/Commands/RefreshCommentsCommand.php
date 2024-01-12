@@ -2,23 +2,26 @@
 
 namespace Magpie\Models\Commands;
 
+use Magpie\Codecs\Parsers\ClosureParser;
+use Magpie\Codecs\Parsers\Parser;
+use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Attributes\CommandDescriptionL;
+use Magpie\Commands\Attributes\CommandOptionDescriptionL;
 use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
+use Magpie\Exceptions\ParseFailedException;
 use Magpie\Facades\Console;
-use Magpie\Models\ClosureModelCheckListener;
-use Magpie\Models\Model;
-use Magpie\Models\Schemas\Checks\TableSchemaCommenter;
-use Magpie\Models\Schemas\ModelDefinition;
-use Magpie\System\HardCore\AutoloadReflection;
-use Magpie\System\Kernel\Kernel;
+use Magpie\Facades\FileSystem\Providers\Local\LocalFileSystem;
+use Magpie\Logs\Formats\CleanConsoleLogStringFormat;
+use Magpie\Models\Commands\Features\DatabaseCommandFeature;
 
 /**
  * Refresh model source files comments
  */
-#[CommandSignature('db:refresh-comments')]
+#[CommandSignature('db:refresh-comments {--path=}')]
 #[CommandDescriptionL('Refresh model source files comments')]
+#[CommandOptionDescriptionL('path', 'Specific path to target source files')]
 class RefreshCommentsCommand extends Command
 {
     /**
@@ -26,23 +29,25 @@ class RefreshCommentsCommand extends Command
      */
     protected function onRun(Request $request) : void
     {
-        $listener = new ClosureModelCheckListener(
-            function (string $className, string $tableName, bool $isTableExisting) : void {
-                _used($className, $isTableExisting);
-                Console::info(_l('Processing table: ') . $tableName);
-            },
-            function (string $className, string $tableName, string $columnName, string|ModelDefinition|null $columnDef, bool $isColumnExisting) : void {
-                // nop
-            },
-        );
+        $path = $request->options->optional('path', static::createPathParser());
+        $paths = $path !== null ? [ $path ] : null;
 
-        $paths = iter_flatten(Kernel::current()->getConfig()->getModelSourceDirectories());
+        $listener = DatabaseCommandFeature::createRefreshCommentsListener(Console::asLogger(new CleanConsoleLogStringFormat()));
+        DatabaseCommandFeature::refreshComments($listener, $paths);
+    }
 
-        foreach (AutoloadReflection::instance()->expandDiscoverySourcesReflection($paths) as $class) {
-            if (!$class->isSubclassOf(Model::class)) continue;
 
-            $model = new $class->name;
-            TableSchemaCommenter::apply($model, $listener);
-        }
+    /**
+     * Create parser for parsing path
+     * @return Parser
+     */
+    protected static function createPathParser() : Parser
+    {
+        return ClosureParser::create(function (mixed $value, ?string $hintName) : string {
+            $value = StringParser::create()->parse($value, $hintName);
+            $fs = LocalFileSystem::initializeFromWorkDir();
+            if (!$fs->isDirectoryExist($value)) throw new ParseFailedException(_l('directory does not exist'));
+            return $fs->getRealPath($value);
+        });
     }
 }

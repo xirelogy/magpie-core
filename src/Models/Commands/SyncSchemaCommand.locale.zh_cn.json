@@ -1,8 +1,4 @@
 {
   "Synchronize database schema to database": "将数据库模型定义同步到数据库",
-  "**NEW**": "**新建**",
-  "Processing table: ": "数据库表处理中：",
-  "Update column: ": "更新列：",
-  "New column: ": "新建列：",
   "": ""
 }
