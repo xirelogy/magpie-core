@@ -5,7 +5,7 @@ namespace Magpie\Facades\Mutex\Providers;
 use Exception;
 use Magpie\Exceptions\OperationFailedException;
 use Magpie\Facades\Mutex\Concepts\MutexProvidable;
-use Magpie\Facades\Mutex\Impls\MutexHandle;
+use Magpie\Facades\Mutex\MutexHandle;
 use Magpie\Facades\Random;
 use Magpie\Facades\Redis\RedisClient;
 use Magpie\General\DateTimes\Duration;

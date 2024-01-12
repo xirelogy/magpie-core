@@ -5,7 +5,7 @@ namespace Magpie\Facades\Mutex;
 use Exception;
 use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\OperationTimeoutException;
-use Magpie\Facades\Mutex\Impls\MutexHandle;
+use Magpie\Facades\Mutex\Impls\DefaultMutexHandle;
 use Magpie\General\DateTimes\Duration;
 use Magpie\General\DateTimes\Stopwatch;
 
@@ -169,8 +169,18 @@ abstract class Mutex
     protected function _createHandles() : array
     {
         return [
-            MutexHandle::create(static::class, $this->getMutexKey(), $this->ttl),
+            $this->createHandle(),
         ];
+    }
+
+
+    /**
+     * Create associated handle
+     * @return MutexHandle
+     */
+    protected function createHandle() : MutexHandle
+    {
+        return DefaultMutexHandle::create(static::class, $this->getMutexKey(), $this->ttl);
     }
 
 

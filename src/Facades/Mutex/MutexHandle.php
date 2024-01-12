@@ -1,25 +1,19 @@
 <?php
 
-namespace Magpie\Facades\Mutex\Impls;
+namespace Magpie\Facades\Mutex;
 
 use Exception;
-use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\OperationFailedException;
-use Magpie\Facades\Mutex\Concepts\MutexProvidable;
 use Magpie\General\Concepts\Releasable;
 use Magpie\General\DateTimes\Duration;
 use Magpie\General\Traits\ReleaseOnDestruct;
-use Magpie\System\Kernel\ExceptionHandler;
-use Magpie\System\Kernel\Kernel;
 
 /**
- * An actual mutex handle
- * @internal
+ * Handle to a single mutex instance
  */
-final class MutexHandle implements Releasable
+abstract class MutexHandle implements Releasable
 {
     use ReleaseOnDestruct;
-
 
     /**
      * @var array<string, string> Currently acquired keys
@@ -49,7 +43,7 @@ final class MutexHandle implements Releasable
      * @param string $key
      * @param Duration $ttl
      */
-    private function __construct(string $key, Duration $ttl)
+    protected function __construct(string $key, Duration $ttl)
     {
         $this->key = $key;
         $this->ttl = $ttl;
@@ -62,7 +56,7 @@ final class MutexHandle implements Releasable
      * @return bool
      * @throws OperationFailedException
      */
-    public function acquire(?Duration $timeout = null) : bool
+    public final function acquire(?Duration $timeout = null) : bool
     {
         // Do not re-acquire
         if ($this->isAcquired) return true;
@@ -74,7 +68,7 @@ final class MutexHandle implements Releasable
         }
 
         // Attempt to acquire
-        if (!static::getProvider()->acquire($this->key, $this->ttl, $timeout)) return false;
+        if (!$this->onAcquire($timeout)) return false;
 
         // Update states
         static::$acquiredKeys[$this->key] = $this->key;
@@ -86,9 +80,18 @@ final class MutexHandle implements Releasable
 
 
     /**
+     * Try to acquire the mutex from the specific provider or implementation
+     * @param Duration|null $timeout
+     * @return bool
+     * @throws OperationFailedException
+     */
+    protected abstract function onAcquire(?Duration $timeout) : bool;
+
+
+    /**
      * @inheritDoc
      */
-    public function release() : void
+    public final function release() : void
     {
         if (!$this->isAcquired) return;
 
@@ -96,7 +99,7 @@ final class MutexHandle implements Releasable
             if (!$this->isOwned) return;
             unset(static::$acquiredKeys[$this->key]);
 
-            static::getProvider()->release($this->key);
+            $this->onRelease();
         } catch (Exception) {
             // Ignored
         } finally {
@@ -106,41 +109,20 @@ final class MutexHandle implements Releasable
 
 
     /**
+     * Release the mutex from the specific provider or implementation
+     * @return void
+     * @throws Exception
+     */
+    protected abstract function onRelease() : void;
+
+
+    /**
      * If mutex is acquired
      * @return bool
      */
-    public function isAcquired() : bool
+    public final function isAcquired() : bool
     {
         return $this->isAcquired;
-    }
-
-
-    /**
-     * Get the associated provider
-     * @return MutexProvidable
-     */
-    protected static function getProvider() : MutexProvidable
-    {
-        try {
-            $provider = Kernel::current()->getProvider(MutexProvidable::class);
-            if (!$provider instanceof MutexProvidable) throw new NotOfTypeException($provider, MutexProvidable::class);
-            return $provider;
-        } catch (Exception $ex) {
-            ExceptionHandler::systemCritical($ex);
-        }
-    }
-
-
-    /**
-     * Create an instance
-     * @param string $className
-     * @param string $key
-     * @param Duration $ttl
-     * @return static
-     */
-    public static function create(string $className, string $key, Duration $ttl) : static
-    {
-        return new static("$className::$key", $ttl);
     }
 
 
