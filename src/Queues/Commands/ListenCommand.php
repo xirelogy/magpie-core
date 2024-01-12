@@ -9,12 +9,10 @@ use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
 use Magpie\Facades\Console;
-use Magpie\General\Concepts\StreamReadable;
-use Magpie\General\Concepts\StreamReadConvertible;
-use Magpie\System\Concepts\ProcessOutputCollectable;
 use Magpie\System\Process\Process;
 use Magpie\System\Process\ProcessCommandLine;
 use Magpie\System\Process\ProcessStandardStream;
+use Magpie\System\Process\SimpleReceivingProcessOutputCollector;
 
 #[CommandSignature('queue:listen {--queue=}')]
 #[CommandDescriptionL('Run queue\'s listener')]
@@ -34,16 +32,7 @@ class ListenCommand extends Command
 
         $commandLine = ProcessCommandLine::fromCommand(RunWorkerCommand::getCommand(), ...$commandArgs);
 
-        $collector = new class implements ProcessOutputCollectable {
-            /**
-             * @inheritDoc
-             */
-            public function close() : void
-            {
-                // nop
-            }
-
-
+        $collector = new class extends SimpleReceivingProcessOutputCollector {
             /**
              * @inheritDoc
              */
@@ -52,15 +41,6 @@ class ListenCommand extends Command
                 $content = rtrim($content, "\r\n");
 
                 Console::output($content);
-            }
-
-
-            /**
-             * @inheritDoc
-             */
-            public function export(ProcessStandardStream $stream) : StreamReadable|StreamReadConvertible|iterable|string|null
-            {
-                return null;
             }
         };
 

@@ -3,22 +3,12 @@
 namespace Magpie\System\Process;
 
 use Magpie\Facades\Console;
-use Magpie\System\Concepts\ProcessOutputCollectable;
 
 /**
  * Receive and redirect process output directly to the console
  */
-class ConsoleProcessOutputCollector implements ProcessOutputCollectable
+class ConsoleProcessOutputCollector extends SimpleReceivingProcessOutputCollector
 {
-    /**
-     * @inheritDoc
-     */
-    public function close() : void
-    {
-        // NOP
-    }
-
-
     /**
      * @inheritDoc
      */
@@ -37,14 +27,5 @@ class ConsoleProcessOutputCollector implements ProcessOutputCollectable
                 // NOP
                 break;
         }
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function export(ProcessStandardStream $stream) : ?string
-    {
-        return null;
     }
 }
