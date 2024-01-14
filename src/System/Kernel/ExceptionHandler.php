@@ -12,7 +12,6 @@ use Magpie\General\Traits\StaticClass;
 use Magpie\HttpServer\PhpResponse;
 use Magpie\System\Concepts\AbnormalExitHandleable;
 use Magpie\System\Concepts\SysErrorHandleable;
-use Magpie\System\Impls\DefaultAbnormalExitHandle;
 use Throwable;
 
 /**

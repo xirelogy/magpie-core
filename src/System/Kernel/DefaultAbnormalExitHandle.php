@@ -1,13 +1,12 @@
 <?php
 
-namespace Magpie\System\Impls;
+namespace Magpie\System\Kernel;
 
 use Magpie\System\Concepts\AbnormalExitHandleable;
 use Throwable;
 
 /**
  * Default abnormal exit handle
- * @internal
  */
 class DefaultAbnormalExitHandle implements AbnormalExitHandleable
 {
