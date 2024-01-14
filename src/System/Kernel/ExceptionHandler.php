@@ -167,6 +167,17 @@ class ExceptionHandler
 
 
     /**
+     * Specify abnormal exit handler
+     * @param AbnormalExitHandleable $handle
+     * @return void
+     */
+    public static function handleAbnormalExitUsing(AbnormalExitHandleable $handle) : void
+    {
+        static::$abnormalHandle = $handle;
+    }
+
+
+    /**
      * Exit abnormally
      * @param Exception|null $ex
      * @return never
