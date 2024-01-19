@@ -3,6 +3,7 @@
 namespace Magpie\Models\Providers\Pdo;
 
 use Exception;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Models\Concepts\DirectTransactionable;
 use Magpie\Models\Concepts\StatementLogListenable;
 use Magpie\Models\Connection;
@@ -14,6 +15,8 @@ use Magpie\Models\Providers\Pdo\Exceptions\PdoModelOperationFailedException;
 use Magpie\Models\Providers\Pdo\Exceptions\PdoPrepareStatementFailedException;
 use Magpie\Models\RawStatement;
 use Magpie\Models\StatementOptions;
+use Magpie\Objects\NumericVersion;
+use Magpie\Objects\Version;
 use PDO;
 use PDOException as PhpPdoException;
 use PDOStatement as PhpPdoStatement;
@@ -48,6 +51,18 @@ abstract class PdoConnection extends Connection
         } catch (Exception $ex) {
             throw new ModelConnectionFailedException(previous: $ex);
         }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getServerVersion() : ?Version
+    {
+        return Excepts::noThrow(function () {
+            $pdoVersion = $this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION);
+            return NumericVersion::parse($pdoVersion);
+        });
     }
 
 

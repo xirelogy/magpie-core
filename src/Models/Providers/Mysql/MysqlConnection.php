@@ -5,6 +5,7 @@ namespace Magpie\Models\Providers\Mysql;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\General\Factories\ClassFactory;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Models\Configs\ConnectionConfig;
 use Magpie\Models\Connection;
 use Magpie\Models\Exceptions\ModelConnectionFailedException;
@@ -16,6 +17,8 @@ use Magpie\Models\Providers\Pdo\PdoTransactionGrammar;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
 use Magpie\Models\Schemas\DatabaseEdits\TableEditor;
 use Magpie\Models\Schemas\TableSchemaAtDatabase;
+use Magpie\Objects\NumericVersion;
+use Magpie\Objects\Version;
 use Magpie\System\Kernel\BootContext;
 use Magpie\System\Kernel\BootRegistrar;
 use PDO;
@@ -60,6 +63,34 @@ class MysqlConnection extends PdoConnection
     public static function getTypeClass() : string
     {
         return static::TYPECLASS;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getServerVersion() : ?Version
+    {
+        return Excepts::noThrow(function () {
+            $pdoVersion = $this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION);
+            $mariaDbPos = strpos($pdoVersion, '-MariaDB');
+            if ($mariaDbPos !== false) {
+                return NumericVersion::parse(substr($pdoVersion, 0, $mariaDbPos));
+            } else {
+                return NumericVersion::parse($pdoVersion);
+            }
+        });
+    }
+
+
+    /**
+     * If the connection is made to a MariaDB server
+     * @return bool
+     */
+    protected function isServerMariaDb() : bool
+    {
+        $pdoVersion = $this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION);
+        return str_contains($pdoVersion, 'MariaDB');
     }
 
 

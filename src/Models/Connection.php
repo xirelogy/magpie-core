@@ -26,6 +26,7 @@ use Magpie\Models\Schemas\ColumnSchema;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
 use Magpie\Models\Schemas\DatabaseEdits\TableEditor;
 use Magpie\Models\Schemas\TableSchemaAtDatabase;
+use Magpie\Objects\Version;
 use Magpie\System\Concepts\SystemBootable;
 use Magpie\System\Kernel\BootContext;
 
@@ -60,6 +61,13 @@ abstract class Connection implements Identifiable, TypeClassable, SystemBootable
     {
         return $this->id;
     }
+
+
+    /**
+     * Server version
+     * @return Version|null
+     */
+    public abstract function getServerVersion() : ?Version;
 
 
     /**
