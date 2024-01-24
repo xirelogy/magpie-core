@@ -50,7 +50,7 @@ class RedisQueueConfig extends QueueConfig
     protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload) : static
     {
         $redisParser = RedisClient::createEnvParser();
-        $redis = $parserHost->optional($envKey->key('REDIS'), $redisParser, '-');
+        $redis = $parserHost->requires($envKey->key('REDIS'), $redisParser);
 
         return new static($redis);
     }
