@@ -242,7 +242,7 @@ class LocalFileSystem extends FileSystem
         $path = $this->checkPath($path);
         if ($path === null) return false;
 
-        if (!$this->isDirectoryExist($path)) return false;
+        if (!static::isNativeDirectoryExist($path)) return false;
 
         return rmdir($path);
     }
