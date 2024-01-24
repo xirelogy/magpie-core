@@ -91,11 +91,12 @@ abstract class FileSystem implements TypeClassable, SystemBootable
     /**
      * Delete a directory
      * @param string $path
+     * @param bool $isEmpty If the content of the directory is emptied
      * @return bool
      * @throws SafetyCommonException
      * @throws PersistenceException
      */
-    public abstract function deleteDirectory(string $path) : bool;
+    public abstract function deleteDirectory(string $path, bool $isEmpty = true) : bool;
 
 
     /**

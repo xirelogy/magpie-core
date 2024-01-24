@@ -7,6 +7,7 @@ use Magpie\Exceptions\FileNotFoundException;
 use Magpie\Exceptions\FileOperationFailedException;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\OperationFailedException;
+use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\FileSystem\FileSystem;
 use Magpie\Facades\FileSystem\FileSystemConfig;
@@ -237,12 +238,45 @@ class LocalFileSystem extends FileSystem
     /**
      * @inheritDoc
      */
-    public function deleteDirectory(string $path) : bool
+    public function deleteDirectory(string $path, bool $isEmpty = true) : bool
     {
         $path = $this->checkPath($path);
         if ($path === null) return false;
 
         if (!static::isNativeDirectoryExist($path)) return false;
+
+        if ($isEmpty) return static::recursiveRmdir($path);
+
+        return rmdir($path);
+    }
+
+
+    /**
+     * Recursively delete a directory
+     * @param string $path
+     * @return bool
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    private static function recursiveRmdir(string $path) : bool
+    {
+        $files = @scandir($path);
+        if ($files === false) throw new OperationFailedException();
+
+        foreach ($files as $file) {
+            if ($file == '.') continue;
+            if ($file == '..') continue;
+
+            $fullPath = $path . '/' . $file;
+            $fileType = @filetype($fullPath);
+            if ($fileType === false) continue;
+
+            if ($fileType === 'dir') {
+                if (!static::recursiveRmdir($fullPath)) return false;
+            } else {
+                if (!unlink($fullPath)) return false;
+            }
+        }
 
         return rmdir($path);
     }
