@@ -33,9 +33,9 @@ class FileOperationFailedException extends OperationFailedException
     protected static function formatMessage(string $path, ?string $ops) : string
     {
         if ($ops !== null) {
-            return _format_safe(_l('File {{0}} operation failed: {{1}}'), $ops, $path) ?? _l('File operation failed');
+            return _format_safe(_l('File {{0}} operation failed in: {{1}}'), $ops, $path) ?? _l('File operation failed');
         } else {
-            return _format_safe(_l('File operation failed: {{0}}'), $path) ?? _l('File operation failed');
+            return _format_safe(_l('File operation failed in: {{0}}'), $path) ?? _l('File operation failed');
         }
     }
 
