@@ -2,6 +2,7 @@
 
 namespace Magpie\Exceptions;
 
+use Magpie\Locales\Concepts\Localizable;
 use Throwable;
 
 /**
@@ -36,5 +37,25 @@ class FileOperationFailedException extends OperationFailedException
         } else {
             return _format_safe(_l('File operation failed: {{0}}'), $path) ?? _l('File operation failed');
         }
+    }
+
+
+    /**
+     * Common operation: read
+     * @return Localizable
+     */
+    public static function readOperation() : Localizable
+    {
+        return _l('read');
+    }
+
+
+    /**
+     * Common operation: write
+     * @return Localizable
+     */
+    public static function writeOperation() : Localizable
+    {
+        return _l('write');
     }
 }

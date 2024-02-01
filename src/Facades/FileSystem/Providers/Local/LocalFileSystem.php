@@ -97,7 +97,7 @@ class LocalFileSystem extends FileSystem
             if ($ret === false) throw new OperationFailedException();
             return static::wrapData($ret, basename($checkedPath));
         } catch (Exception $ex) {
-            throw new FileOperationFailedException($path, _l('read'), previous: $ex);
+            throw new FileOperationFailedException($path, FileOperationFailedException::readOperation(), previous: $ex);
         }
     }
 
@@ -116,7 +116,7 @@ class LocalFileSystem extends FileSystem
             $ret = file_put_contents($checkedPath, $data);
             if ($ret === false) throw new OperationFailedException();
         } catch (Exception $ex) {
-            throw new FileOperationFailedException($path, _l('write'), previous: $ex);
+            throw new FileOperationFailedException($path, FileOperationFailedException::writeOperation(), previous: $ex);
         }
     }
 
