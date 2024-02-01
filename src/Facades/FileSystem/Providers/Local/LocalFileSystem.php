@@ -271,7 +271,7 @@ class LocalFileSystem extends FileSystem
             $fileType = @filetype($fullPath);
             if ($fileType === false) continue;
 
-            if ($fileType === 'dir') {
+            if ($fileType === 'dir' && !is_link($fullPath)) {
                 if (!static::recursiveRmdir($fullPath)) return false;
             } else {
                 if (!unlink($fullPath)) return false;
