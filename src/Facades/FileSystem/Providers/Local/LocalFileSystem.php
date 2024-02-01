@@ -215,7 +215,7 @@ class LocalFileSystem extends FileSystem
         $this->createRecursiveDirectory($parentPath);
 
         // And then create current directory
-        mkdir($path);
+        if (!is_dir($path)) @mkdir($path);
 
         return true;
     }
