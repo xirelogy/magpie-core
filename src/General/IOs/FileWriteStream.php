@@ -102,8 +102,7 @@ class FileWriteStream implements StreamWriteFinalizable, Releasable
      */
     public static function createForPath(string $path) : static
     {
-        $file = fopen($path, 'w+');
-        if ($file === false) throw new FileOperationFailedException($path);
+        $file = PhpIo::fopen($path, 'w+');
         return new static($path, $file);
     }
 }

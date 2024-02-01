@@ -7,6 +7,7 @@ use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\FileSystemAccessible;
 use Magpie\General\Concepts\PrimitiveBinaryContentable;
 use Magpie\General\Contents\BinaryContent;
+use Magpie\General\IOs\PhpIo;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Sugars\Quote;
 use Magpie\HttpServer\Concepts\CookieSpecifiable;
@@ -118,8 +119,8 @@ class BinaryContentResponse extends CommonRenderable implements WithHeaderSpecif
         $scope = ExceptionHandler::setScopeErrorLevel();
         _used($scope);
 
-        $output = fopen('php://output', 'w');
-        $file = fopen($content->getFileSystemPath(), 'r');
+        $output = PhpIo::fopen('php://output', 'w');
+        $file = PhpIo::fopen($content->getFileSystemPath(), 'r');
 
         stream_copy_to_stream($file, $output);
 

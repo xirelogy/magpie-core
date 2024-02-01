@@ -92,8 +92,7 @@ class FileReadStream implements StreamReadable, Releasable, Closeable
     {
         if (static::isCheckPath($path) && !LocalRootFileSystem::instance()->isFileExist($path)) throw new FileNotFoundException($path);
 
-        $file = fopen($path, 'r');
-        if ($file === false) throw new FileOperationFailedException($path);
+        $file = PhpIo::fopen($path, 'r');
         return new static($file);
     }
 
