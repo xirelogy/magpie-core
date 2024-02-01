@@ -2,12 +2,18 @@
 
 namespace Magpie\Logs\Relays;
 
+use Magpie\Exceptions\FileOperationFailedException;
+use Magpie\Exceptions\InvalidPathException;
+use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Facades\FileSystem\FileSystem;
 use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
-use Magpie\General\Sugars\Excepts;
+use Magpie\General\IOs\PhpIo;
 use Magpie\Logs\Concepts\LogStringFormattable;
 use Magpie\Logs\Formats\SimpleLogStringFormat;
 use Magpie\Logs\LogConfig;
 use Magpie\Logs\LogEntry;
+use Magpie\System\Kernel\ExceptionHandler;
+use Throwable;
 
 /**
  * File-based relay log
@@ -50,13 +56,18 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
      */
     public final function log(LogEntry $record) : void
     {
-        $formatted = $this->logFormatter->format($record, $this->config);
+        try {
+            $formatted = $this->logFormatter->format($record, $this->config);
 
-        $path = static::getLogFullPath($this->getFilename());
+            $path = static::getLogFullPath($this->getFilename());
 
-        $file = fopen($path, 'a');
-        fwrite($file, "$formatted\n");
-        fclose($file);
+            $file = PhpIo::fopen($path, 'a');
+            $written = fwrite($file, "$formatted\n");
+            if ($written === false) throw new FileOperationFailedException($path, FileOperationFailedException::writeOperation());
+            fclose($file);
+        } catch (Throwable $ex) {
+            ExceptionHandler::systemCritical($ex);
+        }
     }
 
 
@@ -71,9 +82,12 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
      * Get log full path
      * @param string $filename
      * @return string
+     * @throws SafetyCommonException
      */
     protected static final function getLogFullPath(string $filename) : string
     {
+        $originalFilename = $filename;
+
         $prefix = null;
         $lastSlash = strrpos($filename, '/');
 
@@ -84,6 +98,8 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
             $filename = substr($filename, $lastSlash + 1);
         }
 
+        if (empty($filename)) throw new InvalidPathException($originalFilename);
+
         $logPath = static::getLogBasePath($prefix);
         return "$logPath/$filename";
     }
@@ -93,10 +109,12 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
      * Get log base (directory) path
      * @param string|null $relDir Relative directory in related to the initial base path
      * @return string
+     * @throws SafetyCommonException
      */
-    protected static function getLogBasePath(?string $relDir = null) : string
+    protected static final function getLogBasePath(?string $relDir = null) : string
     {
-        $logPath = project_path('/storage/logs');
+        $basePath = project_path('/storage/logs');
+        $logPath = $basePath;
 
         if (!is_empty_string($relDir)) {
             if (!str_starts_with($relDir, '/')) $relDir = "/$relDir";
@@ -106,7 +124,13 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
             $logPath .= $relDir;
         }
 
-        Excepts::noThrow(fn () => LocalRootFileSystem::instance()->createDirectory($logPath));
+        // Security check
+        $logPath = FileSystem::normalizePath($logPath);
+        if ($basePath != $logPath && !str_starts_with($logPath, "$basePath/")) {
+            throw new InvalidPathException($logPath);
+        }
+
+        LocalRootFileSystem::instance()->createDirectory($logPath);
 
         return $logPath;
     }
