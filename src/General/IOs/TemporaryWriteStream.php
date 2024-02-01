@@ -100,7 +100,7 @@ final class TemporaryWriteStream implements StreamWriteFinalizable, Releasable
      */
     public static function create() : static
     {
-        $handle = fopen('php://temp', 'w+');
+        $handle = @fopen('php://temp', 'w+');
         if ($handle === false) throw new OperationFailedException();
 
         return new static($handle);
