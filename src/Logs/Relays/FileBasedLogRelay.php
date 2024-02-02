@@ -13,6 +13,7 @@ use Magpie\Logs\Formats\SimpleLogStringFormat;
 use Magpie\Logs\LogConfig;
 use Magpie\Logs\LogEntry;
 use Magpie\System\Kernel\ExceptionHandler;
+use Magpie\System\Kernel\Kernel;
 use Throwable;
 
 /**
@@ -113,7 +114,13 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
      */
     protected static final function getLogBasePath(?string $relDir = null) : string
     {
-        $basePath = project_path('/storage/logs');
+        // Relative log path to the project is now configurable
+        $relPath = Kernel::current()->getConfig()->getProjectRelativeLogPath();
+        while (str_ends_with($relPath, '/')) {
+            $relPath = substr($relPath, -1);
+        }
+
+        $basePath = project_path($relPath);
         $logPath = $basePath;
 
         if (!is_empty_string($relDir)) {

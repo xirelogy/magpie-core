@@ -133,6 +133,16 @@ abstract class AppConfig
 
 
     /**
+     * The log path, in relative to the project path
+     * @return string
+     */
+    public function getProjectRelativeLogPath() : string
+    {
+        return '/storage/logs';
+    }
+
+
+    /**
      * Get connection configuration for given model
      * @param string $name
      * @return ConnectionConfig|null
