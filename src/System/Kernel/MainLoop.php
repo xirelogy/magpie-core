@@ -2,6 +2,7 @@
 
 namespace Magpie\System\Kernel;
 
+use Magpie\Exceptions\InvalidStateException;
 use Magpie\General\Traits\StaticClass;
 use Magpie\System\Concepts\MainLoopPollable;
 use Magpie\System\Impls\MainLoopInstance;
@@ -58,9 +59,20 @@ final class MainLoop
      * Run the main loop until exit condition is fulfilled (no more polls, or
      * exit signal is received)
      * @return mixed
+     * @throws InvalidStateException
      */
     public static function run() : mixed
     {
         return MainLoopInstance::instance()->run();
+    }
+
+
+    /**
+     * Send termination signal
+     * @return void
+     */
+    public static function terminate() : void
+    {
+        MainLoopInstance::instance()->terminate();
     }
 }

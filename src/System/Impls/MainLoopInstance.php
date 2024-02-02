@@ -2,6 +2,7 @@
 
 namespace Magpie\System\Impls;
 
+use Magpie\Exceptions\InvalidStateException;
 use Magpie\General\Arr;
 use Magpie\General\Concepts\Dispatchable;
 use Magpie\General\DateTimes\Duration;
@@ -80,9 +81,12 @@ final class MainLoopInstance
     /**
      * Run the main loop
      * @return mixed
+     * @throws InvalidStateException
      */
     public function run() : mixed
     {
+        if ($this->isRunning) throw new InvalidStateException();
+
         $this->isRunning = true;
         $this->lastResult = null;
 
@@ -101,7 +105,20 @@ final class MainLoopInstance
             }
         } while ($hasPoll && $this->isRunning);
 
+        // Main loop is marked as no longer running
+        $this->isRunning = false;
+
         return $this->lastResult;
+    }
+
+
+    /**
+     * Send in termination signal
+     * @return void
+     */
+    public function terminate() : void
+    {
+        $this->isRunning = false;
     }
 
 
