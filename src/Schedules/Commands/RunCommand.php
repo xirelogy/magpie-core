@@ -8,8 +8,8 @@ use Magpie\Commands\Attributes\CommandSignature;
 use Magpie\Commands\Command;
 use Magpie\Commands\Request;
 use Magpie\Schedules\Impls\ScheduleRegistry;
-use Magpie\System\Kernel\EasyFiber;
-use Magpie\System\Kernel\MainLoop;
+use Magpie\System\Kernel\EasyFiberPromise;
+use Magpie\System\Process\Process;
 
 /**
  * Run scheduled job
@@ -43,13 +43,13 @@ class RunCommand extends Command
 
         $hasBackground = count($backgroundProcesses) > 0;
 
+        $backgroundPromises = [];
         if ($hasBackground) {
             foreach ($backgroundProcesses as $backgroundProcess) {
-                EasyFiber::run(function () use ($backgroundProcess) {
+                $backgroundPromises[] = EasyFiberPromise::create(function (Process $backgroundProcess) {
                     $running = $backgroundProcess->runAsync();
-                    $exitCode = $running->wait();
-                    _used($exitCode);
-                });
+                    return $running->wait();
+                }, $backgroundProcess);
             }
         }
 
@@ -58,8 +58,8 @@ class RunCommand extends Command
             $foregroundProcess->run();
         }
 
-        if ($hasBackground) {
-            MainLoop::run();
-        }
+        // Wait until all background processes completes
+        EasyFiberPromise::loop();
+        _used($backgroundPromises);
     }
 }
