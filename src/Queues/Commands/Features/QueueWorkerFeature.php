@@ -17,6 +17,7 @@ use Magpie\Queues\Events\QueuedItemExceptionEvent;
 use Magpie\Queues\Events\QueuedItemFailedEvent;
 use Magpie\Queues\Events\QueuedItemRunningEvent;
 use Magpie\Queues\Events\WorkerKillEvent;
+use Magpie\Queues\Events\WorkerRestartingEvent;
 use Magpie\Queues\Events\WorkerStartedEvent;
 use Magpie\Queues\Providers\Queue;
 use Magpie\Queues\Providers\QueueCreator;
@@ -113,9 +114,9 @@ class QueueWorkerFeature
      */
     protected function loopOnQueue() : void
     {
-        WorkerStartedEvent::create()->run();
-
         $started = Carbon::now();
+        WorkerStartedEvent::create($started)->run();
+
         $this->isRunning = true;
 
         for (;;) {
@@ -156,7 +157,10 @@ class QueueWorkerFeature
     {
         if (!$this->isRunning) return false;
 
-        if ($this->queue->shallWorkerRestart($started)) return false;
+        if ($this->queue->shallWorkerRestart($started)) {
+            WorkerRestartingEvent::create()->run();
+            return false;
+        }
 
         return true;
     }
