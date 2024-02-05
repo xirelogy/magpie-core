@@ -26,7 +26,6 @@ use Magpie\Models\Exceptions\ModelReadException;
 use Magpie\Models\Exceptions\ModelWriteException;
 use Magpie\Models\Impls\ClosureDeferringModelStorageProvider;
 use Magpie\Models\Impls\ClosureQuerySetupListener;
-use Magpie\Models\Impls\ConnectionsCache;
 use Magpie\Models\Impls\DeferringModelStorageProvider;
 use Magpie\Models\Impls\ModelBinder;
 use Magpie\Models\Impls\ActualModelQuery;

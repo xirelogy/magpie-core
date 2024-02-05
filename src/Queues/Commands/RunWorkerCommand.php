@@ -2,9 +2,6 @@
 
 namespace Magpie\Queues\Commands;
 
-use Carbon\Carbon;
-use Carbon\CarbonInterface;
-use Exception;
 use Magpie\Codecs\Parsers\BooleanParser;
 use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Commands\Attributes\CommandDescriptionL;
@@ -23,10 +20,7 @@ use Magpie\Queues\Events\QueuedItemEvent;
 use Magpie\Queues\Events\QueuedItemExceptionEvent;
 use Magpie\Queues\Events\QueuedItemFailedEvent;
 use Magpie\Queues\Events\QueuedItemRunningEvent;
-use Magpie\Queues\Events\WorkerKillEvent;
 use Magpie\Queues\Events\WorkerStartedEvent;
-use Magpie\Queues\Providers\Queue;
-use Magpie\Queues\Providers\QueueCreator;
 
 #[CommandSignature('queue:run-worker {--once} {--queue=} {--timeout=}')]
 #[CommandDescriptionL('Run queue\'s worker')]

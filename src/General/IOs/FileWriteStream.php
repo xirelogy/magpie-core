@@ -3,7 +3,6 @@
 namespace Magpie\General\IOs;
 
 use Exception;
-use Magpie\Exceptions\FileOperationFailedException;
 use Magpie\Exceptions\StreamWriteFailureException;
 use Magpie\General\Concepts\Releasable;
 use Magpie\General\Concepts\StreamReadable;
