@@ -17,10 +17,40 @@ use Magpie\Queues\Simples\FailedExecutableEncoded;
 abstract class Queue implements Enqueueable, Dequeueable
 {
     /**
+     * Default queue name
+     */
+    protected const NAME_DEFAULT = 'default';
+
+    /**
+     * @var string Queue name
+     */
+    protected string $name;
+    /**
+     * @var Duration Timeout for retrying job
+     */
+    protected Duration $retryTimeout;
+
+
+    /**
+     * Constructor
+     * @param string|null $name
+     * @param Duration|null $retryTimeout
+     */
+    public function __construct(?string $name, ?Duration $retryTimeout)
+    {
+        $this->name = $name ?? static::NAME_DEFAULT;
+        $this->retryTimeout = $retryTimeout ?? Duration::inSeconds(60);
+    }
+
+
+    /**
      * Current queue name
      * @return string
      */
-    public abstract function getName() : string;
+    public function getName() : string
+    {
+        return $this->name;
+    }
 
 
     /**

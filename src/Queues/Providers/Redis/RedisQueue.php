@@ -29,10 +29,6 @@ use Magpie\Queues\Simples\QueueArguments;
 class RedisQueue extends Queue
 {
     /**
-     * Default queue name
-     */
-    protected const NAME_DEFAULT = 'default';
-    /**
      * Queue sub-tag: restart signal
      */
     protected const TAG_RESTART = 'restart';
@@ -53,14 +49,6 @@ class RedisQueue extends Queue
      * @var RedisClient Redis client
      */
     protected readonly RedisClient $redis;
-    /**
-     * @var string Queue name
-     */
-    protected string $name;
-    /**
-     * @var Duration Timeout for retrying job
-     */
-    protected Duration $retryTimeout;
 
 
     /**
@@ -71,18 +59,9 @@ class RedisQueue extends Queue
      */
     public function __construct(RedisClient $redis, ?string $name = null, ?Duration $retryTimeout = null)
     {
+        parent::__construct($name, $retryTimeout);
+
         $this->redis = $redis;
-        $this->name = $name ?? static::NAME_DEFAULT;
-        $this->retryTimeout = $retryTimeout ?? Duration::inSeconds(60);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getName() : string
-    {
-        return $this->name;
     }
 
 
