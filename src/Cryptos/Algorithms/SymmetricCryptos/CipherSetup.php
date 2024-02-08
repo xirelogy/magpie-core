@@ -82,21 +82,6 @@ class CipherSetup implements Packable, AlgoTypeClassable
 
 
     /**
-     * Specify cipher mode
-     * @param string $mode
-     * @return $this
-     * @throws SafetyCommonException
-     * @throws CryptoException
-     * @deprecated Mode shall be set during initialization and no longer changed.
-     */
-    public function withMode(string $mode) : static
-    {
-        $this->mode = $this->impl->setMode($mode);
-        return $this;
-    }
-
-
-    /**
      * Specify key
      * @param BinaryData|string $key
      * @return $this

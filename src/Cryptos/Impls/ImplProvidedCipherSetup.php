@@ -76,15 +76,6 @@ class ImplProvidedCipherSetup extends CipherSetup
             /**
              * @inheritDoc
              */
-            public function setMode(string $mode) : string
-            {
-                return $this->service->setMode($mode);
-            }
-
-
-            /**
-             * @inheritDoc
-             */
             public function getIvNumBits() : ?int
             {
                 return $this->service->getIvNumBits();

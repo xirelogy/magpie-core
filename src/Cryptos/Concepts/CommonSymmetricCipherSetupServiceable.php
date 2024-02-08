@@ -18,17 +18,6 @@ interface CommonSymmetricCipherSetupServiceable
 
 
     /**
-     * Set cipher mode
-     * @param string $mode
-     * @return string
-     * @throws SafetyCommonException
-     * @throws CryptoException
-     * @deprecated
-     */
-    public function setMode(string $mode) : string;
-
-
-    /**
      * Get number of bits expected for IV
      * @return int|null
      */

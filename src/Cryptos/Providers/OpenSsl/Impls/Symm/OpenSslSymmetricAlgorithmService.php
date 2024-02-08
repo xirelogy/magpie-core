@@ -66,18 +66,6 @@ class OpenSslSymmetricAlgorithmService implements SymmetricCipherSetupServiceabl
     /**
      * @inheritDoc
      */
-    public function setMode(string $mode) : string
-    {
-        $this->seeder->checkBlockSizeAndMode($this->currentBlockNumBits, $mode);
-
-        $this->currentMode = $mode;
-        return $mode;
-    }
-
-
-    /**
-     * @inheritDoc
-     */
     public function getIvNumBits() : ?int
     {
         $ret = @openssl_cipher_iv_length($this->getOpenSslAlgoName());
