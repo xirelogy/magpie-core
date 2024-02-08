@@ -9,6 +9,7 @@ use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\StreamException;
 use Magpie\Exceptions\StreamReadFailureException;
+use Magpie\Exceptions\UnsupportedException;
 use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\TypeClassable;
@@ -100,13 +101,14 @@ abstract class CryptoFormatContent extends CommonObject implements TypeClassable
 
     /**
      * Accept variant of crypto related content, or it's source content
-     * @param self|CryptoContent|BinaryDataProvidable|string $spec
+     * @param self|BinaryDataProvidable|string $spec
      * @return self
      * @throws SafetyCommonException
      */
-    public static function accept(self|CryptoContent|BinaryDataProvidable|string $spec) : self
+    public static function accept(self|BinaryDataProvidable|string $spec) : self
     {
-        if ($spec instanceof CryptoContent) $spec = $spec->upgradeToCryptoFormatContent();
+        _throwable() ?? throw new UnsupportedException();
+
         if ($spec instanceof self) return $spec;
 
         if (is_string($spec)) $spec = SimpleBinaryContent::create($spec);

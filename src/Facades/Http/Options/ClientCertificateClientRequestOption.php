@@ -2,7 +2,6 @@
 
 namespace Magpie\Facades\Http\Options;
 
-use Magpie\Cryptos\Contents\CryptoContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\Http\HttpClientRequestOption;
@@ -53,12 +52,12 @@ class ClientCertificateClientRequestOption extends HttpClientRequestOption
 
     /**
      * Create option
-     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $certificate
-     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $privateKey
+     * @param CryptoFormatContent|BinaryDataProvidable|string $certificate
+     * @param CryptoFormatContent|BinaryDataProvidable|string $privateKey
      * @return static
      * @throws SafetyCommonException
      */
-    public static function create(CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $certificate, CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $privateKey) : static
+    public static function create(CryptoFormatContent|BinaryDataProvidable|string $certificate, CryptoFormatContent|BinaryDataProvidable|string $privateKey) : static
     {
         return new static(CryptoFormatContent::accept($certificate), CryptoFormatContent::accept($privateKey));
     }

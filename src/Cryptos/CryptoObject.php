@@ -7,7 +7,6 @@ use Magpie\Cryptos\Concepts\Exportable;
 use Magpie\Cryptos\Concepts\Importable;
 use Magpie\Cryptos\Concepts\TryImporterListable;
 use Magpie\Cryptos\Contents\BinaryBlockContent;
-use Magpie\Cryptos\Contents\CryptoContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Exceptions\CryptoException;
 use Magpie\Cryptos\Impls\TryErrorHandling;
@@ -51,7 +50,7 @@ abstract class CryptoObject implements Packable, Importable, Exportable
     /**
      * @inheritDoc
      */
-    public static final function import(CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $source, ?Context $context = null) : static
+    public static final function import(CryptoFormatContent|BinaryDataProvidable|string $source, ?Context $context = null) : static
     {
         $source = CryptoFormatContent::accept($source);
 

@@ -2,7 +2,6 @@
 
 namespace Magpie\Cryptos\Concepts;
 
-use Magpie\Cryptos\Contents\CryptoContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Cryptos\Context;
 use Magpie\Cryptos\Exceptions\CryptoException;
@@ -18,7 +17,7 @@ interface Importable
 {
     /**
      * Import and parse from source
-     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $source
+     * @param CryptoFormatContent|BinaryDataProvidable|string $source
      * @param Context|null $context
      * @return static
      * @throws SafetyCommonException
@@ -26,6 +25,6 @@ interface Importable
      * @throws StreamException
      * @throws CryptoException
      */
-    public static function import(CryptoFormatContent|CryptoContent|BinaryDataProvidable|string $source, ?Context $context = null) : static;
+    public static function import(CryptoFormatContent|BinaryDataProvidable|string $source, ?Context $context = null) : static;
 
 }

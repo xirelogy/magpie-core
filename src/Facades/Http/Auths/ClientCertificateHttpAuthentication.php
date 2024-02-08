@@ -2,7 +2,6 @@
 
 namespace Magpie\Facades\Http\Auths;
 
-use Magpie\Cryptos\Contents\CryptoContent;
 use Magpie\Cryptos\Contents\CryptoFormatContent;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Facades\Http\HttpAuthentication;
@@ -47,12 +46,12 @@ class ClientCertificateHttpAuthentication extends HttpAuthentication
 
     /**
      * Create from given certificate and private key
-     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable $certificate
-     * @param CryptoFormatContent|CryptoContent|BinaryDataProvidable $privateKey
+     * @param CryptoFormatContent|BinaryDataProvidable $certificate
+     * @param CryptoFormatContent|BinaryDataProvidable $privateKey
      * @return static
      * @throws SafetyCommonException
      */
-    public static function fromCertAndKey(CryptoFormatContent|CryptoContent|BinaryDataProvidable $certificate, CryptoFormatContent|CryptoContent|BinaryDataProvidable $privateKey) : static
+    public static function fromCertAndKey(CryptoFormatContent|BinaryDataProvidable $certificate, CryptoFormatContent|BinaryDataProvidable $privateKey) : static
     {
         return new static(CryptoFormatContent::accept($certificate), CryptoFormatContent::accept($privateKey));
     }
