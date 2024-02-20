@@ -29,6 +29,7 @@ use Magpie\Models\Impls\ClosureQuerySetupListener;
 use Magpie\Models\Impls\DeferringModelStorageProvider;
 use Magpie\Models\Impls\ModelBinder;
 use Magpie\Models\Impls\ActualModelQuery;
+use Magpie\Models\Impls\PatchHost;
 use Magpie\Models\Impls\QueryContext;
 use Magpie\Models\Impls\QuerySetupListener;
 use Magpie\Models\Impls\SqlFormat;
@@ -389,7 +390,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
         if ($createColumnSchema !== null) {
             $createColumnName = $createColumnSchema->getName();
             if (!array_key_exists($createColumnName, $assignments)) {
-                $assignments[$createColumnName] = Carbon::now();
+                $assignments[$createColumnName] = PatchHost::tryCreateTimestamp($tableSchema->getModelClassName()) ?? Carbon::now();
             }
         }
 
@@ -398,7 +399,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
         if ($updateColumnSchema !== null) {
             $updateColumnName = $updateColumnSchema->getName();
             if (!array_key_exists($updateColumnName, $assignments)) {
-                $assignments[$updateColumnName] = Carbon::now();
+                $assignments[$updateColumnName] = PatchHost::tryUpdateTimestamp($tableSchema->getModelClassName()) ?? Carbon::now();
             }
         }
 

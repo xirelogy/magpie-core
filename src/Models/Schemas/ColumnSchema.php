@@ -14,6 +14,7 @@ use Magpie\Models\ColumnExpression;
 use Magpie\Models\Concepts\AttributeCastable;
 use Magpie\Models\Concepts\AttributeInitializable;
 use Magpie\Models\Impls\DefaultDataTypes;
+use Magpie\Models\Impls\PatchHost;
 use Magpie\Models\Schemas\Configs\SchemaPreference;
 use ReflectionAttribute;
 
@@ -281,6 +282,10 @@ abstract class ColumnSchema implements Packable
      */
     public function initialize() : mixed
     {
+        if (PatchHost::tryInitializeColumn($this->parentTable->getModelClassName(), $this->getName(), $outResult)) {
+            return $outResult;
+        }
+
         $initClassName = $this->dataType->initClass;
         if ($initClassName === null) return null;
 

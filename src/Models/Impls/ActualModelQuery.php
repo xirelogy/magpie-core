@@ -129,7 +129,7 @@ class ActualModelQuery extends ModelQuery
         if ($updateColumnSchema !== null) {
             $updateColumnName = $updateColumnSchema->getName();
             if (!array_key_exists($updateColumnName, $assignments)) {
-                $assignments[$updateColumnName] = Carbon::now();
+                $assignments[$updateColumnName] = PatchHost::tryUpdateTimestamp($this->tableSchema->getModelClassName()) ?? Carbon::now();
             }
         }
 
