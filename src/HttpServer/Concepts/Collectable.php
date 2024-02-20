@@ -6,7 +6,7 @@ use Magpie\Codecs\ParserHosts\ParserHost;
 
 /**
  * General collection
- * @deprecated Replaced by \Magpie\Codecs\ParserHosts\ParserHost\Collectable
+ * @deprecated Replaced by \Magpie\Codecs\Concepts\Collectable
  */
 interface Collectable extends ParserHost
 {
