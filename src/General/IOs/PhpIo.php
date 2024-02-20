@@ -5,6 +5,7 @@ namespace Magpie\General\IOs;
 use Exception;
 use Magpie\Exceptions\FileOperationFailedException;
 use Magpie\General\Traits\StaticClass;
+use Throwable;
 use function fopen;
 
 /**
@@ -29,7 +30,7 @@ final class PhpIo
             $ret = fopen($filename, $mode, $use_include_path);
             if ($ret === false) throw new Exception('fopen() failed');
             return $ret;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             throw new FileOperationFailedException($filename, _l('open'), previous: $ex);
         }
     }
