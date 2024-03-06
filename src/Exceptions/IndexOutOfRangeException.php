@@ -9,6 +9,11 @@ use Throwable;
  */
 class IndexOutOfRangeException extends OutOfRangeException
 {
+    /**
+     * Constructor
+     * @param int|null $index
+     * @param Throwable|null $previous
+     */
     public function __construct(?int $index = null, ?Throwable $previous = null)
     {
         $message = static::formatMessage($index);
