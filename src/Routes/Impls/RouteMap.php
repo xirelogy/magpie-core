@@ -409,6 +409,28 @@ class RouteMap implements SourceCacheTranslatable
 
 
     /**
+     * Discover all route variables for given class
+     * @return iterable<string, mixed>
+     */
+    public static function discoverClassRouteVariables(ReflectionClass $class) : iterable
+    {
+        $variables = [];
+
+        // RouteVariableDefault population
+        foreach (static::listRouteVariableDefaultFromAttribute($class) as $routeVariableDefault) {
+            $variables[$routeVariableDefault->name] = $routeVariableDefault->value;
+        }
+
+        // RouteVariableSet is overriding
+        foreach (static::listRouteVariableSetFromAttribute($class) as $routeVariableSet) {
+            $variables[$routeVariableSet->name] = $routeVariableSet->value;
+        }
+
+        yield from $variables;
+    }
+
+
+    /**
      * Extract route variable from method attributes
      * @param ReflectionMethod $method
      * @return RouteVariable|null

@@ -10,6 +10,7 @@ use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Names\CommonHttpMethod;
+use Magpie\General\Sugars\Quote;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Exceptions\HttpNotFoundException;
 use Magpie\HttpServer\Request;
@@ -131,7 +132,18 @@ abstract class RouteDomain
             $entry = RouteMap::findRouteEntryFromAttribute($method);
             if ($entry === null) return null;
 
-            return RouteMap::combineRoutes($prefix?->path, $entry->path);
+            $ret = RouteMap::combineRoutes($prefix?->path, $entry->path);
+
+            // Replace the path variables
+            foreach (RouteMap::discoverClassRouteVariables($class) as $variableName => $value) {
+                if (!is_string($value)) continue;
+
+                $searchForVariableName = Quote::brace('@' . $variableName);
+                $replaceWithName = Quote::brace($value);
+                $ret = str_replace($searchForVariableName, $replaceWithName, $ret);
+            }
+
+            return $ret;
         } catch (Exception) {
             return null;
         }
