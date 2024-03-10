@@ -16,6 +16,7 @@ abstract class SmtpSentMail
 
     /**
      * Export the entire sent email as MIME message
+     * @return string
      */
     public abstract function exportAsMimeMessage() : string;
 }
