@@ -53,6 +53,17 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
 
 
     /**
+     * Full path
+     * @return string
+     * @throws SafetyCommonException
+     */
+    public function getFullPath() : string
+    {
+        return static::getLogFullPath($this->getFilename());
+    }
+
+
+    /**
      * @inheritDoc
      */
     public final function log(LogEntry $record) : void
@@ -60,7 +71,7 @@ abstract class FileBasedLogRelay extends ConfigurableLogRelay
         try {
             $formatted = $this->logFormatter->format($record, $this->config);
 
-            $path = static::getLogFullPath($this->getFilename());
+            $path = $this->getFullPath();
 
             $file = PhpIo::fopen($path, 'a');
             $written = fwrite($file, "$formatted\n");
