@@ -2,8 +2,8 @@
 
 namespace Magpie\Facades\Smtp;
 
-use Exception;
 use Magpie\Exceptions\InvalidStateException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\Objects\ReleasableCollection;
 
@@ -36,7 +36,7 @@ abstract class SmtpMail
      * @param string $email
      * @param string|null $name
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public abstract function withSender(string $email, ?string $name = null) : static;
 
@@ -47,7 +47,7 @@ abstract class SmtpMail
      * @param string|null $name
      * @param SmtpRecipientType $type
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public abstract function withRecipient(string $email, ?string $name = null, SmtpRecipientType $type = SmtpRecipientType::TO) : static;
 
@@ -57,7 +57,7 @@ abstract class SmtpMail
      * @param string $email
      * @param string|null $name
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public function withCC(string $email, ?string $name = null) : static
     {
@@ -70,7 +70,7 @@ abstract class SmtpMail
      * @param string $email
      * @param string|null $name
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public function withBCC(string $email, ?string $name = null) : static
     {
@@ -82,7 +82,7 @@ abstract class SmtpMail
      * Specify mail subject
      * @param string $subject
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public abstract function withSubject(string $subject) : static;
 
@@ -91,7 +91,7 @@ abstract class SmtpMail
      * Specify mail content body
      * @param MailBody $body
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public abstract function withBody(MailBody $body) : static;
 
@@ -100,7 +100,7 @@ abstract class SmtpMail
      * Add attachment to the mail
      * @param BinaryDataProvidable $content
      * @return $this
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public abstract function withAttachment(BinaryDataProvidable $content) : static;
 
@@ -108,7 +108,7 @@ abstract class SmtpMail
     /**
      * Send the mail
      * @return SmtpSentMail
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public function send() : SmtpSentMail
     {
@@ -127,7 +127,7 @@ abstract class SmtpMail
     /**
      * Handle sending the mail
      * @return SmtpSentMail
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     protected abstract function onSend() : SmtpSentMail;
 }

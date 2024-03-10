@@ -2,8 +2,8 @@
 
 namespace Magpie\Facades\Smtp;
 
-use Exception;
 use Magpie\Exceptions\ClassNotOfTypeException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\LogContainable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
@@ -17,7 +17,7 @@ abstract class SmtpClient implements TypeClassable, LogContainable, SystemBootab
     /**
      * Create a new outgoing mail (to-be sent)
      * @return SmtpMail
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public abstract function createMail() : SmtpMail;
 
@@ -27,7 +27,7 @@ abstract class SmtpClient implements TypeClassable, LogContainable, SystemBootab
      * @param SmtpClientConfig $config
      * @param string|null $typeClass
      * @return static
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public static function initialize(SmtpClientConfig $config, ?string $typeClass = null) : static
     {
@@ -42,7 +42,7 @@ abstract class SmtpClient implements TypeClassable, LogContainable, SystemBootab
      * Initialize a client specifically for this type of adaptation
      * @param SmtpClientConfig $config
      * @return static
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     protected abstract static function specificInitialize(SmtpClientConfig $config) : static;
 }
