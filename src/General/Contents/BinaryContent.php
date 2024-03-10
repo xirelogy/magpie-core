@@ -17,6 +17,7 @@ use Magpie\General\Concepts\PrimitiveBinaryContentable;
 use Magpie\General\Contents\Impls\UpgradedBinaryContent;
 use Magpie\General\Contents\Impls\UpgradedFileBinaryContent;
 use Magpie\General\Names\CommonHttpHeader;
+use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\General\Names\CommonMimeType;
 use Magpie\General\Traits\StaticClass;
 
@@ -116,7 +117,7 @@ class BinaryContent
         $response = HttpClient::initialize()->get($url);
 
         $httpStatusCode = $response->getHttpStatusCode();
-        if ($httpStatusCode !== 200) throw new HttpClientStatusFailedException($httpStatusCode);
+        if ($httpStatusCode !== CommonHttpStatusCode::OK) throw new HttpClientStatusFailedException($httpStatusCode);
 
         $headers = $response->getHeaders();
         $filename = HttpContentDisposition::decodeFilename($headers->optional(CommonHttpHeader::CONTENT_DISPOSITION)) ?? $defaultFilename;
