@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Magpie\Facades\Random;
 use Magpie\General\DateTimes\SystemTimezone;
 use Magpie\General\Randoms\RandomCharset;
+use Magpie\General\Sugars\Excepts;
 use Magpie\Logs\Concepts\Loggable;
 use Magpie\Logs\LogConfig;
 use Magpie\Logs\Loggers\DefaultLogger;
@@ -26,6 +27,10 @@ class NamedFileTaskContextLoggingSetup extends TaskContextLoggingSetup
      * @var LogConfig Log configuration to be used
      */
     protected readonly LogConfig $logConfig;
+    /**
+     * @var string|null Full path filename of log file
+     */
+    protected ?string $logFullPath = null;
 
 
     /**
@@ -41,6 +46,16 @@ class NamedFileTaskContextLoggingSetup extends TaskContextLoggingSetup
 
 
     /**
+     * Full path for log file
+     * @return string|null
+     */
+    public function getLogFullPath() : ?string
+    {
+        return $this->logFullPath;
+    }
+
+
+    /**
      * @inheritDoc
      */
     protected final function createLogger(Task $parentTask, TaskContext $parentContext) : Loggable
@@ -52,6 +67,7 @@ class NamedFileTaskContextLoggingSetup extends TaskContextLoggingSetup
         $name = str_replace('\\', '-', $name);
 
         $relay = new SpecificFileLogRelay("$dir/$name", $this->logConfig, $this->logSource);
+        $this->logFullPath = Excepts::noThrow(fn () => $relay->getFullPath());
         return new DefaultLogger($relay);
     }
 
