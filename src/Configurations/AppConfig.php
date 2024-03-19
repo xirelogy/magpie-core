@@ -33,6 +33,7 @@ use Magpie\Routes\Handlers\ClosureRouteHandler;
 use Magpie\Schedules\Impls\ScheduleRegistry;
 use Magpie\System\Concepts\SourceCacheable;
 use Magpie\System\Concepts\SystemBootable;
+use Magpie\System\HardCore\AutoloadReflection;
 use Magpie\System\Impls\Consoles\SymfonyConsole;
 use Magpie\System\Kernel\ExceptionHandler;
 use Magpie\System\Kernel\Kernel;
@@ -83,10 +84,24 @@ abstract class AppConfig
     public final function initialize(Kernel $kernel) : void
     {
         try {
+            $this->configureAutoloadReflectionFromComposer();
             $this->onInitialize($kernel);
         } catch (Exception $ex) {
             ExceptionHandler::systemCritical($ex);
         }
+    }
+
+
+    /**
+     * Try to configure autoload reflection from composer, if specified in environment:
+     * The configuration AUTOLOAD_FROM_COMPOSER is set to true
+     * @return void
+     */
+    private function configureAutoloadReflectionFromComposer() : void
+    {
+        if (env('AUTOLOAD_FROM_COMPOSER') !== true) return;
+
+        AutoloadReflection::instance()->discoverPathResolversFromComposerRepositories();
     }
 
 

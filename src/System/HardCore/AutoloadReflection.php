@@ -2,13 +2,22 @@
 
 namespace Magpie\System\HardCore;
 
+use Magpie\Exceptions\PersistenceException;
+use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Exceptions\StreamException;
+use Magpie\Facades\FileSystem\FileSystem;
+use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
+use Magpie\General\Simples\SimpleJSON;
 use Magpie\General\Traits\SingletonInstance;
 use Magpie\System\Concepts\AutoloadReflectionPathResolvable;
+use Magpie\System\HardCore\AutoloadResolvers\AutoloadLinkPathResolver;
+use Magpie\System\Kernel\ExceptionHandler;
 use Magpie\System\Kernel\Kernel;
 use ReflectionClass;
 use ReflectionException;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Throwable;
 
 /**
  * Perform reflection using autoload map
@@ -216,6 +225,88 @@ class AutoloadReflection
 
         // Not supported
         return null;
+    }
+
+
+    /**
+     * Automatically discover path resolvers from given composer repository files, and
+     * add them automatically to the path resolvers (like addPathResolver)
+     * @return $this
+     */
+    public function discoverPathResolversFromComposerRepositories() : static
+    {
+        try {
+            $this->tryDiscoverPathResolversFromComposerRepositories();
+        } catch (Throwable $ex) {
+            ExceptionHandler::systemCritical($ex);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Try to discover for path resolvers from the project's root composer.json
+     * @return void
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     * @throws StreamException
+     */
+    private function tryDiscoverPathResolversFromComposerRepositories() : void
+    {
+        $composerPath = project_path('composer.json');
+        $rootFs = LocalRootFileSystem::instance();
+        if (!$rootFs->isFileExist($composerPath)) return;
+
+        $data = SimpleJSON::decode($rootFs->readFile($composerPath)->getData());
+        if (!isset($data->repositories)) return;
+
+        $projectBasePath = project_path('/');
+        if (!str_ends_with($projectBasePath, '/')) $projectBasePath = "$projectBasePath/";
+
+        foreach ($data->repositories as $repository) {
+            $this->tryDiscoverPathResolversFromComposerRepositorySpec($rootFs, $projectBasePath, $repository);
+        }
+    }
+
+
+    /**
+     * Try to discover for path resolvers from the composer.json of a specific repository specification
+     * @param FileSystem $rootFs
+     * @param string $projectBasePath
+     * @param object $repository
+     * @return void
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     * @throws StreamException
+     */
+    private function tryDiscoverPathResolversFromComposerRepositorySpec(FileSystem $rootFs, string $projectBasePath, object $repository) : void
+    {
+        if (($repository->type ?? null) !== 'path') return;
+        if (!isset($repository->url)) return;
+
+        $repositoryUrl = $repository->url;
+
+        $repositoryComposerPath = $projectBasePath . $repositoryUrl;
+        if (!str_ends_with($repositoryComposerPath, '/')) $repositoryComposerPath = "$repositoryComposerPath/";
+        $repositoryComposerPath .= 'composer.json';
+
+        if (!$rootFs->isFileExist($repositoryComposerPath)) return;
+
+        $data = SimpleJSON::decode($rootFs->readFile($repositoryComposerPath)->getData());
+        if (!isset($data->name)) return;
+
+        $projectName = $data->name;
+        $vendorPath = "vendor/$projectName";
+
+        if (!$rootFs->isDirectoryExist($projectBasePath . $vendorPath)) return;
+        $this->addPathResolver(new AutoloadLinkPathResolver($vendorPath, $repositoryUrl));
+    }
+
+
+    public function debug() : never
+    {
+        dd($this);
     }
 
 
