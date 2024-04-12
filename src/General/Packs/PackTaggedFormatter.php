@@ -17,7 +17,7 @@ class PackTaggedFormatter implements CustomFormattable, PackSelectModifiable
     /**
      * @var mixed Target value (that was tagged)
      */
-    protected readonly mixed $target;
+    public readonly mixed $target;
     /**
      * @var PackSelectors Currently effective selectors
      */
