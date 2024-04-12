@@ -3,7 +3,11 @@
 namespace Magpie\Objects;
 
 use Exception;
+use Magpie\Codecs\Concepts\ObjectParseable;
+use Magpie\Codecs\Parsers\ClosureParser;
 use Magpie\Codecs\Parsers\IntegerParser;
+use Magpie\Codecs\Parsers\Parser;
+use Magpie\Codecs\Parsers\StringParser;
 use Magpie\Exceptions\InvalidDataException;
 use Magpie\Exceptions\NullException;
 use Magpie\Exceptions\SafetyCommonException;
@@ -12,7 +16,7 @@ use Throwable;
 /**
  * Representation of simple numeric based version
  */
-class NumericVersion extends Version
+class NumericVersion extends Version implements ObjectParseable
 {
     /**
      * @var array<int> All version numbers
@@ -100,5 +104,17 @@ class NumericVersion extends Version
         } catch (Throwable) {
             throw new InvalidDataException();
         }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public static function createParser() : Parser
+    {
+        return ClosureParser::create(function (mixed $value, ?string $hintName) : static {
+            $value = StringParser::create()->parse($value, $hintName);
+            return static::parse($value);
+        });
     }
 }
