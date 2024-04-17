@@ -157,6 +157,22 @@ abstract class FileSystem implements TypeClassable, SystemBootable
 
 
     /**
+     * Check for existence of specific read/write options
+     * @param iterable<FileSystemReadWriteOption> $options
+     * @param string $typeClass
+     * @return bool
+     */
+    protected static function isReadWriteOptionChecked(iterable $options, string $typeClass) : bool
+    {
+        foreach ($options as $option) {
+            if ($option::getTypeClass() === $typeClass) return true;
+        }
+
+        return false;
+    }
+
+
+    /**
      * Wrap binary data into a simple binary data
      * @param string $data
      * @param string|null $filename

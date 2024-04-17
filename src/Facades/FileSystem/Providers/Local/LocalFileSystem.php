@@ -9,8 +9,11 @@ use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Exceptions\StreamException;
 use Magpie\Facades\FileSystem\FileSystem;
 use Magpie\Facades\FileSystem\FileSystemConfig;
+use Magpie\Facades\FileSystem\Options\FileSystemLazyReadOption;
+use Magpie\Facades\FileSystem\Options\FileSystemReadWriteOption;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\TargetReadable;
 use Magpie\General\Concepts\TargetWritable;
@@ -83,6 +86,22 @@ class LocalFileSystem extends FileSystem
 
 
     /**
+     * Read file content (lazily)
+     * @param string $path
+     * @return BinaryDataProvidable
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     * @throws StreamException
+     */
+    public function readFileLazy(string $path) : BinaryDataProvidable
+    {
+        return $this->readFile($path, [
+            FileSystemLazyReadOption::create(),
+        ]);
+    }
+
+
+    /**
      * @inheritDoc
      */
     public function readFile(string $path, array $options = []) : BinaryDataProvidable
@@ -92,13 +111,21 @@ class LocalFileSystem extends FileSystem
 
         if (!$this->isFileExist($path)) throw new FileNotFoundException($path);
 
-        try {
-            $ret = file_get_contents($checkedPath);
-            if ($ret === false) throw new OperationFailedException();
-            return static::wrapData($ret, basename($checkedPath));
-        } catch (Exception $ex) {
-            throw new FileOperationFailedException($path, FileOperationFailedException::readOperation(), previous: $ex);
+        $reader = function () use ($path, $checkedPath) {
+            try {
+                $ret = file_get_contents($checkedPath);
+                if ($ret === false) throw new OperationFailedException();
+                return static::wrapData($ret, basename($checkedPath));
+            } catch (Exception $ex) {
+                throw new FileOperationFailedException($path, FileOperationFailedException::readOperation(), previous: $ex);
+            }
+        };
+
+        if (static::isReadWriteOptionChecked($options, FileSystemLazyReadOption::TYPECLASS)) {
+            return LocalLazyBinaryContent::_create($checkedPath, $reader);
         }
+
+        return $reader();
     }
 
 
