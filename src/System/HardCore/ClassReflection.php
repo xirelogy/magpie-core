@@ -15,6 +15,18 @@ class ClassReflection
 
 
     /**
+     * If given class is anonymous
+     * @param object|string $className
+     * @return bool
+     */
+    public static function isAnonymous(object|string $className) : bool
+    {
+        $className = is_object($className) ? $className::class : $className;
+        return str_contains($className, "@anonymous\x00");
+    }
+
+
+    /**
      * If given class is an abstract class
      * @param object|class-string $className
      * @return bool
