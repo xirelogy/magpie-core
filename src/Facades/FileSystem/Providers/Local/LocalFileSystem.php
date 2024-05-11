@@ -13,7 +13,6 @@ use Magpie\Exceptions\StreamException;
 use Magpie\Facades\FileSystem\FileSystem;
 use Magpie\Facades\FileSystem\FileSystemConfig;
 use Magpie\Facades\FileSystem\Options\FileSystemLazyReadOption;
-use Magpie\Facades\FileSystem\Options\FileSystemReadWriteOption;
 use Magpie\General\Concepts\BinaryDataProvidable;
 use Magpie\General\Concepts\TargetReadable;
 use Magpie\General\Concepts\TargetWritable;
