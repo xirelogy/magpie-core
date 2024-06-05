@@ -17,9 +17,10 @@ class Excepts
 
     /**
      * Execute ignoring all exceptions
-     * @param callable():mixed $fn
-     * @param mixed|null $defaultReturn
-     * @return mixed
+     * @param callable():T $fn
+     * @param T|null $defaultReturn
+     * @return T
+     * @template T
      */
     public static function noThrow(callable $fn, mixed $defaultReturn = null) : mixed
     {
@@ -35,9 +36,10 @@ class Excepts
     /**
      * Convert any Throwable thrown in scope that is not an Exception to
      * an Exception
-     * @param callable():mixed $fn
-     * @return mixed
+     * @param callable():T $fn
+     * @return T
      * @throws Exception
+     * @template T
      */
     public static function convertThrowable(callable $fn) : mixed
     {

@@ -67,10 +67,11 @@ abstract class ModelTransaction
 
     /**
      * Execute within transaction
-     * @param callable():mixed $fn
-     * @return mixed
+     * @param callable():T $fn
+     * @return T
      * @throws SafetyCommonException
      * @throws PersistenceException
+     * @template T
      */
     public static function execute(callable $fn) : mixed
     {
