@@ -53,6 +53,10 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
      */
     protected bool $isSelectReset = false;
     /**
+     * @var bool If selection is distinct
+     */
+    protected bool $isSelectDistinct = false;
+    /**
      * @var QueryFilterApplicable|null Query filter
      */
     protected ?QueryFilterApplicable $filter = null;
@@ -82,6 +86,23 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     public function select(QuerySelectable|string ...$columns) : static
     {
         $this->isSelectReset = true;
+        $this->selectedColumns = [];
+        return $this->addSelect(...$columns);
+    }
+
+
+    /**
+     * Select columns (distinct)
+     * @param QuerySelectable|string ...$columns
+     * @return $this
+     * @note This function will reset the selection scope and will cause the
+     * expected return Model may have different fields than expected during
+     * hydration
+     */
+    public function selectDistinct(QuerySelectable|string ...$columns) : static
+    {
+        $this->isSelectReset = true;
+        $this->isSelectDistinct = true;
         $this->selectedColumns = [];
         return $this->addSelect(...$columns);
     }

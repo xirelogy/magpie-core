@@ -72,7 +72,11 @@ class ActualModelQuery extends ModelQuery
         $innerContext = new QueryContext($context->connection, $this->tableSchema);
 
         $selectionFinalized = $this->finalizeSelects($innerContext);
-        $query = new QueryStatement('SELECT ' . $selectionFinalized->sql . ' FROM ' . $this->formatTable($innerContext->connection), $selectionFinalized->values);
+
+        $selectionSql = $selectionFinalized->sql;
+        if ($this->isSelectDistinct) $selectionSql = 'DISTINCT ' . $selectionSql;
+
+        $query = new QueryStatement('SELECT ' . $selectionSql . ' FROM ' . $this->formatTable($innerContext->connection), $selectionFinalized->values);
 
         $whereFinalized = $this->condition->_finalize($innerContext);
         $query->appendJoinIfNotEmpty(' WHERE ', $whereFinalized);
@@ -97,7 +101,10 @@ class ActualModelQuery extends ModelQuery
 
         $selectionFinalized = $this->finalizeSelects($context, $modelFinalizer);
 
-        $query = new QueryStatement('SELECT ' . $selectionFinalized->sql . ' FROM ' . $this->formatTable($connection), $selectionFinalized->values);
+        $selectionSql = $selectionFinalized->sql;
+        if ($this->isSelectDistinct) $selectionSql = 'DISTINCT ' . $selectionSql;
+
+        $query = new QueryStatement('SELECT ' . $selectionSql . ' FROM ' . $this->formatTable($connection), $selectionFinalized->values);
 
         return $this->commonPrepareSelectStatement($query, $context, $connection, $filterMode);
     }
