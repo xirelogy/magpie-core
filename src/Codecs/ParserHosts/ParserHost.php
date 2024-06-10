@@ -46,9 +46,10 @@ interface ParserHost
      * A value is optionally required from current parser host.
      * Any exception will also cause the default value returned
      * @param string|int $key
-     * @param Parser|null $parser
-     * @param mixed|null $default
-     * @return mixed
+     * @param Parser<T>|null $parser
+     * @param T|null $default
+     * @return T
+     * @template T
      */
     public function safeOptional(string|int $key, ?Parser $parser = null, mixed $default = null) : mixed;
 
