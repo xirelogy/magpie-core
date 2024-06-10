@@ -7,6 +7,7 @@ use Magpie\Exceptions\InvalidStateException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Models\Concepts\AttributeCastable;
 use Magpie\Models\Concepts\Modelable;
+use Magpie\Models\Concepts\ModelHydratable;
 use Magpie\Models\Concepts\QueryCommonAggregatable;
 use Magpie\Models\Concepts\QueryFilterable;
 use Magpie\Models\Concepts\QueryFilterApplicable;
@@ -170,6 +171,20 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
 
 
     /**
+     * Query for multiple records (manual hydration)
+     * @param ModelHydratable<T> $hydrant
+     * @return iterable<T>
+     * @throws SafetyCommonException
+     * @throws ModelReadException
+     * @throws ModelWriteException
+     */
+    public function listUsing(ModelHydratable $hydrant) : iterable
+    {
+        yield from $this->listUsingFilterModeHydrate(FilterApplyMode::YES, $hydrant);
+    }
+
+
+    /**
      * Query for multiple records (using specific filter mode)
      * @param FilterApplyMode $filterMode
      * @return iterable
@@ -186,6 +201,25 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
 
         // Purposely return generator from another function to ensure pre-actions are executed
         return $this->listFrom($statement, $modelFinalizer);
+    }
+
+
+    /**
+     * Query for multiple records (using specific filter mode and hydrant)
+     * @param FilterApplyMode $filterMode
+     * @param ModelHydratable<T> $hydrant
+     * @return iterable<T>
+     * @throws SafetyCommonException
+     * @throws ModelReadException
+     * @throws ModelWriteException
+     */
+    private function listUsingFilterModeHydrate(FilterApplyMode $filterMode, ModelHydratable $hydrant) : iterable
+    {
+        $statement = $this->prepareSelectStatement($filterMode);
+
+        foreach ($statement->query() as $row) {
+            yield $hydrant->hydrate($row);
+        }
     }
 
 
@@ -217,6 +251,24 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     public function first() : ?Modelable
     {
         foreach ($this->listUsingFilterMode(FilterApplyMode::FIRST) as $result) {
+            return $result;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Query for the first record (manual hydration)
+     * @param ModelHydratable<T> $hydrant
+     * @return T|null
+     * @throws SafetyCommonException
+     * @throws ModelReadException
+     * @throws ModelWriteException
+     */
+    public function firstUsing(ModelHydratable $hydrant) : mixed
+    {
+        foreach ($this->listUsingFilterModeHydrate(FilterApplyMode::FIRST, $hydrant) as $result) {
             return $result;
         }
 
