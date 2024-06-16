@@ -21,6 +21,10 @@ class SimpleDate implements PreferStringable, PrettyFormattable, ObjectParseable
      * The reference timezone where base value is stored in
      */
     public const TIMEZONE = 'UTC';
+    /**
+     * Number of seconds in a (normal) full day
+     */
+    protected const SECONDS_PER_DAY = 86400;
 
     /**
      * @var CarbonInterface Underlying value stored in UTC
@@ -45,6 +49,17 @@ class SimpleDate implements PreferStringable, PrettyFormattable, ObjectParseable
     public function getComponents() : SimpleDateComponents
     {
         return new SimpleDateComponents($this->baseValue->year, $this->baseValue->month, $this->baseValue->day);
+    }
+
+
+    /**
+     * Respective numeric representation
+     * @return int
+     */
+    public function getNumber() : int
+    {
+        $v = $this->expressedInTimezone(static::TIMEZONE);
+        return intdiv($v->getTimestamp(), static::SECONDS_PER_DAY);
     }
 
 
@@ -111,6 +126,32 @@ class SimpleDate implements PreferStringable, PrettyFormattable, ObjectParseable
         $value = $value->toImmutable();
         if ($timezone !== null) $value = $value->setTimezone($timezone);
 
+        $baseValue = Carbon::create($value->year, $value->month, $value->day, 0, 0, 0, static::TIMEZONE);
+
+        return new static($baseValue);
+    }
+
+
+    /**
+     * Create from given numeric value
+     * @param int $number
+     * @return static
+     */
+    public static function fromNumber(int $number) : static
+    {
+        $v = Carbon::createFromTimestampUTC($number * static::SECONDS_PER_DAY);
+        return new static($v);
+    }
+
+
+    /**
+     * Shorthand for today
+     * @param string|null $timezone
+     * @return static
+     */
+    public static function today(?string $timezone = null) : static
+    {
+        $value = Carbon::now($timezone ?? static::TIMEZONE);
         $baseValue = Carbon::create($value->year, $value->month, $value->day, 0, 0, 0, static::TIMEZONE);
 
         return new static($baseValue);
