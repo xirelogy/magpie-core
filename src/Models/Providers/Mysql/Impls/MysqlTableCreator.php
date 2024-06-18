@@ -2,11 +2,13 @@
 
 namespace Magpie\Models\Providers\Mysql\Impls;
 
+use Magpie\General\Sugars\Excepts;
 use Magpie\General\Sugars\Quote;
 use Magpie\Models\Concepts\ColumnDatabaseSpecifiable;
 use Magpie\Models\Impls\SqlFormat;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
+use Magpie\Objects\NumericVersion;
 
 /**
  * MySQL table creator
@@ -93,12 +95,27 @@ class MysqlTableCreator extends TableCreator
         // Handle unique key indices
         foreach ($uniqueKeys as $uniqueKey) {
             $indexKey = $uniqueKey . '_UNIQUE';
-            $declarations[] = 'UNIQUE INDEX ' . SqlFormat::backTick($indexKey) . ' ' . Quote::bracket(SqlFormat::backTick($uniqueKey) . ' ASC') . ' VISIBLE';
+            $declarations[] = 'UNIQUE INDEX ' . SqlFormat::backTick($indexKey) . ' ' . Quote::bracket(SqlFormat::backTick($uniqueKey) . ' ASC') . ' ' . $this->getUniqueIndexVisibleSuffix();
         }
 
         // Finalize
         $sql .= ' ' . Quote::bracket(implode(', ', $declarations));
         yield $this->connection->prepare($sql);
+    }
+
+
+    /**
+     * The VISIBLE suffix for UNIQUE INDEX
+     * @return string
+     */
+    protected function getUniqueIndexVisibleSuffix() : string
+    {
+        return Excepts::noThrow(function () {
+            $compare = $this->connection->getServerVersion()->compare(NumericVersion::fromNumbers(8, 0));
+            if ($compare === null) return '';
+            if ($compare < 0) return ''; // MySQL < 8.0 must not use VISIBLE
+            return 'VISIBLE';
+        }, '');
     }
 
 
