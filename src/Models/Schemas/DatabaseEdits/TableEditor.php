@@ -93,9 +93,58 @@ abstract class TableEditor extends CommonTableEditable
             if ($columnTypeDef->baseType === 'char' && $columnTypeAtDbDef->baseType === 'text') return true;
             if ($columnTypeDef->baseType === 'varchar' && $columnTypeAtDbDef->baseType === 'text') return true;
 
+            // INT/FLOAT type at database allowed to be more specific
+            if ($columnTypeDef->baseType === $columnTypeAtDbDef->baseType &&
+                (static::isIntType($columnTypeDef->baseType) || static::isFloatType($columnTypeDef->baseType))
+            ) {
+                if (count($columnTypeDef->specs) < count($columnTypeAtDbDef->specs)) {
+                    for ($i = 0; $i < count($columnTypeDef->specs); ++$i) {
+                        if ($columnTypeDef->specs[$i] != $columnTypeAtDbDef->specs[$i]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
             return $columnType === $columnTypeAtDb;
         } catch (Exception) {
             return false;
         }
+    }
+
+
+    /**
+     * If the given base type is integer
+     * @param string $baseType
+     * @return bool
+     */
+    protected static function isIntType(string $baseType) : bool
+    {
+        if ($baseType === 'tinyint') return true;
+        if ($baseType === 'smallint') return true;
+        if ($baseType === 'int') return true;
+        if ($baseType === 'bigint') return true;
+
+        if ($baseType === 'utinyint') return true;
+        if ($baseType === 'usmallint') return true;
+        if ($baseType === 'uint') return true;
+        if ($baseType === 'ubigint') return true;
+
+        return false;
+    }
+
+
+    /**
+     * If the given base type is floating point number
+     * @param string $baseType
+     * @return bool
+     */
+    protected static function isFloatType(string $baseType) : bool
+    {
+        if ($baseType === 'float') return true;
+        if ($baseType === 'double') return true;
+
+        return false;
     }
 }
