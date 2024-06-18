@@ -43,6 +43,37 @@ class NumericVersion extends Version implements ObjectParseable
     }
 
 
+    public function compare(Version $rhs) : int|null
+    {
+        if (!$rhs instanceof NumericVersion) return null;
+
+        $lhsCount = count($this->versions);
+        $rhsCount = count($rhs->versions);
+
+        if ($lhsCount <= 0 || $rhsCount <= 0) return null;  // Must be comparable
+
+        for ($i = 0; $i < $lhsCount; ++$i) {
+            if ($i >= $rhsCount) {
+                // RHS run out of data, current version considered to be after RHS
+                return 1;
+            }
+
+            $lhsPart = $this->versions[$i];
+            $rhsPart = $rhs->versions[$i];
+
+            if ($lhsPart < $rhsPart) return -1;
+            if ($lhsPart > $rhsPart) return 1;
+        }
+
+        // Check if RHS is more specific than current version
+        // If yes, current version considered to be prior to RHS
+        if ($rhsCount > $lhsCount) return -1;
+
+        // Both versions identical
+        return 0;
+    }
+
+
     /**
      * Major version
      * @return int
