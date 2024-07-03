@@ -34,7 +34,7 @@ class AutoloadLinkPathResolver implements AutoloadReflectionPathResolvable
     public function tryResolvePath(string $rootPath, string &$realPath) : void
     {
         $checkTargetPath = realpath($rootPath . $this->targetPath);
-        if (!str_starts_with($realPath, $checkTargetPath)) return;
+        if (!str_starts_with($realPath, $checkTargetPath . '/')) return;
 
         $realPath = $rootPath . $this->sourcePath . substr($realPath, strlen($checkTargetPath) + 1);
     }
