@@ -119,6 +119,16 @@ class ForwardingLogger implements Loggable
 
 
     /**
+     * Lock the current next level logger for further usage
+     * @return Loggable
+     */
+    public function lock() : Loggable
+    {
+        return $this->nextLogger;
+    }
+
+
+    /**
      * Switch and change the next logger
      * @param Loggable $nextLogger
      * @return Scoped A scope that upon completion, revert to the last logger
