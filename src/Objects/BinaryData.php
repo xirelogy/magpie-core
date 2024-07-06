@@ -5,6 +5,7 @@ namespace Magpie\Objects;
 use Magpie\Codecs\Concepts\PreferStringable;
 use Magpie\Exceptions\InvalidDataException;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\General\Simples\SimpleUrlBase64;
 
 /**
  * Binary data that can be expressed in various format
@@ -64,6 +65,16 @@ class BinaryData implements PreferStringable
     public function asBase64() : string
     {
         return base64_encode($this->binData);
+    }
+
+
+    /**
+     * Expressed in URL-safe base64
+     * @return string
+     */
+    public function asUrlBase64() : string
+    {
+        return SimpleUrlBase64::encode($this->binData);
     }
 
 
