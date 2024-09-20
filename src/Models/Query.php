@@ -50,6 +50,10 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
      */
     protected array $orders = [];
     /**
+     * @var array<RawColumnExpression> Grouping columns
+     */
+    protected array $groupBys = [];
+    /**
      * @var bool If the field selection had been reset
      */
     protected bool $isSelectReset = false;
@@ -143,6 +147,20 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     public function orderBy(string|ColumnName $column, OrderType $order = OrderType::ASC) : static
     {
         $this->orders[] = new SimpleQueryOrder($column, $order);
+        return $this;
+    }
+
+
+    /**
+     * Specify grouping condition
+     * @param string|ColumnName ...$columns
+     * @return $this
+     */
+    public function groupBy(string|ColumnName ...$columns) : static
+    {
+        $columnTranslate = fn (string|ColumnName $column) => new RawColumnExpression($column);
+
+        $this->groupBys = iter_flatten(iter_filter($columns, $columnTranslate));
         return $this;
     }
 

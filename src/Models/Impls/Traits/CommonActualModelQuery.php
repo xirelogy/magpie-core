@@ -39,6 +39,9 @@ trait CommonActualModelQuery
         $ordersFinalized = $this->finalizeOrders($context);
         $query->appendJoinIfNotEmpty(' ORDER BY ', $ordersFinalized);
 
+        $groupsFinalized = $this->finalizeGroups($context);
+        $query->appendJoinIfNotEmpty(' GROUP BY ', $groupsFinalized);
+
         if ($filterMode === FilterApplyMode::YES && $this->filter !== null) {
             $service = $this->createFilterService($query, $context);
             $this->filter->apply($service);
@@ -67,6 +70,27 @@ trait CommonActualModelQuery
 
         foreach ($this->orders as $order) {
             $ret->appendJoinIfNotEmpty(', ', $order->_finalize($context));
+        }
+
+        $ret->sql = substr($ret->sql, 2);
+        return $ret;
+    }
+
+
+    /**
+     * Finalize group fields
+     * @param QueryContext $context
+     * @return QueryStatement
+     * @throws SafetyCommonException
+     */
+    private function finalizeGroups(QueryContext $context) : QueryStatement
+    {
+        $ret = new QueryStatement('');
+
+        if (count($this->groupBys) <= 0) return $ret;
+
+        foreach ($this->groupBys as $groupBy) {
+            $ret->appendJoinIfNotEmpty(', ', $groupBy->_finalize($context));
         }
 
         $ret->sql = substr($ret->sql, 2);
