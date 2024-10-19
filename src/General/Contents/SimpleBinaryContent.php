@@ -2,8 +2,8 @@
 
 namespace Magpie\General\Contents;
 
-use Exception;
 use Magpie\Exceptions\InvalidDataException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\BinaryContentable;
 use Magpie\General\Concepts\Packable;
 use Magpie\General\Packs\PackContext;
@@ -110,7 +110,7 @@ class SimpleBinaryContent implements BinaryContentable, Packable
      * @param string $text
      * @param string|null $filename
      * @return static
-     * @throws Exception
+     * @throws SafetyCommonException
      */
     public static function fromDataUrl(string $text, ?string $filename = null) : static
     {
