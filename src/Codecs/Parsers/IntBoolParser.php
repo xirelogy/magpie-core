@@ -10,6 +10,9 @@ use Magpie\Exceptions\ParseFailedException;
  */
 class IntBoolParser extends CreatableParser
 {
+    /**
+     * @inheritDoc
+     */
     protected function onParse(mixed $value, ?string $hintName) : bool
     {
         $value = IntegerParser::create()->parse($value, $hintName);
