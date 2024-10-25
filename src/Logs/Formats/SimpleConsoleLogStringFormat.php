@@ -2,6 +2,7 @@
 
 namespace Magpie\Logs\Formats;
 
+use Magpie\General\Str;
 use Magpie\Logs\LogConfig;
 use Magpie\Logs\LogEntry;
 
@@ -18,7 +19,12 @@ class SimpleConsoleLogStringFormat extends CommonLogStringFormat
         $source = $entry->source ?? $config->defaultSource;
 
         $message = $entry->message;
-        $ret = "[$source] $message";
+
+        if (Str::isNullOrEmpty($source)) {
+            $ret = $message;
+        } else {
+            $ret = "[$source] $message";
+        }
 
         if (count($entry->context) > 0) {
             $flattenContext = $this->flattenContext($entry->context);
