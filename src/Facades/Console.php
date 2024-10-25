@@ -14,6 +14,7 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Logs\Concepts\Loggable;
+use Magpie\Logs\Concepts\LogRelayable;
 use Magpie\Logs\Concepts\LogStringFormattable;
 use Magpie\Logs\Formats\SimpleConsoleLogStringFormat;
 use Magpie\Logs\LogConfig;
@@ -210,17 +211,17 @@ class Console
 
 
     /**
-     * Create a logging target and redirect to console
+     * Create a logging relay target that redirects to console
      * @param LogStringFormattable|null $logFormatter
      * @param LogConfig|null $logConfig
-     * @return Loggable
+     * @return LogRelayable
      */
-    public static function asLogger(?LogStringFormattable $logFormatter = null, ?LogConfig $logConfig = null) : Loggable
+    public static function asLogRelay(?LogStringFormattable $logFormatter = null, ?LogConfig $logConfig = null) : LogRelayable
     {
         $logFormatter = $logFormatter ?? new SimpleConsoleLogStringFormat();
         $logConfig = $logConfig ?? Kernel::current()->getConfig()->createDefaultLogConfig();
 
-        $relay = new class(static::output(...), $logFormatter, $logConfig) extends LogRelay {
+        return new class(static::output(...), $logFormatter, $logConfig) extends LogRelay {
             /**
              * @var Closure Output function
              */
@@ -276,6 +277,18 @@ class Console
                 };
             }
         };
+    }
+
+
+    /**
+     * Create a logging target and redirect to console
+     * @param LogStringFormattable|null $logFormatter
+     * @param LogConfig|null $logConfig
+     * @return Loggable
+     */
+    public static function asLogger(?LogStringFormattable $logFormatter = null, ?LogConfig $logConfig = null) : Loggable
+    {
+        $relay = static::asLogRelay($logFormatter, $logConfig);
 
         return new DefaultLogger($relay);
     }
