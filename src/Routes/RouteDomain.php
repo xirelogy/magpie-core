@@ -19,6 +19,7 @@ use Magpie\Routes\Handlers\ClosureRouteHandler;
 use Magpie\Routes\Handlers\ControllerMethodRouteHandler;
 use Magpie\Routes\Handlers\MethodFallbackRouteHandler;
 use Magpie\Routes\Impls\ActualRouteContext;
+use Magpie\Routes\Impls\RouteEventHost;
 use Magpie\Routes\Impls\RouteInfo;
 use Magpie\Routes\Impls\RouteLanding;
 use Magpie\Routes\Impls\RouteMap;
@@ -263,6 +264,7 @@ abstract class RouteDomain
 
                 // Otherwise, fallback
                 $handler = $this->getMethodFallbackRouteHandler($request);
+                RouteEventHost::instance()->notifyRouteHandled($request, $handler);
                 return $this->middlewares->createRouteHandler($handler);
             }
         }
@@ -343,6 +345,8 @@ abstract class RouteDomain
                 $request->routeContext->_setRouteVariables($routeVariables);
             }
         }
+
+        RouteEventHost::instance()->notifyRouteHandled($request, $handler, $landing);
 
         return $landing->middlewares->createRouteHandler($handler);
     }

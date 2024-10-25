@@ -11,6 +11,7 @@ use Magpie\HttpServer\Concepts\Renderable;
 use Magpie\HttpServer\Exceptions\HttpResponseException;
 use Magpie\HttpServer\Request;
 use Magpie\Routes\Concepts\RouteHandleable;
+use Magpie\Routes\Impls\RouteEventHost;
 use Magpie\System\Kernel\Kernel;
 
 /**
@@ -67,7 +68,10 @@ class RouteRun
             throw new SystemUnderMaintenanceException();
         }
 
-        return $handler->route($request);
+        RouteEventHost::instance()->notifyBeforeRoute($handler, $request);
+        $response = $handler->route($request);
+        RouteEventHost::instance()->notifyAfterRoute($handler, $response);
+        return $response;
     }
 
 

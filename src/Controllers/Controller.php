@@ -8,6 +8,7 @@ use Magpie\Controllers\Concepts\ControllerCallable;
 use Magpie\Exceptions\MethodNotFoundException;
 use Magpie\General\Traits\StaticCreatable;
 use Magpie\HttpServer\Request;
+use Magpie\Routes\Impls\RouteEventHost;
 
 /**
  * A controller to serve web request
@@ -31,7 +32,10 @@ abstract class Controller
         if (!method_exists($this, $methodName)) throw new MethodNotFoundException($this, $methodName);
 
         $fn = function(Request $request, array $routeArguments) use($methodName) : mixed {
-            return $this->{$methodName}($request, ...$routeArguments);
+            RouteEventHost::instance()->notifyBeforeControllerMethod(static::class, $methodName, $request, $routeArguments);
+            $ret = $this->{$methodName}($request, ...$routeArguments);
+            RouteEventHost::instance()->notifyAfterControllerMethod(static::class, $methodName, $ret);
+            return $ret;
         };
 
         // Create callable
