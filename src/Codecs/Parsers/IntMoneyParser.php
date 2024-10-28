@@ -17,6 +17,6 @@ class IntMoneyParser extends CreatableParser
     {
         $value = FloatParser::create()->parse($value, $hintName);
 
-        return floor($value * 100);
+        return intval(round($value * 100));
     }
 }
