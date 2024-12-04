@@ -10,6 +10,7 @@ use Magpie\Exceptions\OperationFailedException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Names\CommonHttpMethod;
+use Magpie\General\Str;
 use Magpie\General\Sugars\Quote;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Exceptions\HttpNotFoundException;
@@ -64,8 +65,15 @@ abstract class RouteDomain
      */
     protected function __construct(?string $domain = null, string ...$altDomains)
     {
-        $this->domain = $domain !== null ? trim($domain) : null;
-        $this->altDomains = $altDomains;
+        $domains = static::parseDomains($domain, $altDomains);
+        if (count($domains) <= 0) {
+            $this->domain = null;
+            $this->altDomains = [];
+        } else {
+            $this->domain = array_shift($domains);
+            $this->altDomains = [...$domains];
+        }
+
         $this->middlewares = new RouteMiddlewareCollection();
     }
 
@@ -397,5 +405,38 @@ abstract class RouteDomain
         } catch (Exception) {
             return false;
         }
+    }
+
+
+    /**
+     * Parse domain specification
+     * @param string|null $domain
+     * @param array $altDomains
+     * @return array<string>
+     */
+    private static function parseDomains(?string $domain, array $altDomains) : array
+    {
+        if ($domain === null) return [];
+
+        $domain = trim($domain);
+        if (Str::isNullOrEmpty($domain)) return [];
+
+        $ret = [];
+
+        $expDomains = explode(',', $domain);
+        foreach ($expDomains as $expDomain) {
+            $expDomain = trim($expDomain);
+            if (!Str::isNullOrEmpty($expDomain)) $ret[] = $expDomain;
+        }
+
+        foreach ($altDomains as $altDomain) {
+            $expAltDomains = explode(',', $altDomain);
+            foreach ($expAltDomains as $expAltDomain) {
+                $expAltDomain = trim($expAltDomain);
+                if (!Str::isNullOrEmpty($expAltDomain)) $ret[] = $expAltDomain;
+            }
+        }
+
+        return $ret;
     }
 }
