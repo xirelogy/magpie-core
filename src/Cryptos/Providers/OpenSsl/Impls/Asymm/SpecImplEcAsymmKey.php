@@ -31,8 +31,9 @@ class SpecImplEcAsymmKey extends SpecImplAsymmKey implements ImplEcAsymmKey
     public function getCurve() : SpecImplEcCurve
     {
         $curveName = $this->inDetails['ec']['curve_name'] ?? throw new NullException();
+        $curveOid = $this->inDetails['ec']['curve_oid'] ?? throw new NullException();
 
-        return new SpecImplEcCurve($curveName);
+        return new SpecImplEcCurve($curveName, $curveOid);
     }
 
 

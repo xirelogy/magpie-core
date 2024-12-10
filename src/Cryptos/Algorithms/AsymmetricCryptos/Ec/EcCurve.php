@@ -44,12 +44,19 @@ class EcCurve implements Packable
     }
 
 
+    public function getOid() : string
+    {
+        return $this->impl->getOid();
+    }
+
+
     /**
      * @inheritDoc
      */
     protected function onPack(object $ret, PackContext $context) : void
     {
         $ret->name = $this->getName();
+        $ret->oid = $this->getOid();
     }
 
 
@@ -67,6 +74,26 @@ class EcCurve implements Packable
 
         $implContext = ImplContext::initialize($context->getTypeClass());
         $implCurve = $implContext->findEcCurveByName($name);
+
+        if ($implCurve === null) return null;
+        return new static($implCurve);
+    }
+
+
+    /**
+     * Create curve instance by searching with given OID
+     * @param string $oid
+     * @param Context|null $context
+     * @return static|null
+     * @throws SafetyCommonException
+     * @throws CryptoException
+     */
+    public static function fromOid(string $oid, ?Context $context = null) : ?static
+    {
+        $context = $context ?? Context::getDefault();
+
+        $implContext = ImplContext::initialize($context->getTypeClass());
+        $implCurve = $implContext->findEcCurveByOid($oid);
 
         if ($implCurve === null) return null;
         return new static($implCurve);

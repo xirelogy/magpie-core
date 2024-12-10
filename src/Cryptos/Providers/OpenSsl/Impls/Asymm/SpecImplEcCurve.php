@@ -14,15 +14,21 @@ class SpecImplEcCurve implements ImplEcCurve
      * @var string Common name
      */
     protected string $name;
+    /**
+     * @var string Curve OID
+     */
+    protected string $oid;
 
 
     /**
      * Constructor
      * @param string $name
+     * @param string $oid
      */
-    public function __construct(string $name)
+    public function __construct(string $name, string $oid)
     {
         $this->name = $name;
+        $this->oid = $oid;
     }
 
 
@@ -32,5 +38,14 @@ class SpecImplEcCurve implements ImplEcCurve
     public function getName() : string
     {
         return $this->name;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getOid() : string
+    {
+        return $this->oid;
     }
 }

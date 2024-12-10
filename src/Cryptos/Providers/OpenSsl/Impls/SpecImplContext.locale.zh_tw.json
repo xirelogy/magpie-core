@@ -1,5 +1,6 @@
 {
   "block size": "塊大小",
   "Block size cannot be specified": "無法指定塊大小",
+  "OpenSSL EC curve OID": "OpenSSL EC曲線 OID",
   "": ""
 }

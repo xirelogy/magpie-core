@@ -13,4 +13,11 @@ interface ImplEcCurve
      * @return string
      */
     public function getName() : string;
+
+
+    /**
+     * OID of the curve
+     * @return string
+     */
+    public function getOid() : string;
 }

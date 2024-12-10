@@ -62,6 +62,16 @@ abstract class ImplContext implements TypeClassable
 
 
     /**
+     * Find Elliptic Curve's curve parameter implementation by given OID
+     * @param string $oid
+     * @return ImplEcCurve|null
+     * @throws SafetyCommonException
+     * @throws CryptoException
+     */
+    public abstract function findEcCurveByOid(string $oid) : ?ImplEcCurve;
+
+
+    /**
      * Initialize new implementation context
      * @param string $typeClass
      * @return static

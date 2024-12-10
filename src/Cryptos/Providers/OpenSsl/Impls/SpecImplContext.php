@@ -14,8 +14,10 @@ use Magpie\Cryptos\Impls\ImplEcCurve;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplAsymmKey;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplAsymmKeyGenerator;
 use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplEcCurve;
+use Magpie\Cryptos\Providers\OpenSsl\Impls\Asymm\SpecImplEcCurveMap;
 use Magpie\Cryptos\Providers\OpenSsl\SpecContext;
 use Magpie\Exceptions\SafetyCommonException;
+use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\Objects\BinaryData;
 
@@ -136,7 +138,21 @@ class SpecImplContext extends ImplContext
 
         if (!in_array($name, $names)) return null;
 
-        return new SpecImplEcCurve($name);
+        $oid = SpecImplEcCurveMap::resolveOid($name) ?? throw new UnsupportedValueException($name, _l('OpenSSL EC curve OID'));
+
+        return new SpecImplEcCurve($name, $oid);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findEcCurveByOid(string $oid) : ?ImplEcCurve
+    {
+        $name = SpecImplEcCurveMap::resolveName($oid);
+        if ($name === null) return null;
+
+        return new SpecImplEcCurve($name, $oid);
     }
 
 
