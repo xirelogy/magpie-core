@@ -129,6 +129,19 @@ class BinaryData implements PreferStringable
 
 
     /**
+     * Construct from URL-safe base64 data
+     * @param string $data
+     * @return static
+     * @throws SafetyCommonException
+     */
+    public static function fromUrlBase64(string $data) : static
+    {
+        $binData = SimpleUrlBase64::decode($data);
+        return new static($binData);
+    }
+
+
+    /**
      * Accept and convert into BinaryData, whereby string is understood as binary string
      * @param BinaryData|string $data
      * @return static
