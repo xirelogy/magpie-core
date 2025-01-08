@@ -128,7 +128,6 @@ class ConsoleRunContext extends RunContext
         $commandClass = $handler->payloadClassName;
         if (!is_subclass_of($commandClass, Command::class)) throw new ClassNotOfTypeException($commandClass, Command::class);
 
-        /** @var Command $commandInstance */
         $commandInstance = new $commandClass;
 
         return $commandInstance->run($request);

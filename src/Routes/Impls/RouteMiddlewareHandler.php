@@ -39,7 +39,6 @@ class RouteMiddlewareHandler implements RouteHandleable
      */
     public function route(Request $request) : mixed
     {
-        /** @var RouteMiddleware $instance */
         $instance = ($this->middlewareClassName)::create();
         return $instance->handle($request, $this->next);
     }
