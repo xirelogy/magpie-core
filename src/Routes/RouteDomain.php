@@ -135,13 +135,13 @@ abstract class RouteDomain
     {
         try {
             $class = new ReflectionClass($className);
-            $prefix = RouteMap::findRoutePrefixFromAttribute($class);
+            $prefixes = RouteMap::findRoutePrefixesFromAttribute($class);
 
             $method = $class->getMethod($methodName);
             $entry = RouteMap::findRouteEntryFromAttribute($method);
             if ($entry === null) return null;
 
-            $ret = RouteMap::combineRoutes($prefix?->path, $entry->path);
+            $ret = RouteMap::combineRoutes($prefixes, $entry->path);
 
             // Replace the path variables
             foreach (RouteMap::discoverClassRouteVariables($class) as $variableName => $value) {

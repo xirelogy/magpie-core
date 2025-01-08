@@ -10,6 +10,7 @@ use Magpie\General\Names\CommonHttpMethod;
 use Magpie\Routes\Annotations\RouteEntry;
 use Magpie\Routes\Annotations\RouteIf;
 use Magpie\Routes\Annotations\RoutePrefix;
+use Magpie\Routes\Annotations\RoutePrefixSection;
 use Magpie\Routes\Annotations\RouteUseMiddleware;
 use Magpie\Routes\Annotations\RouteVariable;
 use Magpie\Routes\Annotations\RouteVariableDefault;
@@ -61,7 +62,7 @@ class RouteMap implements SourceCacheTranslatable
      */
     public function discover(ReflectionClass $class, RouteMiddlewareCollection $domainMiddlewares, ?string $prefix = null) : void
     {
-        $routePrefix = static::findRoutePrefixFromAttribute($class);
+        $routePrefixes = static::findRoutePrefixesFromAttribute($class);
 
         // Add all class middlewares
         $controllerMiddlewares = $domainMiddlewares->clone();
@@ -115,7 +116,7 @@ class RouteMap implements SourceCacheTranslatable
 
             $routeMiddlewares->mergeIn(static::listRouteUseMiddlewareClassNamesFromAttribute($method));
 
-            $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefix, $routeEntry, $routeMiddlewares, $variables);
+            $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefixes, $routeEntry, $routeMiddlewares, $variables);
         }
 
         $this->routeVariables[$class->name] = $variables;
@@ -177,7 +178,7 @@ class RouteMap implements SourceCacheTranslatable
      * @param ReflectionClass $class
      * @param ReflectionMethod $method
      * @param string|null $globalPrefix
-     * @param RoutePrefix|null $routePrefix
+     * @param array<string>|null $routePrefixes
      * @param RouteEntry $routeEntry
      * @param RouteMiddlewareCollection $middlewares
      * @param array<string, mixed> $reflectedVariables
@@ -185,9 +186,9 @@ class RouteMap implements SourceCacheTranslatable
      * @throws InvalidDataFormatException
      * @throws InvalidStateException
      */
-    protected function addControllerMethodRouteEntry(ReflectionClass $class, ReflectionMethod $method, ?string $globalPrefix, ?RoutePrefix $routePrefix, RouteEntry $routeEntry, RouteMiddlewareCollection $middlewares, array $reflectedVariables) : void
+    protected function addControllerMethodRouteEntry(ReflectionClass $class, ReflectionMethod $method, ?string $globalPrefix, ?array $routePrefixes, RouteEntry $routeEntry, RouteMiddlewareCollection $middlewares, array $reflectedVariables) : void
     {
-        $requestPath = static::combineRoutes($globalPrefix, $routePrefix?->path ?? null, $routeEntry->path);
+        $requestPath = static::combineRoutes($globalPrefix, $routePrefixes, $routeEntry->path);
         $requestMethods = static::flattenRequestMethods($routeEntry->method);
 
         $this->addRouteEntry($requestPath, $requestMethods, ControllerMethodRouteHandler::TYPECLASS, [
@@ -289,15 +290,26 @@ class RouteMap implements SourceCacheTranslatable
 
     /**
      * Combine multiple paths into a path
-     * @param string|null ...$paths
+     * @param string|array<string>|null ...$paths
      * @return string
+     * @noinspection PhpDocSignatureInspection
      */
-    public static function combineRoutes(?string ...$paths) : string
+    public static function combineRoutes(string|array|null ...$paths) : string
     {
-        $ret = '';
-        foreach ($paths as $path) {
-            if ($path === null) continue;
+        $expandedPaths = function() use ($paths) {
+            foreach ($paths as $pathSpec) {
+                if ($pathSpec === null) continue;
 
+                if (is_array($pathSpec)) {
+                    yield from $pathSpec;
+                } else {
+                    yield $pathSpec;
+                }
+            }
+        };
+
+        $ret = '';
+        foreach ($expandedPaths() as $path) {
             // Remove all double-slash
             for (;;) {
                 $doubleSlashPos = strpos($path, '//');
@@ -351,9 +363,49 @@ class RouteMap implements SourceCacheTranslatable
     /**
      * Extract route prefix from class attributes
      * @param ReflectionClass|false $class
+     * @return array<string>
+     */
+    public static function findRoutePrefixesFromAttribute(ReflectionClass|false $class) : array
+    {
+        if ($class === false) return [];
+
+        // Override attribute exist for backwards compatibility
+        $overrideAttribute = iter_first($class->getAttributes(RoutePrefix::class));
+        if ($overrideAttribute !== null) return [ $overrideAttribute->newInstance()->path ];
+
+        // Prefer section concatenation
+        $sectionPaths = iter_flatten(static::findRoutePrefixesFromSectionAttributes($class), false);
+        if (count($sectionPaths) > 0) return $sectionPaths;
+
+        // Fallback to single prefix
+        $routePrefix = static::findRoutePrefixFromAttribute($class);
+        if ($routePrefix !== null) return [ $routePrefix->path ];
+
+        return [];
+    }
+
+
+    /**
+     * Extract route prefixes from RouteEntrySection class attributes
+     * @param ReflectionClass|false $class
+     * @return iterable<string>
+     */
+    private static function findRoutePrefixesFromSectionAttributes(ReflectionClass|false $class) : iterable
+    {
+        if ($class === false) return;
+         yield from static::findRoutePrefixesFromSectionAttributes($class->getParentClass());
+
+         $attribute = iter_first($class->getAttributes(RoutePrefixSection::class));
+         if ($attribute !== null) yield $attribute->newInstance()->path;
+    }
+
+
+    /**
+     * Extract route prefix from class attributes
+     * @param ReflectionClass|false $class
      * @return RoutePrefix|null
      */
-    public static function findRoutePrefixFromAttribute(ReflectionClass|false $class) : ?RoutePrefix
+    private static function findRoutePrefixFromAttribute(ReflectionClass|false $class) : ?RoutePrefix
     {
         if ($class === false) return null;
 
