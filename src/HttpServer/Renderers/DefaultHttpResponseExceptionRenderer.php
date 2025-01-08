@@ -22,7 +22,7 @@ class DefaultHttpResponseExceptionRenderer implements HttpResponseExceptionRende
         $text = htmlspecialchars("$code $message");
 
         /** @noinspection HtmlRequiredLangAttribute */
-        $response = new Response("<html><head><title>$text</title></head><body><h1>$text</h1></body></html>", $code);
+        $response = new Response("<!DOCTYPE html><html><head><title>$text</title></head><body><h1>$text</h1></body></html>", $code);
 
         foreach ($ex->getHeaders() as $headerKey => $headerValue) {
             $response->withHeader($headerKey, $headerValue);
