@@ -224,6 +224,16 @@ class PhpRedisClient extends RedisClient
     /**
      * @inheritDoc
      */
+    public function clear() : bool
+    {
+        $redis = $this->ensureRedis();
+        return static::safeExecute('flushAll', fn() => $redis->flushAll());
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function listSize(string $key) : int
     {
         $redis = $this->ensureRedis();

@@ -105,6 +105,15 @@ abstract class RedisClient implements TypeClassable, LogContainable, SystemBoota
 
 
     /**
+     * Clears everything
+     * @return bool
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    public abstract function clear() : bool;
+
+
+    /**
      * Get list size
      * @param string $key Key of the list
      * @return int
