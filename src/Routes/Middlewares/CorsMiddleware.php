@@ -90,6 +90,11 @@ class CorsMiddleware extends RouteMiddleware
         $response->withHeader(CommonHttpHeader::ACCESS_CONTROL_ALLOW_METHODS, implode(', ', $allowedMethods));
         $response->withHeader(CommonHttpHeader::ACCESS_CONTROL_ALLOW_HEADERS, implode(', ', iter_flatten($this->getHeadersAllowed(), false)));
 
+        $exposedHeaders = $this->getAllHeadersExposed();
+        if (count($exposedHeaders) > 0) {
+            $response->withHeader(CommonHttpHeader::ACCESS_CONTROL_EXPOSE_HEADERS, implode(', ', $exposedHeaders));
+        }
+
         if ($this->isCredentialsAllowed()) {
             $response->withHeader(CommonHttpHeader::ACCESS_CONTROL_ALLOW_CREDENTIALS, 'true');
         }
@@ -149,6 +154,26 @@ class CorsMiddleware extends RouteMiddleware
         yield CommonHttpHeader::CONTENT_LANGUAGE;
         yield CommonHttpHeader::CONTENT_TYPE;
         yield CommonHttpHeader::RANGE;
+    }
+
+
+    /**
+     * Get exposed headers
+     * @return array<string>
+     */
+    private function getAllHeadersExposed() : array
+    {
+        return iter_flatten($this->getHeadersExposed(), false);
+    }
+
+
+    /**
+     * Get exposed headers
+     * @return iterable<string>
+     */
+    protected function getHeadersExposed() : iterable
+    {
+        return [];
     }
 
 
