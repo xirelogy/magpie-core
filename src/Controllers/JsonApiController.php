@@ -18,6 +18,7 @@ use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\General\Names\CommonMimeType;
 use Magpie\General\Simples\SimpleJSON;
+use Magpie\General\Sugars\Excepts;
 use Magpie\HttpServer\Exceptions\HttpResponseException;
 use Magpie\HttpServer\JsonResponse;
 use Magpie\HttpServer\Request;
@@ -40,6 +41,7 @@ abstract class JsonApiController extends Controller
             $response = $callable->call($request, $routeArguments);
             $response = $this->onAfterCall($request, $routeArguments, $response);
             $response = static::_createResponse($this->createResponseFormatter(), $response);
+            $response = $this->onAfterResponse($response);
             $scopes->succeeded();
             return $response;
         } catch (HttpResponseException $ex) {
@@ -49,7 +51,8 @@ abstract class JsonApiController extends Controller
             $scopes->crash($ex);
             $httpStatusCode = $this->getExceptionHttpStatusCode($ex);
             $payload = $this->createExceptionPayload($ex);
-            return $this->createExceptionResponse($payload, $httpStatusCode);
+            $response = $this->createExceptionResponse($payload, $httpStatusCode);
+            return Excepts::noThrow(fn () => $this->onAfterResponse($response), $response);
         } finally {
             $scopes->release();
         }
@@ -94,6 +97,18 @@ abstract class JsonApiController extends Controller
     protected function onAfterCall(Request $request, array $routeArguments, mixed $response) : mixed
     {
         _used($request, $routeArguments);
+        return $response;
+    }
+
+
+    /**
+     * Handle response after formatting
+     * @param Response $response
+     * @return Response
+     * @throws Exception
+     */
+    protected function onAfterResponse(Response $response) : Response
+    {
         return $response;
     }
 
