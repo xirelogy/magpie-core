@@ -12,6 +12,7 @@ use Magpie\General\Factories\ClassFactory;
 
 /**
  * Trait to support typed configuration
+ * @deprecated
  */
 trait EnvTypeConfigurable
 {

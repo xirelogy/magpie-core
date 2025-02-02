@@ -2,43 +2,74 @@
 
 namespace Magpie\Logs\Relays;
 
-use Magpie\Configurations\EnvKeySchema;
-use Magpie\Configurations\EnvParserHost;
+use Magpie\Configurations\Concepts\ConfigSelectable;
+use Magpie\Configurations\Concepts\Configurable;
+use Magpie\Configurations\Providers\ConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigSelection;
+use Magpie\Configurations\Traits\CommonConfigurable;
+use Magpie\Configurations\Traits\CommonTypeConfigurable;
 use Magpie\Exceptions\ArgumentException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\Logs\LogConfig;
 use Magpie\Logs\LogRelay;
 use Magpie\System\Traits\EnvTypeConfigurable;
+use Throwable;
 
 /**
  * Configurable log relay
  */
-abstract class ConfigurableLogRelay extends LogRelay implements TypeClassable
+abstract class ConfigurableLogRelay extends LogRelay implements Configurable, TypeClassable
 {
+    use CommonConfigurable;
+    use CommonTypeConfigurable;
     use EnvTypeConfigurable;
 
     /**
-     * Configuration from environment payload
+     * Log configuration (in config context)
      */
-    protected const ENV_PAYLOAD_CONFIG = 'config';
+    protected const CONTEXT_CONFIG = 'config';
 
 
     /**
-     * Create configuration from environment variables
+     * Create instance by parsing from environment variables
      * @param LogConfig $config
-     * @param string|null $prefix
+     * @param string|null ...$prefixes
      * @return static|null
+     * @throws SafetyCommonException
      * @throws ArgumentException
      */
-    public static function fromEnv(LogConfig $config, ?string $prefix = null) : ?static
+    public static function fromSpecificEnv(LogConfig $config, ?string ...$prefixes) : ?static
     {
-        $parserHost = new EnvParserHost();
-        $envKey = new EnvKeySchema('LOG', $prefix);
+        $provider = EnvConfigProvider::create();
+        $selection = new EnvConfigSelection(array_merge(['LOG'], $prefixes));
 
-        if (!$parserHost->has($envKey->key('TYPE'))) return null;
+        return static::fromSpecificConfig($provider, $config, $selection);
+    }
 
-        return static::fromEnvType($parserHost, $envKey, [
-            static::ENV_PAYLOAD_CONFIG => $config,
-        ]);
+
+    /**
+     * Create instance by parsing from specific configuration
+     * @param ConfigProvider $provider
+     * @param LogConfig $config
+     * @param ConfigSelectable|null $selection
+     * @return static|null
+     * @throws SafetyCommonException
+     * @throws ArgumentException
+     */
+    private static function fromSpecificConfig(ConfigProvider $provider, LogConfig $config, ?ConfigSelectable $selection) : ?static
+    {
+        $provider->withContext(static::CONTEXT_CONFIG, $config);
+
+        // Extra check for 'TYPE'
+        try {
+            $parser = $provider->createParser(static::getConfigurationKeys(), $selection);
+            if (!$parser->has('type')) return null;
+        } catch (Throwable) {
+            return null;
+        }
+
+        return static::fromConfig($provider, $selection);
     }
 }

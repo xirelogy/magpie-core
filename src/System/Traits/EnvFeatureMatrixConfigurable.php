@@ -13,6 +13,7 @@ use Magpie\General\Factories\ClassFactory;
 
 /**
  * Trait to support feature-matrix typed configuration
+ * @deprecated
  */
 trait EnvFeatureMatrixConfigurable
 {

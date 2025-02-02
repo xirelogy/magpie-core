@@ -5,38 +5,41 @@ namespace Magpie\Models\Configs;
 use Magpie\Codecs\Parsers\ClosureParser;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Parsers\StringParser;
-use Magpie\Configurations\EnvKeySchema;
-use Magpie\Configurations\EnvParserHost;
-use Magpie\Exceptions\ArgumentException;
+use Magpie\Configurations\Concepts\Configurable;
+use Magpie\Configurations\Concepts\EnvConfigurable;
+use Magpie\Configurations\Providers\EnvConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigSelection;
+use Magpie\Configurations\Traits\CommonConfigurable;
+use Magpie\Configurations\Traits\CommonTypeConfigurable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\System\Traits\EnvTypeConfigurable;
 
 /**
  * Database connection specific configuration
  */
-abstract class ConnectionConfig implements TypeClassable
+abstract class ConnectionConfig implements Configurable, EnvConfigurable, TypeClassable
 {
+    use CommonConfigurable;
+    use CommonTypeConfigurable;
     use EnvTypeConfigurable;
 
 
     /**
-     * Create configuration from environment variables
-     * @param string|null $prefix
-     * @return static
-     * @throws ArgumentException
+     * @inheritDoc
      */
-    public static function fromEnv(?string $prefix = null) : static
+    public static function fromEnv(?string ...$prefixes) : static
     {
-        $parserHost = new EnvParserHost();
-        $envKey = new EnvKeySchema('DB', $prefix);
+        $provider = EnvConfigProvider::create();
+        $selection = new EnvConfigSelection(array_merge(['DB'], $prefixes));
 
-        return static::fromEnvType($parserHost, $envKey);
+        return static::fromConfig($provider, $selection);
     }
 
 
     /**
      * Create a parser to parse configuration from environment
      * @return Parser<static>
+     * @deprecated
      */
     public static function createEnvParser() : Parser
     {

@@ -6,6 +6,7 @@ use Magpie\Caches\CacheConfig;
 use Magpie\Caches\Concepts\CacheFormattable;
 use Magpie\Configurations\EnvKeySchema;
 use Magpie\Configurations\EnvParserHost;
+use Magpie\Configurations\Providers\ConfigParser;
 use Magpie\Facades\Redis\RedisClient;
 use Magpie\Facades\Redis\RedisClientConfig;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
@@ -66,6 +67,18 @@ class RedisCacheConfig extends CacheConfig
     {
         $redisConfigParser = RedisClientConfig::createEnvParser();
         $redisConfig = $parserHost->optional($envKey->key('REDIS'), $redisConfigParser, '-');
+
+        return new static($redisConfig);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function specificParseTypeConfig(ConfigParser $parser) : static
+    {
+        $key = RedisClientConfig::createConfigRedirectSetup($parser->provider)->createKey('redis', false);
+        $redisConfig = $parser->get($key);
 
         return new static($redisConfig);
     }

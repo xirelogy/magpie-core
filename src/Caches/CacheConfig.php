@@ -5,9 +5,12 @@ namespace Magpie\Caches;
 use Exception;
 use Magpie\Caches\Concepts\CacheFormattable;
 use Magpie\Caches\Concepts\CacheProvidable;
-use Magpie\Configurations\EnvKeySchema;
-use Magpie\Configurations\EnvParserHost;
-use Magpie\Exceptions\ArgumentException;
+use Magpie\Configurations\Concepts\Configurable;
+use Magpie\Configurations\Concepts\EnvConfigurable;
+use Magpie\Configurations\Providers\EnvConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigSelection;
+use Magpie\Configurations\Traits\CommonConfigurable;
+use Magpie\Configurations\Traits\CommonTypeConfigurable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\System\Concepts\SystemBootable;
 use Magpie\System\Traits\EnvTypeConfigurable;
@@ -15,8 +18,10 @@ use Magpie\System\Traits\EnvTypeConfigurable;
 /**
  * Cache configuration
  */
-abstract class CacheConfig implements TypeClassable, SystemBootable
+abstract class CacheConfig implements Configurable, EnvConfigurable, TypeClassable, SystemBootable
 {
+    use CommonConfigurable;
+    use CommonTypeConfigurable;
     use EnvTypeConfigurable;
 
 
@@ -30,16 +35,12 @@ abstract class CacheConfig implements TypeClassable, SystemBootable
 
 
     /**
-     * Create configuration from environment variables
-     * @param string|null $prefix
-     * @return static
-     * @throws ArgumentException
+     * @inheritDoc
      */
-    public static function fromEnv(?string $prefix = null) : static
+    public static final function fromEnv(?string ...$prefixes) : static
     {
-        $parserHost = new EnvParserHost();
-        $envKey = new EnvKeySchema('CACHE', $prefix);
-
-        return static::fromEnvType($parserHost, $envKey);
+        $provider = EnvConfigProvider::create();
+        $selection = new EnvConfigSelection(array_merge(['CACHE'], $prefixes));
+        return static::fromConfig($provider, $selection);
     }
 }

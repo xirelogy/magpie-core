@@ -3,8 +3,10 @@
 namespace Magpie\Logs\Relays;
 
 use Magpie\Codecs\Parsers\StringParser;
+use Magpie\Configurations\ConfigKey;
 use Magpie\Configurations\EnvKeySchema;
 use Magpie\Configurations\EnvParserHost;
+use Magpie\Configurations\Providers\ConfigParser;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\Logs\LogConfig;
 
@@ -18,6 +20,8 @@ class SpecificFileLogRelay extends FileBasedLogRelay
      * Current type class
      */
     public const TYPECLASS = 'specific-file';
+
+    protected const CONFIG_FILENAME = 'filename';
 
     /**
      * @var string Specific filename to be used
@@ -60,10 +64,35 @@ class SpecificFileLogRelay extends FileBasedLogRelay
     /**
      * @inheritDoc
      */
+    public static function getConfigurationKeys() : iterable
+    {
+        yield self::CONFIG_FILENAME
+            => ConfigKey::create('filename', true, StringParser::create(), desc: _l('filename'));
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function specificParseTypeConfig(ConfigParser $parser) : static
+    {
+        /** @var LogConfig $config */
+        $config = $parser->getContext(static::CONTEXT_CONFIG);
+
+        /** @var string $specificFilename */
+        $specificFilename = $parser->get(static::CONFIG_FILENAME);
+
+        return new static($specificFilename, $config);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     protected static function specificFromEnv(EnvParserHost $parserHost, EnvKeySchema $envKey, array $payload) : static
     {
         /** @var LogConfig $config */
-        $config = $payload[static::ENV_PAYLOAD_CONFIG];
+        $config = $payload[static::CONTEXT_CONFIG];
 
         $specificFilename = $parserHost->requires($envKey->key('FILENAME'), StringParser::create());
 

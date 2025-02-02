@@ -3,9 +3,12 @@
 namespace Magpie\Facades\Mutex;
 
 use Exception;
-use Magpie\Configurations\EnvKeySchema;
-use Magpie\Configurations\EnvParserHost;
-use Magpie\Exceptions\ArgumentException;
+use Magpie\Configurations\Concepts\Configurable;
+use Magpie\Configurations\Concepts\EnvConfigurable;
+use Magpie\Configurations\Providers\EnvConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigSelection;
+use Magpie\Configurations\Traits\CommonConfigurable;
+use Magpie\Configurations\Traits\CommonTypeConfigurable;
 use Magpie\Facades\Mutex\Concepts\MutexProvidable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\System\Concepts\SystemBootable;
@@ -14,8 +17,10 @@ use Magpie\System\Traits\EnvTypeConfigurable;
 /**
  * Mutex configuration
  */
-abstract class MutexConfig implements TypeClassable, SystemBootable
+abstract class MutexConfig implements Configurable, EnvConfigurable, TypeClassable, SystemBootable
 {
+    use CommonConfigurable;
+    use CommonTypeConfigurable;
     use EnvTypeConfigurable;
 
 
@@ -28,16 +33,13 @@ abstract class MutexConfig implements TypeClassable, SystemBootable
 
 
     /**
-     * Create configuration from environment variables
-     * @param string|null $prefix
-     * @return static
-     * @throws ArgumentException
+     * @inheritDoc
      */
-    public static function fromEnv(?string $prefix = null) : static
+    public static function fromEnv(?string ...$prefixes) : static
     {
-        $parserHost = new EnvParserHost();
-        $envKey = new EnvKeySchema('MUTEX', $prefix);
+        $provider = EnvConfigProvider::create();
+        $selection = new EnvConfigSelection(array_merge(['MUTEX'], $prefixes));
 
-        return static::fromEnvType($parserHost, $envKey);
+        return static::fromConfig($provider, $selection);
     }
 }

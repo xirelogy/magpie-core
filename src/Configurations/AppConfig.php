@@ -114,7 +114,7 @@ abstract class AppConfig
     protected function onInitialize(Kernel $kernel) : void
     {
         $config = $this->createDefaultLogConfig();
-        $logRelay = ConfigurableLogRelay::fromEnv($config);
+        $logRelay = ConfigurableLogRelay::fromSpecificEnv($config);
 
         if ($logRelay !== null) {
             Kernel::current()->setLogger(new DefaultLogger($logRelay));

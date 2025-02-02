@@ -4,6 +4,7 @@ namespace Magpie\Facades\Mutex\Providers;
 
 use Magpie\Configurations\EnvKeySchema;
 use Magpie\Configurations\EnvParserHost;
+use Magpie\Configurations\Providers\ConfigParser;
 use Magpie\Facades\Mutex\Concepts\MutexProvidable;
 use Magpie\Facades\Mutex\MutexConfig;
 use Magpie\Facades\Redis\RedisClient;
@@ -66,6 +67,18 @@ class RedisMutexConfig extends MutexConfig
     {
         $redisConfigParser = RedisClientConfig::createEnvParser();
         $redisConfig = $parserHost->optional($envKey->key('REDIS'), $redisConfigParser, '-');
+
+        return new static($redisConfig);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function specificParseTypeConfig(ConfigParser $parser) : static
+    {
+        $key = RedisClientConfig::createConfigRedirectSetup($parser->provider)->createKey('redis', false);
+        $redisConfig = $parser->get($key);
 
         return new static($redisConfig);
     }

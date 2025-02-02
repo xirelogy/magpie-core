@@ -3,8 +3,10 @@
 namespace Magpie\Models\Providers\Sqlite;
 
 use Magpie\Codecs\Parsers\StringParser;
+use Magpie\Configurations\ConfigKey;
 use Magpie\Configurations\EnvKeySchema;
 use Magpie\Configurations\EnvParserHost;
+use Magpie\Configurations\Providers\ConfigParser;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\Models\Configs\ConnectionConfig;
 
@@ -14,6 +16,8 @@ use Magpie\Models\Configs\ConnectionConfig;
 #[FactoryTypeClass(SqliteConnection::TYPECLASS, ConnectionConfig::class)]
 class SqliteConnectionConfig extends ConnectionConfig
 {
+    protected const CONFIG_PATH = 'path';
+
     /**
      * @var string SQLite path
      */
@@ -37,6 +41,27 @@ class SqliteConnectionConfig extends ConnectionConfig
     public static function getTypeClass() : string
     {
         return SqliteConnection::TYPECLASS;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function specificParseTypeConfig(ConfigParser $parser) : static
+    {
+        $path = $parser->get(static::CONFIG_PATH);
+
+        return new static($path);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public static function getConfigurationKeys() : iterable
+    {
+        yield static::CONFIG_PATH =>
+            ConfigKey::create('path', true, StringParser::create(), desc: _l('File path'));
     }
 
 

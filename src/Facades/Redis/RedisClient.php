@@ -272,6 +272,7 @@ abstract class RedisClient implements TypeClassable, LogContainable, SystemBoota
     /**
      * Create a parser to parse redis client from environment
      * @return Parser<static>
+     * @deprecated
      */
     public static function createEnvParser() : Parser
     {

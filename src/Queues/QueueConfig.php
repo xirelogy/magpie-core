@@ -2,31 +2,32 @@
 
 namespace Magpie\Queues;
 
-use Magpie\Configurations\EnvKeySchema;
-use Magpie\Configurations\EnvParserHost;
-use Magpie\Exceptions\ArgumentException;
+use Magpie\Configurations\Concepts\Configurable;
+use Magpie\Configurations\Concepts\EnvConfigurable;
+use Magpie\Configurations\Providers\EnvConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigSelection;
+use Magpie\Configurations\Traits\CommonConfigurable;
+use Magpie\Configurations\Traits\CommonTypeConfigurable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\System\Traits\EnvTypeConfigurable;
 
 /**
  * Queue configuration
  */
-abstract class QueueConfig implements TypeClassable
+abstract class QueueConfig implements Configurable, EnvConfigurable, TypeClassable
 {
+    use CommonConfigurable;
+    use CommonTypeConfigurable;
     use EnvTypeConfigurable;
 
 
     /**
-     * Create configuration from environment variables
-     * @param string|null $prefix
-     * @return static
-     * @throws ArgumentException
+     * @inheritDoc
      */
-    public static function fromEnv(?string $prefix = null) : static
+    public static function fromEnv(?string ...$prefixes) : static
     {
-        $parserHost = new EnvParserHost();
-        $envKey = new EnvKeySchema('QUEUE', $prefix);
-
-        return static::fromEnvType($parserHost, $envKey);
+        $provider = EnvConfigProvider::create();
+        $selection = new EnvConfigSelection(array_merge(['QUEUE'], $prefixes));
+        return static::fromConfig($provider, $selection);
     }
 }

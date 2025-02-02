@@ -4,7 +4,9 @@ namespace Magpie\Queues\Providers\Redis;
 
 use Magpie\Configurations\EnvKeySchema;
 use Magpie\Configurations\EnvParserHost;
+use Magpie\Configurations\Providers\ConfigParser;
 use Magpie\Facades\Redis\RedisClient;
+use Magpie\Facades\Redis\RedisClientConfig;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\Queues\QueueConfig;
 
@@ -41,6 +43,22 @@ class RedisQueueConfig extends QueueConfig
     public static function getTypeClass() : string
     {
         return static::TYPECLASS;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function specificParseTypeConfig(ConfigParser $parser) : static
+    {
+        $setup = RedisClientConfig::createConfigRedirectSetup($parser->provider)->chain(function (RedisClientConfig $config) : RedisClient {
+            return RedisClient::initialize($config);
+        });
+
+        $key = $setup->createKey('redis', true);
+        $redis = $parser->get($key);
+
+        return new static($redis);
     }
 
 

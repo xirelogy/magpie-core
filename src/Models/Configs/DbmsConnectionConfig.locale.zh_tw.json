@@ -1,0 +1,9 @@
+{
+  "Hostname": "主機名",
+  "Port": "端口",
+  "Username": "用戶名",
+  "Password": "密碼",
+  "Specific database": "指定數據庫",
+  "Character set": "字符集",
+  "": ""
+}

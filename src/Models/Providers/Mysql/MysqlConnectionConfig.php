@@ -24,7 +24,7 @@ class MysqlConnectionConfig extends DbmsConnectionConfig
     /**
      * @inheritDoc
      */
-    protected static function envDefaultPort() : ?int
+    protected static function configDefaultPort() : ?int
     {
         return 3306;
     }
@@ -33,7 +33,7 @@ class MysqlConnectionConfig extends DbmsConnectionConfig
     /**
      * @inheritDoc
      */
-    protected static function envDefaultCharset() : ?string
+    protected static function configDefaultCharset() : ?string
     {
         return 'utf8mb4';
     }

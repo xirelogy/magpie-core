@@ -6,20 +6,37 @@ use Magpie\Codecs\Parsers\ClosureParser;
 use Magpie\Codecs\Parsers\IntegerParser;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Codecs\Parsers\StringParser;
-use Magpie\Configurations\EnvKeySchema;
-use Magpie\Configurations\EnvParserHost;
-use Magpie\Exceptions\ArgumentException;
+use Magpie\Configurations\Concepts\ConfigRedirectable;
+use Magpie\Configurations\Concepts\ConfigSelectable;
+use Magpie\Configurations\Concepts\Configurable;
+use Magpie\Configurations\Concepts\EnvConfigurable;
+use Magpie\Configurations\ConfigKey;
+use Magpie\Configurations\ConfigRedirect;
+use Magpie\Configurations\Providers\ConfigParser;
+use Magpie\Configurations\Providers\ConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigProvider;
+use Magpie\Configurations\Providers\EnvConfigSelection;
+use Magpie\Configurations\Traits\CommonConfigurable;
 use Magpie\Objects\BasicUsernamePassword;
 
 /**
  * Configuration for redis client
+ * @implements ConfigRedirectable<static>
  */
-class RedisClientConfig
+class RedisClientConfig implements Configurable, ConfigRedirectable, EnvConfigurable
 {
+    use CommonConfigurable;
+
     /**
      * The default port for redis
      */
     public const DEFAULT_PORT = 6379;
+
+    protected const CONFIG_HOST = 'host';
+    protected const CONFIG_PORT = 'port';
+    protected const CONFIG_DB = 'db';
+    protected const CONFIG_USERNAME = 'username';
+    protected const CONFIG_PASSWORD = 'password';
 
 
     /**
@@ -61,25 +78,70 @@ class RedisClientConfig
 
 
     /**
-     * Create configuration from environment variables
-     * @param string|null $prefix
-     * @return static
-     * @throws ArgumentException
+     * @inheritDoc
      */
-    public static function fromEnv(?string $prefix = null) : static
+    public static function fromEnv(?string ...$prefixes) : static
     {
-        $parserHost = new EnvParserHost();
-        $envKey = new EnvKeySchema('REDIS', $prefix);
+        $provider = EnvConfigProvider::create();
+        $selection = new EnvConfigSelection(array_merge(['REDIS'], $prefixes));
 
-        $host = $parserHost->requires($envKey->key('HOST'), StringParser::create());
-        $port = $parserHost->optional($envKey->key('PORT'), IntegerParser::create()->withMin(1)->withMax(65535), 6379);
-        $database = $parserHost->optional($envKey->key('DB'), IntegerParser::create()->withMin(0));
+        return static::fromConfig($provider, $selection);
+    }
 
-        $authUsername = $parserHost->optional($envKey->key('USERNAME'), StringParser::create());
-        $authPassword = $parserHost->optional($envKey->key('PASSWORD'), StringParser::create());
+
+    /**
+     * @inheritDoc
+     */
+    public static function createConfigRedirectSetup(ConfigProvider $provider) : ConfigRedirect
+    {
+        $setupFunction = function () use ($provider) {
+            if ($provider::getTypeClass() == EnvConfigProvider::TYPECLASS) {
+                return EnvConfigProvider::createRedirectSetup(['REDIS']);
+            }
+
+            return ConfigRedirect::invalid();
+        };
+
+        $setup = $setupFunction();
+
+        return $setup->chain(function (ConfigSelectable $selection) use ($provider) {
+            return static::fromConfig($provider, $selection);
+        });
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected static function parseConfig(ConfigParser $parser) : static
+    {
+        $host = $parser->get(static::CONFIG_HOST);
+        $port = $parser->get(static::CONFIG_PORT);
+        $database = $parser->get(static::CONFIG_DB);
+
+        $authUsername = $parser->get(static::CONFIG_USERNAME);
+        $authPassword = $parser->get(static::CONFIG_PASSWORD);
         $auth = static::translateAuth($authUsername, $authPassword);
 
         return new static($host, $port, $auth, $database);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public static function getConfigurationKeys() : iterable
+    {
+        yield static::CONFIG_HOST
+            => ConfigKey::create('host', true, StringParser::create(), desc: _l('Hostname'));
+        yield static::CONFIG_PORT
+            => ConfigKey::create('port', false, IntegerParser::create()->withMin(1)->withMax(65535), static::DEFAULT_PORT, desc: _l('Port'));
+        yield static::CONFIG_DB
+            => ConfigKey::create('db', false, IntegerParser::create()->withMin(0), desc: _l('Database number'));
+        yield static::CONFIG_USERNAME
+            => ConfigKey::create('username', false, StringParser::create(), desc: _l('Username'));
+        yield static::CONFIG_PASSWORD
+            => ConfigKey::create('password', false, StringParser::create(), desc: _l('Password'));
     }
 
 
@@ -101,6 +163,7 @@ class RedisClientConfig
     /**
      * Create a parser to parse redis client configuration from environment
      * @return Parser<static>
+     * @deprecated
      */
     public static function createEnvParser() : Parser
     {
