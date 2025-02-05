@@ -60,6 +60,8 @@ class SqliteConnectionConfig extends ConnectionConfig
      */
     public static function getConfigurationKeys() : iterable
     {
+        yield from parent::getConfigurationKeys();
+
         yield static::CONFIG_PATH =>
             ConfigKey::create('path', true, StringParser::create(), desc: _l('File path'));
     }

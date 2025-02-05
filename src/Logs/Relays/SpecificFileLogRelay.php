@@ -66,6 +66,8 @@ class SpecificFileLogRelay extends FileBasedLogRelay
      */
     public static function getConfigurationKeys() : iterable
     {
+        yield from parent::getConfigurationKeys();
+
         yield self::CONFIG_FILENAME
             => ConfigKey::create('filename', true, StringParser::create(), desc: _l('filename'));
     }

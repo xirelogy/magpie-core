@@ -103,6 +103,8 @@ class RotatingFileLogRelay extends FileBasedLogRelay
      */
     public static function getConfigurationKeys() : iterable
     {
+        yield from parent::getConfigurationKeys();
+
         yield static::CONFIG_DATEFORMAT
             => ConfigKey::create('dateformat', false, StringParser::create(), static::DEFAULT_DATE_FORMAT, desc: _l('Date format'));
         yield static::CONFIG_TIMEZONE

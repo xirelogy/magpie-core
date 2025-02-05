@@ -59,6 +59,8 @@ class LocalFileSystemConfig extends FileSystemConfig
      */
     public static function getConfigurationKeys() : iterable
     {
+        yield from parent::getConfigurationKeys();
+
         yield static::CONFIG_ROOT =>
             ConfigKey::create('root', true, StringParser::create(), desc: _l('Root path'));
     }

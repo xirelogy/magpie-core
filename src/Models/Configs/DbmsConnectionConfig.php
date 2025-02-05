@@ -94,6 +94,8 @@ abstract class DbmsConnectionConfig extends ConnectionConfig
      */
     public static function getConfigurationKeys() : iterable
     {
+        yield from parent::getConfigurationKeys();
+
         yield static::CONFIG_HOST =>
             ConfigKey::create('host', true, StringParser::create(), desc: _l('Hostname'));
         yield static::CONFIG_PORT =>
