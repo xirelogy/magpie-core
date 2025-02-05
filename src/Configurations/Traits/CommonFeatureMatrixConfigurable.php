@@ -24,15 +24,8 @@ trait CommonFeatureMatrixConfigurable
      */
     public static function getConfigurationKeys() : iterable
     {
-        return [];
-    }
+        $typeName = static::getTypeConfigName();
 
-
-    /**
-     * @throws ArgumentException
-     */
-    protected static final function parseConfig(ConfigParser $parser) : static
-    {
         $typeParser = ClosureParser::create(function (mixed $value, ?string $hintName) : string {
             $value = StringParser::create()->parse($value, $hintName);
             $values = explode(';', $value);
@@ -44,10 +37,18 @@ trait CommonFeatureMatrixConfigurable
 
             return $className;
         });
-        $configKey = ConfigKey::create(static::getTypeConfigName(), true, $typeParser, desc: ConfigProvider::describeType());
 
+        yield $typeName => ConfigKey::create($typeName, true, $typeParser, desc: ConfigProvider::describeType());
+    }
+
+
+    /**
+     * @throws ArgumentException
+     */
+    protected static final function parseConfig(ConfigParser $parser) : static
+    {
         /** @var static $typeClassName */
-        $typeClassName = $parser->get($configKey);
+        $typeClassName = $parser->get(static::getTypeConfigName());
 
         return $typeClassName::specificParseConfig($parser);
     }

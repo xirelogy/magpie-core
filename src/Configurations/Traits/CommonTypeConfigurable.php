@@ -23,7 +23,17 @@ trait CommonTypeConfigurable
      */
     public static function getConfigurationKeys() : iterable
     {
-        return [];
+        $typeName = static::getTypeConfigName();
+
+        $typeParser = ClosureParser::create(function (mixed $value, ?string $hintName) : string {
+            $value = StringParser::create()->parse($value, $hintName);
+            $className = ClassFactory::resolve($value, self::class);
+            if (!is_subclass_of($className, self::class)) throw new ClassNotOfTypeException($className, self::class);
+
+            return $className;
+        });
+
+        yield $typeName => ConfigKey::create($typeName, true, $typeParser, desc: ConfigProvider::describeType());
     }
 
 
@@ -32,18 +42,8 @@ trait CommonTypeConfigurable
      */
     protected static final function parseConfig(ConfigParser $parser) : static
     {
-        // Create configuration key
-        $typeParser = ClosureParser::create(function (mixed $value, ?string $hintName) : string {
-            $value = StringParser::create()->parse($value, $hintName);
-            $className = ClassFactory::resolve($value, self::class);
-            if (!is_subclass_of($className, self::class)) throw new ClassNotOfTypeException($className, self::class);
-
-            return $className;
-        });
-        $configKey = ConfigKey::create(static::getTypeConfigName(), true, $typeParser, desc: ConfigProvider::describeType());
-
         /** @var static $typeClassName */
-        $typeClassName = $parser->get($configKey);
+        $typeClassName = $parser->get(static::getTypeConfigName());
 
         return $typeClassName::specificParseConfig($parser);
     }
