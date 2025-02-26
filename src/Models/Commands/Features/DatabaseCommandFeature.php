@@ -49,7 +49,7 @@ class DatabaseCommandFeature
      */
     public static function refreshComments(ModelCheckListenable $listener, ?array $paths = null) : void
     {
-        $paths = $paths ?? iter_flatten(Kernel::current()->getConfig()->getModelSourceDirectories());
+        $paths = $paths ?? iter_flatten(Kernel::current()->getConfig()->getModelSourceDirectories(), false);
 
         foreach (AutoloadReflection::instance()->expandDiscoverySourcesReflection($paths) as $class) {
             if (!$class->isSubclassOf(Model::class)) continue;
@@ -89,7 +89,7 @@ class DatabaseCommandFeature
      */
     public static function syncSchema(ModelCheckListenable $listener, ?array $paths = null) : void
     {
-        $paths = $paths ?? iter_flatten(Kernel::current()->getConfig()->getModelSourceSyncDirectories());
+        $paths = $paths ?? iter_flatten(Kernel::current()->getConfig()->getModelSourceSyncDirectories(), false);
 
         foreach (AutoloadReflection::instance()->expandDiscoverySourcesReflection($paths) as $class) {
             if (!$class->isSubclassOf(Model::class)) continue;
