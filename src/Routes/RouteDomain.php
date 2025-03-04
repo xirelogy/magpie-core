@@ -341,6 +341,7 @@ abstract class RouteDomain
     private static function landRouteHandler(Request $request, array $routeArguments, RouteLanding $landing, ?RouteMap $map) : RouteHandleable
     {
         if ($request->routeContext instanceof ActualRouteContext) {
+            $request->routeContext->_setLanding($landing);
             $request->routeContext->_setRouteArguments(array_combine($landing->argumentNames, $routeArguments));
         }
 

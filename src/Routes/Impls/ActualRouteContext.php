@@ -26,6 +26,10 @@ class ActualRouteContext extends RouteContext
      * @var array<string, mixed> Route variables
      */
     protected array $routeVariables = [];
+    /**
+     * @var string|null Routing group ID
+     */
+    protected ?string $routeGroupId = null;
 
 
     /**
@@ -49,6 +53,18 @@ class ActualRouteContext extends RouteContext
     public function _setLandingMap(array $landingMap) : void
     {
         $this->landingMap = $landingMap;
+    }
+
+
+    /**
+     * Assign specific final landing map
+     * @param RouteLanding $landing
+     * @return void
+     * @internal
+     */
+    public function _setLanding(RouteLanding $landing) : void
+    {
+        $this->routeGroupId = $landing->routeGroupId;
     }
 
 
@@ -105,6 +121,15 @@ class ActualRouteContext extends RouteContext
     public function _setRouteArguments(iterable $vars) : void
     {
         $this->routeArguments->_reconfigure($vars);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getRouteGroupId() : ?string
+    {
+        return $this->routeGroupId;
     }
 
 

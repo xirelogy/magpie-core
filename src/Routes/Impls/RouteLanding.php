@@ -27,6 +27,10 @@ class RouteLanding implements SourceCacheTranslatable, Stringable
      */
     public readonly RouteMiddlewareCollection $middlewares;
     /**
+     * @var string|null Routing group ID, if available
+     */
+    public readonly ?string $routeGroupId;
+    /**
      * @var array<string> Argument names
      */
     public array $argumentNames = [];
@@ -37,12 +41,14 @@ class RouteLanding implements SourceCacheTranslatable, Stringable
      * @param string $typeClass
      * @param array<string, mixed> $arguments
      * @param RouteMiddlewareCollection $middlewares
+     * @param string|null $routeGroupId
      */
-    public function __construct(string $typeClass, array $arguments, RouteMiddlewareCollection $middlewares)
+    public function __construct(string $typeClass, array $arguments, RouteMiddlewareCollection $middlewares, ?string $routeGroupId = null)
     {
         $this->typeClass = $typeClass;
         $this->arguments = $arguments;
         $this->middlewares = $middlewares;
+        $this->routeGroupId = $routeGroupId;
     }
 
 
@@ -81,6 +87,7 @@ class RouteLanding implements SourceCacheTranslatable, Stringable
             'arguments' => $this->arguments,
             'middlewares' => $this->middlewares->sourceCacheExport(),
             'argumentNames' => [...$this->argumentNames],
+            'routeGroupId' => $this->routeGroupId,
         ];
     }
 
@@ -127,8 +134,9 @@ class RouteLanding implements SourceCacheTranslatable, Stringable
         $typeClass = $data['typeClass'];
         $arguments = $data['arguments'];
         $middlewares = RouteMiddlewareCollection::sourceCacheImport($data['middlewares']);
+        $routeGroupId = $data['routeGroupId'] ?? null;
 
-        $ret = new static($typeClass, $arguments, $middlewares);
+        $ret = new static($typeClass, $arguments, $middlewares, $routeGroupId);
         $ret->argumentNames = $data['argumentNames'];
 
         return $ret;

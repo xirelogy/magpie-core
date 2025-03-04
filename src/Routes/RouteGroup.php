@@ -5,6 +5,9 @@ namespace Magpie\Routes;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\InvalidStateException;
 use Magpie\Exceptions\UnsupportedException;
+use Magpie\Facades\Random;
+use Magpie\General\LazyArray;
+use Magpie\General\Randoms\RandomCharset;
 use Magpie\Routes\Impls\RouteMap;
 use Magpie\Routes\Impls\RouteMiddlewareCollection;
 use Magpie\System\HardCore\AutoloadReflection;
@@ -15,6 +18,22 @@ use ReflectionException;
  */
 abstract class RouteGroup
 {
+    /**
+     * @var string ID for current routing group
+     */
+    public readonly string $id;
+
+
+    /**
+     * Constructor
+     * @param string|null $id Specific ID for current routing group, otherwise randomly generated
+     */
+    protected function __construct(?string $id = null)
+    {
+        $this->id = $id ?? Random::string(8, RandomCharset::LOWER_ALPHANUM);
+    }
+
+
     /**
      * Prefix of the routing group
      * @return string|null
@@ -63,7 +82,7 @@ abstract class RouteGroup
 
         $autoload = AutoloadReflection::instance();
         foreach ($autoload->expandDiscoverySourcesReflection($paths) as $class) {
-            $map->discover($class, $groupMiddlewares, $prefix);
+            $map->discover($class, $groupMiddlewares, $prefix, $this->id);
         }
     }
 
@@ -72,26 +91,30 @@ abstract class RouteGroup
      * Create group from simple routing group
      * @param iterable<string> $directories
      * @param string|null $prefix
-     * @param array<class-string<RouteMiddleware>> $useMiddlewares
+     * @param iterable<class-string<RouteMiddleware>> $useMiddlewares
+     * @param string|null $id
      * @return static
      */
-    public static function fromSimple(iterable $directories, ?string $prefix = null, array $useMiddlewares = []) : static
+    public static function fromSimple(iterable $directories, ?string $prefix = null, iterable $useMiddlewares = [], ?string $id = null) : static
     {
-        $directories = iter_flatten($directories, false);
+        $directories = new LazyArray($directories);
+        $useMiddlewares = new LazyArray($useMiddlewares);
 
-        return new class($directories, $prefix, $useMiddlewares) extends RouteGroup {
+        return new class($directories, $prefix, $useMiddlewares, $id) extends RouteGroup {
             /**
              * Constructor
-             * @param array<string> $directories
+             * @param LazyArray<string> $directories
              * @param string|null $prefix
-             * @param array<class-string<RouteMiddleware>> $useMiddlewares
+             * @param LazyArray<class-string<RouteMiddleware>> $useMiddlewares
+             * @param string|null $id
              */
             public function __construct(
-                protected array $directories,
+                protected LazyArray $directories,
                 protected ?string $prefix,
-                protected array $useMiddlewares,
+                protected LazyArray $useMiddlewares,
+                ?string $id,
             ) {
-
+                parent::__construct($id);
             }
 
 
@@ -109,7 +132,7 @@ abstract class RouteGroup
              */
             protected function getControllerDirectories() : iterable
             {
-                return $this->directories;
+                yield from $this->directories->getItems();
             }
 
 
@@ -118,7 +141,7 @@ abstract class RouteGroup
              */
             protected function getUseMiddlewares() : iterable
             {
-                return $this->useMiddlewares;
+                yield from $this->useMiddlewares->getItems();
             }
         };
     }

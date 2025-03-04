@@ -21,4 +21,11 @@ abstract class RouteContext
      * @return mixed
      */
     public abstract function getRouteVariable(string $name, mixed $default = null) : mixed;
+
+
+    /**
+     * Associated routing group ID, if available
+     * @return string|null
+     */
+    public abstract function getRouteGroupId() : ?string;
 }

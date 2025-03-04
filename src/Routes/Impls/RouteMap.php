@@ -54,13 +54,14 @@ class RouteMap implements SourceCacheTranslatable
      * @param ReflectionClass $class
      * @param RouteMiddlewareCollection $domainMiddlewares
      * @param string|null $prefix
+     * @param string|null $routeGroupId
      * @return void
      * @throws InvalidDataFormatException
      * @throws InvalidStateException
      * @throws ReflectionException
      * @throws UnsupportedException
      */
-    public function discover(ReflectionClass $class, RouteMiddlewareCollection $domainMiddlewares, ?string $prefix = null) : void
+    public function discover(ReflectionClass $class, RouteMiddlewareCollection $domainMiddlewares, ?string $prefix = null, ?string $routeGroupId = null) : void
     {
         $routePrefixes = static::findRoutePrefixesFromAttribute($class);
 
@@ -116,7 +117,7 @@ class RouteMap implements SourceCacheTranslatable
 
             $routeMiddlewares->mergeIn(static::listRouteUseMiddlewareClassNamesFromAttribute($method));
 
-            $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefixes, $routeEntry, $routeMiddlewares, $variables);
+            $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefixes, $routeEntry, $routeMiddlewares, $variables, $routeGroupId);
         }
 
         $this->routeVariables[$class->name] = $variables;
@@ -182,11 +183,12 @@ class RouteMap implements SourceCacheTranslatable
      * @param RouteEntry $routeEntry
      * @param RouteMiddlewareCollection $middlewares
      * @param array<string, mixed> $reflectedVariables
+     * @param string|null $routeGroupId
      * @return void
      * @throws InvalidDataFormatException
      * @throws InvalidStateException
      */
-    protected function addControllerMethodRouteEntry(ReflectionClass $class, ReflectionMethod $method, ?string $globalPrefix, ?array $routePrefixes, RouteEntry $routeEntry, RouteMiddlewareCollection $middlewares, array $reflectedVariables) : void
+    protected function addControllerMethodRouteEntry(ReflectionClass $class, ReflectionMethod $method, ?string $globalPrefix, ?array $routePrefixes, RouteEntry $routeEntry, RouteMiddlewareCollection $middlewares, array $reflectedVariables, ?string $routeGroupId) : void
     {
         $requestPath = static::combineRoutes($globalPrefix, $routePrefixes, $routeEntry->path);
         $requestMethods = static::flattenRequestMethods($routeEntry->method);
@@ -194,7 +196,7 @@ class RouteMap implements SourceCacheTranslatable
         $this->addRouteEntry($requestPath, $requestMethods, ControllerMethodRouteHandler::TYPECLASS, [
             'class' => $class->name,
             'method' => $method->name,
-        ], $middlewares, $reflectedVariables);
+        ], $middlewares, $reflectedVariables, $routeGroupId);
     }
 
 
@@ -206,15 +208,16 @@ class RouteMap implements SourceCacheTranslatable
      * @param array<string, mixed> $handlerArgs
      * @param RouteMiddlewareCollection $middlewares
      * @param array<string, mixed> $reflectedVariables
+     * @param string|null $routeGroupId
      * @return void
      * @throws InvalidDataFormatException
      * @throws InvalidStateException
      */
-    protected function addRouteEntry(string $requestPath, array $requestMethods, string $handlerTypeClass, array $handlerArgs, RouteMiddlewareCollection $middlewares, array $reflectedVariables) : void
+    protected function addRouteEntry(string $requestPath, array $requestMethods, string $handlerTypeClass, array $handlerArgs, RouteMiddlewareCollection $middlewares, array $reflectedVariables, ?string $routeGroupId) : void
     {
         $requestPathSections = static::getPathSections($requestPath);
 
-        $landing = new RouteLanding($handlerTypeClass, $handlerArgs, $middlewares);
+        $landing = new RouteLanding($handlerTypeClass, $handlerArgs, $middlewares, $routeGroupId);
         $this->root->mergeRoute($requestPathSections, $reflectedVariables, [], $requestMethods, $landing);
     }
 
