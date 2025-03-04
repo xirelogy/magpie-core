@@ -304,12 +304,6 @@ class AutoloadReflection
     }
 
 
-    public function debug() : never
-    {
-        dd($this);
-    }
-
-
     /**
      * Add path resolver
      * @param AutoloadReflectionPathResolvable $resolver
