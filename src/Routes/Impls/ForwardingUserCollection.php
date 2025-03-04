@@ -3,11 +3,13 @@
 namespace Magpie\Routes\Impls;
 
 use Magpie\Codecs\Parsers\Parser;
-use Magpie\HttpServer\Collection;
 use Magpie\HttpServer\Concepts\UserCollectable;
+use Magpie\HttpServer\Collection;
+use Magpie\Locales\Concepts\Localizable;
 
 /**
  * An actual user collection that is forwarded
+ * Target: domain arguments, route arguments
  * @internal
  */
 final class ForwardingUserCollection implements UserCollectable
@@ -16,14 +18,19 @@ final class ForwardingUserCollection implements UserCollectable
      * @var UserCollectable Forwarded user collection
      */
     protected UserCollectable $base;
+    /**
+     * @var string|Localizable|null Current argument type
+     */
+    protected readonly string|Localizable|null $argType;
 
 
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(string|Localizable|null $argType)
     {
-        $this->base = static::createBaseCollection([]);
+        $this->argType = $argType;
+        $this->base = static::createBaseCollection([], $this->argType);
     }
 
 
@@ -107,25 +114,27 @@ final class ForwardingUserCollection implements UserCollectable
      */
     public function _reconfigure(iterable $vars) : void
     {
-        $this->base = static::createBaseCollection($vars);
+        $this->base = static::createBaseCollection($vars, $this->argType);
     }
 
 
     /**
      * Create a base collection
      * @param iterable<string, mixed> $vars
+     * @param string|Localizable|null $argType
      * @return UserCollectable
      */
-    private static function createBaseCollection(iterable $vars) : UserCollectable
+    private static function createBaseCollection(iterable $vars, string|Localizable|null $argType) : UserCollectable
     {
-        return new class(iter_flatten($vars)) extends Collection implements UserCollectable {
+        return new class(iter_flatten($vars), $argType) extends Collection implements UserCollectable {
             /**
              * Constructor
              * @param array<string, mixed> $keyValues
+             * @param string|Localizable|null $argType
              */
-            public function __construct(array $keyValues)
+            public function __construct(array $keyValues, string|Localizable|null $argType)
             {
-                parent::__construct($keyValues);
+                parent::__construct($keyValues, null, $argType);
             }
 
 

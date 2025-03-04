@@ -2,10 +2,28 @@
 
 namespace Magpie\HttpServer;
 
+use Magpie\Codecs\ParserHosts\ArrayCollection;
 use Magpie\System\Concepts\Capturable;
 
-class ServerCollection extends Collection implements Capturable
+/**
+ * PHP server arguments collection
+ */
+class ServerCollection extends ArrayCollection implements Capturable
 {
+    /**
+     * Constructor
+     * @param iterable<string, mixed> $keyValues
+     * @param string|null $prefix
+     */
+    protected function __construct(iterable $keyValues, ?string $prefix = null)
+    {
+        parent::__construct(iter_flatten($keyValues), $prefix);
+
+        $this->argType = _l('server variable');
+    }
+
+
+
     /**
      * Get headers collection
      * @return HeaderCollection
@@ -20,7 +38,15 @@ class ServerCollection extends Collection implements Capturable
         };
 
         return new class($headers()) extends HeaderCollection {
-
+            /**
+             * Constructor
+             * @param iterable<string, mixed> $keyValues
+             * @param string|null $prefix
+             */
+            public function __construct(iterable $keyValues, ?string $prefix = null)
+            {
+                parent::__construct($keyValues, $prefix);
+            }
         };
     }
 

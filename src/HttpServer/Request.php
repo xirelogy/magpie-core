@@ -12,6 +12,7 @@ use Magpie\General\Names\CommonHttpMethod;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Concepts\UserCollectable;
 use Magpie\HttpServer\Contents\PostBodyContent;
+use Magpie\Locales\Concepts\Localizable;
 use Magpie\Objects\Uri;
 use Magpie\Routes\Impls\ActualRouteContext;
 use Magpie\Routes\Impls\ForwardingUserCollection;
@@ -94,8 +95,8 @@ class Request implements Capturable
      */
     protected function __construct(UserCollectable $queries, UserCollectable $posts, UserCollectable $cookies, ServerCollection $serverVars, bool $isSuppressBody = false)
     {
-        $this->domainArguments = new ForwardingUserCollection();
-        $this->routeArguments = new ForwardingUserCollection();
+        $this->domainArguments = new ForwardingUserCollection(_l('domain argument'));
+        $this->routeArguments = new ForwardingUserCollection(_l('route argument'));
         $this->routeContext = ActualRouteContext::_create($this->domainArguments, $this->routeArguments);
         $this->queries = $queries;
         $this->posts = $posts;
@@ -203,7 +204,7 @@ class Request implements Capturable
         $serverVars = ServerCollection::capture();
         $queries = static::createUserCollectionFrom($_GET);
         $posts = static::createUserCollectionFrom(static::getPosts($serverVars, $isSuppressBody));
-        $cookies = static::createUserCollectionFrom($_COOKIE);
+        $cookies = static::createUserCollectionFrom($_COOKIE, _l('cookie'));
 
         return new static($queries, $posts, $cookies, $serverVars, $isSuppressBody);
     }
@@ -372,18 +373,20 @@ class Request implements Capturable
     /**
      * Create user inputs collection from given super global
      * @param iterable<string, mixed> $vars
+     * @param string|Localizable|null $argType
      * @return UserCollectable
      */
-    protected static function createUserCollectionFrom(iterable $vars) : UserCollectable
+    protected static function createUserCollectionFrom(iterable $vars, string|Localizable|null $argType = null) : UserCollectable
     {
-        return new class($vars) extends Collection implements UserCollectable {
+        return new class($vars, $argType) extends Collection implements UserCollectable {
             /**
              * Constructor
              * @param iterable<string, mixed> $keyValues
+             * @param string|Localizable|null $argType
              */
-            public function __construct(iterable $keyValues)
+            public function __construct(iterable $keyValues, string|Localizable|null $argType)
             {
-                parent::__construct(iter_flatten($keyValues));
+                parent::__construct(iter_flatten($keyValues), null, $argType);
             }
         };
     }
