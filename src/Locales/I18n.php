@@ -2,7 +2,10 @@
 
 namespace Magpie\Locales;
 
+use Closure;
 use Magpie\Facades\FileSystem\Providers\Local\LocalRootFileSystem;
+use Magpie\General\Contexts\ClosureReleaseScoped;
+use Magpie\General\Contexts\Scoped;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Locales\Concepts\Localizable;
 use Magpie\Locales\Traits\CommonLoadTranslation;
@@ -128,6 +131,54 @@ class I18n
             public function getDefaultTranslation() : string
             {
                 return $this->text;
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function __toString() : string
+            {
+                return $this->getDefaultTranslation();
+            }
+        };
+    }
+
+
+    /**
+     * Defer translation into specific locale translation
+     * @param callable(string):string $fn
+     * @return Localizable
+     */
+    public static function defer(callable $fn) : Localizable
+    {
+        return new class($fn) implements Localizable {
+            /**
+             * Constructor
+             * @param Closure(string):string $fn
+             */
+            public function __construct(
+                protected readonly Closure $fn,
+            ) {
+
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function getTranslation(string $locale) : string
+            {
+                return ($this->fn)($locale);
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function getDefaultTranslation() : string
+            {
+                return $this->getTranslation(I18n::getCurrentLocale());
             }
 
 
@@ -276,5 +327,20 @@ class I18n
         }
 
         static::$currentLocale = $locale;
+    }
+
+
+    /**
+     * Create a locale scope
+     * @param string|null $locale
+     * @return Scoped
+     */
+    public static function createLocaleScoped(?string $locale) : Scoped {
+        $oldCurrentLocale = static::$currentLocale;
+        static::setCurrentLocale($locale);
+
+        return ClosureReleaseScoped::create(function () use ($oldCurrentLocale) {
+            static::$currentLocale = $oldCurrentLocale;
+        });
     }
 }
