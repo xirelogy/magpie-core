@@ -126,6 +126,18 @@ class Identifier implements PreferStringable
 
 
     /**
+     * Check for equality between two identifiers
+     * @param Identifier|string|int $lhs
+     * @param Identifier|string|int $rhs
+     * @return bool
+     */
+    public static final function isEqual(self|string|int $lhs, self|string|int $rhs) : bool
+    {
+        return static::toString($lhs) == static::toString($rhs);
+    }
+
+
+    /**
      * String representing invalid value
      * @return string
      */
