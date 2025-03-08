@@ -310,4 +310,16 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
     {
         return 0;
     }
+
+
+    /**
+     * Check for equality between two objects
+     * @param Identifiable $lhs
+     * @param Identifiable $rhs
+     * @return bool
+     */
+    public static function isEqual(Identifiable $lhs, Identifiable $rhs) : bool
+    {
+        return Identifier::isEqual($lhs->getId(), $rhs->getId());
+    }
 }
