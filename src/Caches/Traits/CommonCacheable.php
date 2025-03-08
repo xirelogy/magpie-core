@@ -140,7 +140,10 @@ trait CommonCacheable
     protected static function onCacheFind(string $key, ?string $cacheNamespace = null) : ?static
     {
         $cacheNamespace = $cacheNamespace ?? static::getCacheNamespace();
-        return static::getCacheProvider()->get($cacheNamespace, $key);
+        $ret = static::getCacheProvider()->get($cacheNamespace, $key);
+        if (!$ret instanceof static) return null;
+
+        return $ret;
     }
 
 
