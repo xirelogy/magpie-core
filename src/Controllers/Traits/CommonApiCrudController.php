@@ -276,7 +276,7 @@ trait CommonApiCrudController
      * Create an object parser
      * @param ApiCrudContext $context
      * @param ApiCrudState $crudState
-     * @return Parser
+     * @return Parser<CommonObject>
      */
     protected function onCreateObjectParser(ApiCrudContext $context, ApiCrudState $crudState) : Parser
     {
