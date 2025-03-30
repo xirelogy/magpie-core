@@ -13,6 +13,7 @@ use Magpie\Controllers\Strategies\ApiCrudContextAndState;
 use Magpie\Controllers\Strategies\ApiCrudNames;
 use Magpie\Controllers\Strategies\ApiCrudPurpose;
 use Magpie\Controllers\Strategies\ApiCrudState;
+use Magpie\Controllers\Strategies\ApiSpecificCrudPurpose;
 use Magpie\Exceptions\CrudNotCreatableException;
 use Magpie\Exceptions\CrudNotDeletableException;
 use Magpie\Exceptions\CrudNotEditableException;
@@ -43,6 +44,7 @@ trait CommonApiCrudController
     public final function getRoot(Request $request) : ?object
     {
         $contextAndState = $this->onGetContextAndState($request, ApiCrudPurpose::READ);
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::LIST, $contextAndState->context, $contextAndState->crudState);
 
         $intercepted = $this->onInterceptGetRoot($request, $contextAndState->context, $contextAndState->crudState);
         if ($intercepted !== null) return $intercepted;
@@ -122,9 +124,11 @@ trait CommonApiCrudController
     public final function getItem(Request $request) : ?object
     {
         $contextAndState = $this->onGetContextAndState($request, ApiCrudPurpose::READ);
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::GET, $contextAndState->context, $contextAndState->crudState);
 
         $idArgName = $request->routeContext->getRouteVariable('id');
         $object = $request->routeArguments->requires($idArgName, $this->onCreateObjectParser($contextAndState->context, $contextAndState->crudState));
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::GET, $contextAndState->context, $contextAndState->crudState, $object);
 
         return $this->onResponseGetItem($request, $contextAndState->crudState, $object);
     }
@@ -164,6 +168,7 @@ trait CommonApiCrudController
     {
         $parserHost = static::crudGetParserHostFromRequest($request);
         $contextAndState = $this->onGetContextAndState($request, ApiCrudPurpose::CREATE);
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::CREATE, $contextAndState->context, $contextAndState->crudState);
 
         $className = static::crudGetCreatableClassName($contextAndState->context, $contextAndState->crudState, $parserHost);
         if (!is_subclass_of($className, ApiCreatable::class)) throw new CrudNotCreatableException();
@@ -199,10 +204,12 @@ trait CommonApiCrudController
     {
         $parserHost = static::crudGetParserHostFromRequest($request);
         $contextAndState = $this->onGetContextAndState($request, ApiCrudPurpose::EDIT);
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::EDIT, $contextAndState->context, $contextAndState->crudState);
 
         $idArgName = $request->routeContext->getRouteVariable('id');
         /** @var CommonObject $object */
         $object = $request->routeArguments->requires($idArgName, $this->onCreateObjectParser($contextAndState->context, $contextAndState->crudState));
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::EDIT, $contextAndState->context, $contextAndState->crudState, $object);
 
         if (!$object instanceof ApiEditable) throw new CrudNotEditableException();
         $object->editFromApi($contextAndState->context, $contextAndState->crudState, $parserHost);
@@ -235,9 +242,11 @@ trait CommonApiCrudController
     public final function deleteItem(Request $request) : ?object
     {
         $contextAndState = $this->onGetContextAndState($request, ApiCrudPurpose::DELETE);
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::DELETE, $contextAndState->context, $contextAndState->crudState);
 
         $idArgName = $request->routeContext->getRouteVariable('id');
         $object = $request->routeArguments->requires($idArgName, $this->onCreateObjectParser($contextAndState->context, $contextAndState->crudState));
+        $this->onCheckPermission($request, ApiSpecificCrudPurpose::DELETE, $contextAndState->context, $contextAndState->crudState, $object);
 
         if (!$object instanceof Deletable) throw new CrudNotDeletableException();
         $object->delete();
@@ -306,6 +315,21 @@ trait CommonApiCrudController
      * @throws Exception
      */
     protected abstract function onGetContextAndState(Request $request, ApiCrudPurpose $purpose) : ApiCrudContextAndState;
+
+
+    /**
+     * Check for permission to perform specific CRUD operation
+     * @param Request $request
+     * @param ApiSpecificCrudPurpose $purpose
+     * @param ApiCrudContext $context
+     * @param ApiCrudState $crudState
+     * @param CommonObject|null $target
+     * @return void
+     */
+    protected function onCheckPermission(Request $request, ApiSpecificCrudPurpose $purpose, ApiCrudContext $context, ApiCrudState $crudState, ?CommonObject $target = null) : void
+    {
+        _used($request, $purpose, $context, $crudState, $target);
+    }
 
 
     /**
