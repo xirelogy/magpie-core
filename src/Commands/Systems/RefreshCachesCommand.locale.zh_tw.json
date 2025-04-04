@@ -1,7 +1,7 @@
 {
-  "Refresh and regenerate source cache": "重新生成緩存",
-  "Removing existing caches...": "正在刪除舊緩存…",
-  "Updating caches...": "正在更新緩存…",
+  "Refresh and regenerate source cache": "重新生成快取",
+  "Removing existing caches...": "正在刪除舊快取…",
+  "Updating caches...": "正在更新快取…",
   "Done": "完成",
   "": ""
 }

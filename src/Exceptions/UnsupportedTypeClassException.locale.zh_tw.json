@@ -1,5 +1,5 @@
 {
-  "'{{1}}' cannot create instance of the '{{0}}' type class": "'{{1}}'無法創建'{{0}}'子類型的實例",
-  "Cannot create instance of given type class": "無法創建該子類型的實例",
+  "'{{1}}' cannot create instance of the '{{0}}' type class": "'{{1}}'無法建立'{{0}}'子型別的例項",
+  "Cannot create instance of given type class": "無法建立該子型別的例項",
   "": ""
 }

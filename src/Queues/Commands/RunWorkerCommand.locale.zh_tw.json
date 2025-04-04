@@ -1,8 +1,8 @@
 {
-  "Run queue's worker": "運行隊列任務進程",
-  "The worker should only run once and exit": "任務進程將只運行一次后退出",
-  "Target queue name": "目標隊列名字",
-  "Timeout in seconds to wait for job from queue": "等待隊列任務的超時，以秒表示",
+  "Run queue's worker": "執行佇列任務程序",
+  "The worker should only run once and exit": "任務程序將只執行一次後退出",
+  "Target queue name": "目標佇列名字",
+  "Timeout in seconds to wait for job from queue": "等待佇列任務的超時，以秒錶示",
   "{{0}} running...": "{{0}}執行中…",
   "Job running...": "任務執行中…",
   "{{0}} completed": "{{0}}完成",
@@ -11,6 +11,6 @@
   "Job crashed with exception": "任務出錯了",
   "{{0}} failed": "{{0}}失敗",
   "Job failed": "任務失敗",
-  "Worker started": "任務進程已啓動",
+  "Worker started": "任務程序已啟動",
   "": ""
 }

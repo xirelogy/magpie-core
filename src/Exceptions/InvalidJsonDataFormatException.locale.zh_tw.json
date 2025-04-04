@@ -1,5 +1,5 @@
 {
-  "Invalid JSON data format": "JSON數據格式錯誤",
-  "Invalid JSON data format: {{0}}": "JSON數據格式錯誤：{{0}}",
+  "Invalid JSON data format": "JSON資料格式錯誤",
+  "Invalid JSON data format: {{0}}": "JSON資料格式錯誤：{{0}}",
   "": ""
 }

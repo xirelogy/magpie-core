@@ -1,9 +1,9 @@
 {
-  "Show help for given command": "顯示命令的幫助信息",
-  "The command to show help for": "需要顯示幫助信息的命令",
+  "Show help for given command": "顯示命令的幫助資訊",
+  "The command to show help for": "需要顯示幫助資訊的命令",
   "Description:": "描述：",
   "Usage:": "使用方法：",
-  "Arguments:": "參數：",
+  "Arguments:": "引數：",
   "Options:": "選項：",
   "": ""
 }

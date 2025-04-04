@@ -1,6 +1,6 @@
 {
-  "Restart all running queue workers": "重啓所有運行中的任務進程",
-  "Target queue name": "目標隊列名字",
-  "Restart signal sent to queue workers": "已向任務進程發送重啓信號",
+  "Restart all running queue workers": "重啟所有執行中的任務程序",
+  "Target queue name": "目標佇列名字",
+  "Restart signal sent to queue workers": "已向任務程序傳送重啟訊號",
   "": ""
 }

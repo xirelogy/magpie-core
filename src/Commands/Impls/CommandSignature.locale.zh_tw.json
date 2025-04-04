@@ -1,8 +1,8 @@
 {
   "Missing command": "命令缺失",
-  "Unexpected character '{{0}}' in command signature": "命令簽名中未預期的字符'{{0}}'",
-  "Unexpected character in command signature": "命令簽名中未預期的字符",
+  "Unexpected character '{{0}}' in command signature": "命令簽名中未預期的字元'{{0}}'",
+  "Unexpected character in command signature": "命令簽名中未預期的字元",
   "option": "選項",
-  "argument": "參數",
+  "argument": "引數",
   "": ""
 }

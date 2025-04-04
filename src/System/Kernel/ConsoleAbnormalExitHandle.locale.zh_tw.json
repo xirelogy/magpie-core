@@ -1,7 +1,7 @@
 {
   "Unexpected abnormal error": "未預料異常錯誤",
   "Unexpected abnormal error: {{0}}": "未預料異常錯誤：{{0}}",
-  "- caused by error": "- 來源于錯誤",
-  "- caused by: {{0}}": "- 來源于錯誤：{{0}}",
+  "- caused by error": "- 來源於錯誤",
+  "- caused by: {{0}}": "- 來源於錯誤：{{0}}",
   "": ""
 }

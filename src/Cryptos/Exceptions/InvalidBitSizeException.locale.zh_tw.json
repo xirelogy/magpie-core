@@ -1,8 +1,8 @@
 {
-  "Provided bit size is invalid": "所提供的比特大小不正確",
-  "Provided bit size {{0}} is invalid": "所提供的比特大小{{0}}不正確",
-  "Provided bit size {{0}} is invalid, {{1}} expected": "所提供的比特大小{{0}}不正確，應為{{1}}",
-  "Provided {{1}} bit size {{0}} is invalid": "所提供的{{1}}比特大小{{0}}不正確",
-  "Provided {{1}} bit size {{0}} is invalid, {{2}} expected": "所提供的{{1}}比特大小{{0}}不正確，應為{{2}}",
+  "Provided bit size is invalid": "所提供的位元大小不正確",
+  "Provided bit size {{0}} is invalid": "所提供的位元大小{{0}}不正確",
+  "Provided bit size {{0}} is invalid, {{1}} expected": "所提供的位元大小{{0}}不正確，應為{{1}}",
+  "Provided {{1}} bit size {{0}} is invalid": "所提供的{{1}}位元大小{{0}}不正確",
+  "Provided {{1}} bit size {{0}} is invalid, {{2}} expected": "所提供的{{1}}位元大小{{0}}不正確，應為{{2}}",
   "": ""
 }

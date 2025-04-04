@@ -1,14 +1,14 @@
 {
-  "invalid data": "數據錯誤",
+  "invalid data": "資料錯誤",
   "invalid {{0}}": "{{0}}錯誤",
   "timezone": "時區",
-  "day of week": "星期几",
+  "day of week": "星期幾",
   "day": "日",
   "month": "月份",
   "year/month combination": "年月組合",
   "hour": "小時",
   "minute": "分鐘",
   "second": "秒",
-  "wrong day of week": "錯誤的星期几",
+  "wrong day of week": "錯誤的星期幾",
   "": ""
 }

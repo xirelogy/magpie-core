@@ -1,6 +1,6 @@
 {
-  "File {{0}} operation failed in: {{1}}": "’{{1}}‘{{0}}文件操作失败",
-  "File operation failed in: {{0}}": "’{{0}}‘文件操作失败",
+  "File {{0}} operation failed in: {{1}}": "‘{{1}}’{{0}}文件操作失败",
+  "File operation failed in: {{0}}": "‘{{0}}’文件操作失败",
   "File operation failed": "文件操作失败",
   "read": "读取",
   "write": "写入",

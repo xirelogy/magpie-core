@@ -1,8 +1,8 @@
 {
   "Hostname": "主機名",
-  "Port": "端口",
-  "Database number": "數據庫號",
-  "Username": "用戶名",
+  "Port": "埠",
+  "Database number": "資料庫號",
+  "Username": "使用者名稱",
   "Password": "密碼",
   "": ""
 }

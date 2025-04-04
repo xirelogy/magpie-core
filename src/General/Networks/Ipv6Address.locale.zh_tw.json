@@ -1,10 +1,10 @@
 {
   "wrong number of groups": "組別數量錯誤",
-  "group must be hexadecimal": "組別必須為十六進制",
+  "group must be hexadecimal": "組別必須為十六進位制",
   "group value out of range": "組別超出範圍",
-  "overflow": "溢出",
+  "overflow": "溢位",
   "out of range": "超出範圍",
-  "must be {{0}}-bits": "必須為{{0}}比特",
-  "must be of specific number of bits": "必須為指定比特數",
+  "must be {{0}}-bits": "必須為{{0}}位元",
+  "must be of specific number of bits": "必須為指定位元數",
   "": ""
 }

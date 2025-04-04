@@ -1,5 +1,5 @@
 {
-  "Failed preparing PDO statement": "無法創建PDO語句",
-  "Failed preparing PDO statement: {{0}}": "無法創建PDO語句：{{0}}",
+  "Failed preparing PDO statement": "無法建立PDO語句",
+  "Failed preparing PDO statement: {{0}}": "無法建立PDO語句：{{0}}",
   "": ""
 }
