@@ -62,6 +62,16 @@ abstract class RouteGroup
 
 
     /**
+     * All route variables set
+     * @return iterable<string, mixed>
+     */
+    protected function getSetVariables() : iterable
+    {
+        return [];
+    }
+
+
+    /**
      * Map the routes from current route group into target
      * @param RouteMap $map
      * @param RouteMiddlewareCollection $middlewares
@@ -80,9 +90,11 @@ abstract class RouteGroup
         $groupMiddlewares = $middlewares->clone();
         $groupMiddlewares->mergeIn($this->getUseMiddlewares());
 
+        $setVariables = iter_flatten($this->getSetVariables());
+
         $autoload = AutoloadReflection::instance();
         foreach ($autoload->expandDiscoverySourcesReflection($paths) as $class) {
-            $map->discover($class, $groupMiddlewares, $prefix, $this->id);
+            $map->discover($class, $groupMiddlewares, $setVariables, $prefix, $this->id);
         }
     }
 
@@ -92,26 +104,30 @@ abstract class RouteGroup
      * @param iterable<string> $directories
      * @param string|null $prefix
      * @param iterable<class-string<RouteMiddleware>> $useMiddlewares
+     * @param iterable<string, mixed> $setVariables
      * @param string|null $id
      * @return static
      */
-    public static function fromSimple(iterable $directories, ?string $prefix = null, iterable $useMiddlewares = [], ?string $id = null) : static
+    public static function fromSimple(iterable $directories, ?string $prefix = null, iterable $useMiddlewares = [], iterable $setVariables = [], ?string $id = null) : static
     {
         $directories = new LazyArray($directories);
         $useMiddlewares = new LazyArray($useMiddlewares);
+        $setVariables = iter_flatten($setVariables);
 
-        return new class($directories, $prefix, $useMiddlewares, $id) extends RouteGroup {
+        return new class($directories, $prefix, $useMiddlewares, $setVariables, $id) extends RouteGroup {
             /**
              * Constructor
              * @param LazyArray<string> $directories
              * @param string|null $prefix
              * @param LazyArray<class-string<RouteMiddleware>> $useMiddlewares
+             * @param array<string, mixed> $setVariables
              * @param string|null $id
              */
             public function __construct(
                 protected LazyArray $directories,
                 protected ?string $prefix,
                 protected LazyArray $useMiddlewares,
+                protected array $setVariables,
                 ?string $id,
             ) {
                 parent::__construct($id);
@@ -142,6 +158,15 @@ abstract class RouteGroup
             protected function getUseMiddlewares() : iterable
             {
                 yield from $this->useMiddlewares->getItems();
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            protected function getSetVariables() : iterable
+            {
+                yield from $this->setVariables;
             }
         };
     }

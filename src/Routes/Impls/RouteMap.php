@@ -53,6 +53,7 @@ class RouteMap implements SourceCacheTranslatable
      * Discover from the target controller class and include them in the map
      * @param ReflectionClass $class
      * @param RouteMiddlewareCollection $domainMiddlewares
+     * @param iterable<string, mixed> $setVariables
      * @param string|null $prefix
      * @param string|null $routeGroupId
      * @return void
@@ -61,7 +62,7 @@ class RouteMap implements SourceCacheTranslatable
      * @throws ReflectionException
      * @throws UnsupportedException
      */
-    public function discover(ReflectionClass $class, RouteMiddlewareCollection $domainMiddlewares, ?string $prefix = null, ?string $routeGroupId = null) : void
+    public function discover(ReflectionClass $class, RouteMiddlewareCollection $domainMiddlewares, iterable $setVariables = [], ?string $prefix = null, ?string $routeGroupId = null) : void
     {
         $routePrefixes = static::findRoutePrefixesFromAttribute($class);
 
@@ -74,6 +75,11 @@ class RouteMap implements SourceCacheTranslatable
         // RouteVariableDefault population
         foreach (static::listRouteVariableDefaultFromAttribute($class) as $routeVariableDefault) {
             $variables[$routeVariableDefault->name] = $routeVariableDefault->value;
+        }
+
+        // Specific route variables is overriding
+        foreach ($setVariables as $setName => $setValue) {
+            $variables[$setName] = $setValue;
         }
 
         // Process the route variables calculations
