@@ -96,37 +96,53 @@ class RouteMap implements SourceCacheTranslatable
             $variables[$routeVariableSet->name] = $routeVariableSet->value;
         }
 
-        // Process the route entries
-        foreach ($class->getMethods() as $method) {
-            $routeMiddlewares = $controllerMiddlewares->clone();
+        // Check route-if on route class level
+        if (static::checkRouteIfFromAttribute($class, $variables)) {
+            // Process the route entries
+            foreach ($class->getMethods() as $method) {
+                $routeMiddlewares = $controllerMiddlewares->clone();
 
-            $routeEntry = static::findRouteEntryFromAttribute($method);
-            if ($routeEntry === null) continue;
+                $routeEntry = static::findRouteEntryFromAttribute($method);
+                if ($routeEntry === null) continue;
 
-            $routeIf = static::findRouteIfFromAttribute($method);
-            if ($routeIf !== null) {
-                $name = $routeIf->name;
+                // Check route-if on route entry level
+                if (!static::checkRouteIfFromAttribute($method, $variables)) continue;
 
-                if (!array_key_exists($name, $variables)) {
-                    Log::warning("Expecting variable '$name' but missing, assumed not satisfied");
-                    continue;
-                }
+                $routeMiddlewares->mergeIn(static::listRouteUseMiddlewareClassNamesFromAttribute($method));
 
-                $value = $variables[$name];
-                if (!is_bool($value)) {
-                    Log::warning("Expecting variable '$name' to be a boolean but not, assumed not satisfied");
-                    continue;
-                }
-
-                if (!$value) continue;
+                $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefixes, $routeEntry, $routeMiddlewares, $variables, $routeGroupId);
             }
-
-            $routeMiddlewares->mergeIn(static::listRouteUseMiddlewareClassNamesFromAttribute($method));
-
-            $this->addControllerMethodRouteEntry($class, $method, $prefix, $routePrefixes, $routeEntry, $routeMiddlewares, $variables, $routeGroupId);
         }
 
         $this->routeVariables[$class->name] = $variables;
+    }
+
+
+    /**
+     * Check RouteIf condition
+     * @param ReflectionClass|ReflectionMethod $classOrMethod
+     * @param array $variables
+     * @return bool
+     */
+    protected static function checkRouteIfFromAttribute(ReflectionClass|ReflectionMethod $classOrMethod, array $variables) : bool
+    {
+        $routeIf = static::findRouteIfFromAttribute($classOrMethod);
+        if ($routeIf === null) return true;
+
+        $name = $routeIf->name;
+
+        if (!array_key_exists($name, $variables)) {
+            Log::warning("Expecting variable '$name' but missing, assumed not satisfied");
+            return false;
+        }
+
+        $value = $variables[$name];
+        if (!is_bool($value)) {
+            Log::warning("Expecting variable '$name' to be a boolean but not, assumed not satisfied");
+            return false;
+        }
+
+        return $value;
     }
 
 
@@ -505,12 +521,12 @@ class RouteMap implements SourceCacheTranslatable
 
     /**
      * Extract route if from method attributes
-     * @param ReflectionMethod $method
+     * @param ReflectionClass|ReflectionMethod $classOrMethod
      * @return RouteIf|null
      */
-    protected static function findRouteIfFromAttribute(ReflectionMethod $method) : ?RouteIf
+    protected static function findRouteIfFromAttribute(ReflectionClass|ReflectionMethod $classOrMethod) : ?RouteIf
     {
-        $attribute = iter_first($method->getAttributes(RouteIf::class));
+        $attribute = iter_first($classOrMethod->getAttributes(RouteIf::class));
         return $attribute?->newInstance() ?? null;
     }
 

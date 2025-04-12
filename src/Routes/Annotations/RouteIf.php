@@ -7,7 +7,7 @@ use Attribute;
 /**
  * Specify the variable where condition to be fulfilled for route to be effective
  */
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class RouteIf
 {
     /**
