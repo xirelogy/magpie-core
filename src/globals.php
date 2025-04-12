@@ -330,6 +330,7 @@ function iter_filter(iterable $target, callable $filterFn) : iterable
 function iter_expand(mixed $target) : iterable
 {
     if (is_array($target)) return $target;
+    if (is_iterable($target)) return $target;
     return [$target];
 }
 
