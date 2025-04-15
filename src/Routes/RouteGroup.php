@@ -8,20 +8,29 @@ use Magpie\Exceptions\UnsupportedException;
 use Magpie\Facades\Random;
 use Magpie\General\LazyArray;
 use Magpie\General\Randoms\RandomCharset;
+use Magpie\Routes\Concepts\RouteDiscoverable;
+use Magpie\Routes\Impls\ActualRouteDiscovered;
 use Magpie\Routes\Impls\RouteMap;
 use Magpie\Routes\Impls\RouteMiddlewareCollection;
+use Magpie\Routes\Traits\CommonRouteOfCallable;
 use Magpie\System\HardCore\AutoloadReflection;
 use ReflectionException;
 
 /**
  * Routing group
  */
-abstract class RouteGroup
+abstract class RouteGroup implements RouteDiscoverable
 {
+    use CommonRouteOfCallable;
+
     /**
      * @var string ID for current routing group
      */
     public readonly string $id;
+    /**
+     * @var string|null Specific domain
+     */
+    private ?string $domain = null;
 
 
     /**
@@ -41,6 +50,18 @@ abstract class RouteGroup
     protected function getRoutePrefix() : ?string
     {
         return null;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public final function routeOf(string $className, string $methodName) : ?RouteDiscovered
+    {
+        $url = RouteMap::getRouteOf($className, $methodName);
+        if ($url === null) return null;
+
+        return new ActualRouteDiscovered($this->domain ?? '', ($this->getRoutePrefix() ?? '') . $url);
     }
 
 
@@ -73,6 +94,7 @@ abstract class RouteGroup
 
     /**
      * Map the routes from current route group into target
+     * @param string|null $domain
      * @param RouteMap $map
      * @param RouteMiddlewareCollection $middlewares
      * @return void
@@ -82,8 +104,10 @@ abstract class RouteGroup
      * @throws ReflectionException
      * @internal
      */
-    public final function _mapTo(RouteMap $map, RouteMiddlewareCollection $middlewares) : void
+    public final function _mapTo(?string $domain, RouteMap $map, RouteMiddlewareCollection $middlewares) : void
     {
+        $this->domain = $domain;
+
         $prefix = $this->getRoutePrefix();
         $paths = iter_flatten($this->getControllerDirectories());
 

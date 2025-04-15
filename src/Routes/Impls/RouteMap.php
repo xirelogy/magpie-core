@@ -7,6 +7,8 @@ use Magpie\Exceptions\InvalidStateException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\Facades\Log;
 use Magpie\General\Names\CommonHttpMethod;
+use Magpie\General\Sugars\Excepts;
+use Magpie\General\Sugars\Quote;
 use Magpie\Routes\Annotations\RouteEntry;
 use Magpie\Routes\Annotations\RouteIf;
 use Magpie\Routes\Annotations\RoutePrefix;
@@ -574,5 +576,37 @@ class RouteMap implements SourceCacheTranslatable
         $ret = new static($root);
         $ret->routeVariables = $data['routeVariables'];
         return $ret;
+    }
+
+
+    /**
+     * Get route path for given class/method using discovery
+     * @param string $className
+     * @param string $methodName
+     * @return string|null
+     */
+    public static function getRouteOf(string $className, string $methodName) : ?string
+    {
+        return Excepts::noThrow(function () use ($className, $methodName) {
+            $class = new ReflectionClass($className);
+            $prefixes = static::findRoutePrefixesFromAttribute($class);
+
+            $method = $class->getMethod($methodName);
+            $entry = static::findRouteEntryFromAttribute($method);
+            if ($entry === null) return null;
+
+            $ret = static::combineRoutes($prefixes, $entry->path);
+
+            // Replace the path variables
+            foreach (static::discoverClassRouteVariables($class) as $variableName => $value) {
+                if (!is_string($value)) continue;
+
+                $searchForVariableName = Quote::brace('@' . $variableName);
+                $replaceWithName = Quote::brace($value);
+                $ret = str_replace($searchForVariableName, $replaceWithName, $ret);
+            }
+
+            return $ret;
+        });
     }
 }

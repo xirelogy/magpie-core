@@ -2,7 +2,6 @@
 
 namespace Magpie\Routes;
 
-use Closure;
 use Exception;
 use Magpie\Exceptions\InvalidDataFormatException;
 use Magpie\Exceptions\InvalidStateException;
@@ -11,31 +10,32 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\General\Names\CommonHttpMethod;
 use Magpie\General\Str;
-use Magpie\General\Sugars\Quote;
 use Magpie\HttpServer\Concepts\ClientAddressesResolvable;
 use Magpie\HttpServer\Exceptions\HttpNotFoundException;
 use Magpie\HttpServer\Request;
+use Magpie\Routes\Concepts\RouteDiscoverable;
 use Magpie\Routes\Concepts\RouteHandleable;
 use Magpie\Routes\Handlers\ClosureRouteHandler;
 use Magpie\Routes\Handlers\ControllerMethodRouteHandler;
 use Magpie\Routes\Handlers\MethodFallbackRouteHandler;
 use Magpie\Routes\Impls\ActualRouteContext;
+use Magpie\Routes\Impls\ActualRouteDiscovered;
 use Magpie\Routes\Impls\RouteEventHost;
 use Magpie\Routes\Impls\RouteInfo;
 use Magpie\Routes\Impls\RouteLanding;
 use Magpie\Routes\Impls\RouteMap;
 use Magpie\Routes\Impls\RouteMiddlewareCollection;
+use Magpie\Routes\Traits\CommonRouteOfCallable;
 use Magpie\System\HardCore\SourceCache;
-use ReflectionClass;
 use ReflectionException;
-use ReflectionFunction;
-use Throwable;
 
 /**
  * Routing domain
  */
-abstract class RouteDomain
+abstract class RouteDomain implements RouteDiscoverable
 {
+    use CommonRouteOfCallable;
+
     /**
      * @var string|null The associated route domain / domain specification
      */
@@ -79,83 +79,14 @@ abstract class RouteDomain
 
 
     /**
-     * Get the route for given class-method combination
-     * @param string $className
-     * @param string $methodName
-     * @return RouteDiscovered|null
+     * @inheritDoc
      */
     public final function routeOf(string $className, string $methodName) : ?RouteDiscovered
     {
-        $url = $this->discoverRouteOf($className, $methodName);
+        $url = RouteMap::getRouteOf($className, $methodName);
         if ($url === null) return null;
 
-        return new class($this->domain ?? '', $url) extends RouteDiscovered {
-            /**
-             * Constructor
-             * @param string $hostname
-             * @param string $url
-             */
-            public function __construct(string $hostname, string $url)
-            {
-                parent::__construct($hostname, $url);
-            }
-        };
-    }
-
-
-    /**
-     * Get the route for given callable
-     * @param Closure $fn
-     * @return RouteDiscovered|null
-     */
-    public final function routeOfCallable(Closure $fn) : ?RouteDiscovered
-    {
-        try {
-            $reflection = new ReflectionFunction($fn);
-
-            $methodName = $reflection->name;
-            if (str_contains($methodName, '{closure}')) return null;
-            $className = $reflection->getClosureScopeClass()?->name;
-            if ($className === null) return null;
-
-            return $this->routeOf($className, $methodName);
-        } catch (Throwable) {
-            return null;
-        }
-    }
-
-
-    /**
-     * Get route from discovery
-     * @param string $className
-     * @param string $methodName
-     * @return string|null
-     */
-    private function discoverRouteOf(string $className, string $methodName) : ?string
-    {
-        try {
-            $class = new ReflectionClass($className);
-            $prefixes = RouteMap::findRoutePrefixesFromAttribute($class);
-
-            $method = $class->getMethod($methodName);
-            $entry = RouteMap::findRouteEntryFromAttribute($method);
-            if ($entry === null) return null;
-
-            $ret = RouteMap::combineRoutes($prefixes, $entry->path);
-
-            // Replace the path variables
-            foreach (RouteMap::discoverClassRouteVariables($class) as $variableName => $value) {
-                if (!is_string($value)) continue;
-
-                $searchForVariableName = Quote::brace('@' . $variableName);
-                $replaceWithName = Quote::brace($value);
-                $ret = str_replace($searchForVariableName, $replaceWithName, $ret);
-            }
-
-            return $ret;
-        } catch (Exception) {
-            return null;
-        }
+        return new ActualRouteDiscovered($this->domain ?? '', $url);
     }
 
 
@@ -219,6 +150,20 @@ abstract class RouteDomain
     protected function getClientAddressesResolver() : ?ClientAddressesResolvable
     {
         return null;
+    }
+
+
+    /**
+     * Force current domain to boot up
+     * @return $this
+     * @throws SafetyCommonException
+     * @throws ReflectionException
+     */
+    public final function boot() : static
+    {
+        $this->ensureBoot();
+
+        return $this;
     }
 
 
@@ -383,7 +328,7 @@ abstract class RouteDomain
         $this->map = RouteMap::from($this->getControllerDirectories(), $middlewares);
 
         foreach ($this->getGroups() as $group) {
-            $group->_mapTo($this->map, $middlewares);
+            $group->_mapTo($this->domain, $this->map, $middlewares);
         }
     }
 
