@@ -22,7 +22,6 @@ final class ComposerScriptEventHandler
      */
     public static function onPostAutoloadDump(Event $event) : void
     {
-        /** @noinspection PhpIncludeInspection */
         require_once $event->getComposer()->getConfig()->get('vendor-dir') . '/autoload.php';
 
         static::clearPackagesCache();
