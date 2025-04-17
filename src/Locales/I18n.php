@@ -51,47 +51,7 @@ class I18n
     {
         if ($text instanceof Localizable) return $text;
 
-        return new class($text, $className) implements Localizable {
-            /**
-             * Constructor
-             * @param string $text
-             * @param string|null $className
-             */
-            public function __construct(
-                protected string $text,
-                protected ?string $className,
-            ) {
-
-            }
-
-
-            /**
-             * @inheritDoc
-             */
-            public function getDefaultTranslation() : string
-            {
-                return $this->text;
-            }
-
-
-            /**
-             * @inheritDoc
-             */
-            public function getTranslation(string $locale) : string
-            {
-                return I18n::translate($this->text, $this->className, $locale);
-            }
-
-
-            /**
-             * @inheritDoc
-             */
-            public function __toString() : string
-            {
-                $locale = I18n::getCurrentLocale();
-                return $this->getTranslation($locale);
-            }
-        };
+        return new I18nTaggedLocale($text, $className);
     }
 
 
