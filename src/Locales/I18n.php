@@ -175,6 +175,10 @@ class I18n
             if (array_key_exists($text, $translations)) return $translations[$text];
         }
 
+        // Special translation: '_' will be recognized as default
+        $defaultTranslations = static::getTranslations($className, '_');
+        if (array_key_exists($text, $defaultTranslations)) return $defaultTranslations[$text];
+
         return $text;
     }
 
