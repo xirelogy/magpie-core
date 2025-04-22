@@ -12,11 +12,11 @@ class I18nTaggedLocale implements Localizable
     /**
      * @var string Basic text
      */
-    protected readonly string $text;
+    public readonly string $text;
     /**
      * @var string|null Associated class name
      */
-    protected readonly ?string $className;
+    public readonly ?string $className;
 
 
     /**
