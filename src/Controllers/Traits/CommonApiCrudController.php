@@ -170,9 +170,27 @@ trait CommonApiCrudController
         $className = static::crudGetCreatableClassName($contextAndState->context, $contextAndState->crudState, $parserHost);
         if (!is_subclass_of($className, ApiCreatable::class)) throw new CrudNotCreatableException();
 
+        $this->onSetupPostRoot($request, $className, $contextAndState->context, $contextAndState->crudState, $parserHost);
+
         $object = $className::createFromApi($contextAndState->context, $contextAndState->crudState, $parserHost);
 
         return $this->onResponsePostRoot($request, $contextAndState->crudState, $object);
+    }
+
+
+    /**
+     * Setup/prepare for postRoot()
+     * @param Request $request
+     * @param class-string<ApiCreatable> $className
+     * @param ApiCrudContext $context
+     * @param ApiCrudState $crudState
+     * @param ParserHost $parserHost
+     * @return void
+     * @throws Exception
+     */
+    protected function onSetupPostRoot(Request $request, string $className, ApiCrudContext $context, ApiCrudState $crudState, ParserHost $parserHost) : void
+    {
+        // Default NOP
     }
 
 
