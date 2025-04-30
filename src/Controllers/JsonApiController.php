@@ -19,6 +19,7 @@ use Magpie\General\Names\CommonHttpStatusCode;
 use Magpie\General\Names\CommonMimeType;
 use Magpie\General\Simples\SimpleJSON;
 use Magpie\General\Sugars\Excepts;
+use Magpie\HttpServer\CommonRenderable;
 use Magpie\HttpServer\Exceptions\HttpResponseException;
 use Magpie\HttpServer\JsonResponse;
 use Magpie\HttpServer\Request;
@@ -32,7 +33,7 @@ abstract class JsonApiController extends Controller
     /**
      * @inheritDoc
      */
-    protected final function onCall(ControllerCallable $callable, Request $request, array $routeArguments) : Response
+    protected final function onCall(ControllerCallable $callable, Request $request, array $routeArguments) : CommonRenderable
     {
         $scopes = new ScopedCollection($this->onSetupContextScopesBeforeCall($request, $routeArguments));
 
@@ -103,11 +104,11 @@ abstract class JsonApiController extends Controller
 
     /**
      * Handle response after formatting
-     * @param Response $response
-     * @return Response
+     * @param CommonRenderable $response
+     * @return CommonRenderable
      * @throws Exception
      */
-    protected function onAfterResponse(Response $response) : Response
+    protected function onAfterResponse(CommonRenderable $response) : CommonRenderable
     {
         return $response;
     }
@@ -116,10 +117,10 @@ abstract class JsonApiController extends Controller
     /**
      * Handle HTTP response exception
      * @param HttpResponseException $ex
-     * @return Response
+     * @return CommonRenderable
      * @throws Exception
      */
-    protected function onHandleHttpResponseException(HttpResponseException $ex) : Response
+    protected function onHandleHttpResponseException(HttpResponseException $ex) : CommonRenderable
     {
         throw $ex;
     }
@@ -200,10 +201,10 @@ abstract class JsonApiController extends Controller
      * Create exception response
      * @param mixed $payload
      * @param int|null $httpStatusCode
-     * @return Response
+     * @return CommonRenderable|Response
      * @throws InvalidJsonDataFormatException
      */
-    protected function createExceptionResponse(mixed $payload, ?int $httpStatusCode = null) : Response
+    protected function createExceptionResponse(mixed $payload, ?int $httpStatusCode = null) : CommonRenderable|Response
     {
         $httpStatusCode = $httpStatusCode ?? $this->createExceptionHttpStatusCode();
         return static::_createResponse($this->createResponseFormatter(), $payload, $httpStatusCode);
@@ -235,12 +236,15 @@ abstract class JsonApiController extends Controller
      * @param Formatter $formatter
      * @param mixed $payload
      * @param int|null $httpStatusCode
-     * @return Response
+     * @return CommonRenderable
      * @throws InvalidJsonDataFormatException
      * @internal
      */
-    private static function _createResponse(Formatter $formatter, mixed $payload, ?int $httpStatusCode = null) : Response
+    private static function _createResponse(Formatter $formatter, mixed $payload, ?int $httpStatusCode = null) : CommonRenderable
     {
+        // Do not format the payload if it is already renderable
+        if ($payload instanceof CommonRenderable) return $payload;
+
         $payload = $formatter->format($payload);
 
         return new JsonResponse($payload, $httpStatusCode);
