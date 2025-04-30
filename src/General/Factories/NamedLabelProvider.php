@@ -73,7 +73,8 @@ class NamedLabelProvider
     {
         $resolver = ClosureLocaleResolver::create(function (string $text, string $locale) use ($className) : ?string {
             $translations = static::loadTranslations($className, $locale);
-            return $translations[$text] ?? null;
+            $defaultTranslations = static::loadTranslations($className, '_');
+            return $translations[$text] ?? $defaultTranslations[$text] ?? null;
         });
 
         try {
