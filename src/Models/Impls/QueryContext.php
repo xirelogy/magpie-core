@@ -4,6 +4,7 @@ namespace Magpie\Models\Impls;
 
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Models\ColumnName;
+use Magpie\Models\Concepts\QueryContextServiceable;
 use Magpie\Models\Connection;
 use Magpie\Models\Providers\QueryGrammar;
 use Magpie\Models\Schemas\ColumnSchema;
@@ -13,7 +14,7 @@ use Magpie\Models\Schemas\TableSchema;
  * Context to build query
  * @internal
  */
-class QueryContext
+class QueryContext implements QueryContextServiceable
 {
     /**
      * @var Connection|null Associated connection
@@ -47,9 +48,7 @@ class QueryContext
 
 
     /**
-     * Express column name in SQL
-     * @param string|ColumnName $columnName
-     * @return string
+     * @inheritDoc
      */
     public function getColumnNameSql(string|ColumnName $columnName) : string
     {
@@ -66,10 +65,7 @@ class QueryContext
 
 
     /**
-     * Get corresponding column schema
-     * @param string|ColumnName $columnName
-     * @return ColumnSchema|null
-     * @throws SafetyCommonException
+     * @inheritDoc
      */
     public function getColumnSchema(string|ColumnName $columnName) : ?ColumnSchema
     {

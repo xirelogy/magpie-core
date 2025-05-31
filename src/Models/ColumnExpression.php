@@ -4,6 +4,7 @@ namespace Magpie\Models;
 
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Models\Concepts\QueryArgumentable;
+use Magpie\Models\Concepts\QueryContextServiceable;
 use Magpie\Models\Impls\QueryContext;
 use Magpie\Models\Impls\QueryStatement;
 
@@ -41,6 +42,17 @@ abstract class ColumnExpression implements QueryArgumentable
      * @throws SafetyCommonException
      */
     protected abstract function onFinalize(QueryContext $context) : QueryStatement;
+
+
+    /**
+     * Closure column expression
+     * @param callable(QueryContextServiceable):QueryStatementCreator $fn
+     * @return self
+     */
+    public static function closure(callable $fn) : self
+    {
+        return ClosureColumnExpression::create($fn);
+    }
 
 
     /**
