@@ -52,6 +52,14 @@ class QueryOptions implements QueryApplicable
      */
     public final function withCondition(QueryCondition $useCondition) : static
     {
+        // Handle QueryUseOrderCondition
+        if ($useCondition instanceof QueryUseOrderCondition) {
+            return $this
+                ->withCondition($useCondition->baseCondition)
+                ->withOrderCondition($useCondition->orderCondition)
+                ;
+        }
+
         $this->useConditions[] = $useCondition;
         return $this;
     }
