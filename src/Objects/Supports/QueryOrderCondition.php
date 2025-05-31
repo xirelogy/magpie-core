@@ -4,10 +4,10 @@ namespace Magpie\Objects\Supports;
 
 use Magpie\General\Traits\StaticCreatable;
 use Magpie\Models\BaseQueryConditionable;
+use Magpie\Models\ColumnExpression;
 use Magpie\Models\ColumnName;
 use Magpie\Models\Concepts\QueryOrderable;
 use Magpie\Models\Enums\OrderType;
-use Magpie\Models\Impls\SimpleQueryOrder;
 use Magpie\Models\Query;
 
 /**
@@ -18,7 +18,7 @@ class QueryOrderCondition extends QueryCondition implements QueryOrderable
     use StaticCreatable;
 
     /**
-     * @var array<SimpleQueryOrder> Sort orders
+     * @var array<QueryOrderSpecification> Sort orders
      */
     protected array $orders = [];
 
@@ -35,9 +35,10 @@ class QueryOrderCondition extends QueryCondition implements QueryOrderable
     /**
      * @inheritDoc
      */
-    public final function orderBy(string|ColumnName $column, OrderType $order = OrderType::ASC) : static
+    public final function orderBy(string|ColumnName|ColumnExpression $column, OrderType $order = OrderType::ASC) : static
     {
-        $this->orders[] = new SimpleQueryOrder($column, $order);
+        $this->orders[] = new QueryOrderSpecification($column, $order);
+
         return $this;
     }
 

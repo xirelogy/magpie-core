@@ -18,6 +18,7 @@ use Magpie\Models\Enums\WhereJoinType;
 use Magpie\Models\Exceptions\ModelReadException;
 use Magpie\Models\Exceptions\ModelWriteException;
 use Magpie\Models\Exceptions\QuerySelectResetException;
+use Magpie\Models\Impls\ExpressionQueryOrder;
 use Magpie\Models\Impls\FilterApplyMode;
 use Magpie\Models\Impls\ModelFinalizer;
 use Magpie\Models\Impls\QueryContext;
@@ -144,9 +145,12 @@ abstract class Query extends BaseQueryConditionable implements QueryOrderable, Q
     /**
      * @inheritDoc
      */
-    public function orderBy(string|ColumnName $column, OrderType $order = OrderType::ASC) : static
+    public function orderBy(string|ColumnName|ColumnExpression $column, OrderType $order = OrderType::ASC) : static
     {
-        $this->orders[] = new SimpleQueryOrder($column, $order);
+        $this->orders[] = $column instanceof ColumnExpression ?
+            new ExpressionQueryOrder($column, $order) :
+            new SimpleQueryOrder($column, $order);
+
         return $this;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Magpie\Models\Concepts;
 
+use Magpie\Models\ColumnExpression;
 use Magpie\Models\ColumnName;
 use Magpie\Models\Enums\OrderType;
 
@@ -12,9 +13,9 @@ interface QueryOrderable
 {
     /**
      * Specify the sort order
-     * @param ColumnName|string $column
+     * @param ColumnExpression|ColumnName|string $column
      * @param OrderType $order
      * @return $this
      */
-    public function orderBy(ColumnName|string $column, OrderType $order = OrderType::ASC) : static;
+    public function orderBy(ColumnExpression|ColumnName|string $column, OrderType $order = OrderType::ASC) : static;
 }
