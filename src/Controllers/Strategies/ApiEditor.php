@@ -5,7 +5,10 @@ namespace Magpie\Controllers\Strategies;
 use Magpie\Codecs\Parsers\Parser;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\MissingArgumentException;
-use Magpie\General\Sugars\Excepts;
+use Magpie\Exceptions\OperationFailedException;
+use Magpie\Exceptions\PersistenceException;
+use Magpie\Exceptions\SafetyCommonException;
+use Throwable;
 
 /**
  * Handle for editing from API
@@ -54,6 +57,8 @@ class ApiEditor extends ApiModifier
      * @param callable(T):void $onValue
      * @return bool
      * @throws ArgumentException
+     * @throws SafetyCommonException
+     * @throws PersistenceException
      */
     public function whenRequires(string|int $key, ?Parser $parser, callable $onValue) : bool
     {
@@ -61,7 +66,7 @@ class ApiEditor extends ApiModifier
         if (!$this->parserHost->has($key)) return false;
 
         $value = $this->parserHost->requires($key, $parser);
-        Excepts::noThrow(fn () => $onValue($value));
+        $this->safeOnValue($onValue, $value);
         $this->isChanged = true;
 
         return true;
@@ -73,9 +78,11 @@ class ApiEditor extends ApiModifier
      * @template T
      * @param string|int $key
      * @param Parser<T>|null $parser
-     * @param callable(T):void $onValue
+     * @param callable(T|null):void $onValue
      * @return bool
      * @throws ArgumentException
+     * @throws SafetyCommonException
+     * @throws PersistenceException
      */
     public function whenOptional(string|int $key, ?Parser $parser, callable $onValue) : bool
     {
@@ -83,10 +90,31 @@ class ApiEditor extends ApiModifier
         if (!$this->parserHost->has($key)) return false;
 
         $value = $this->parserHost->optional($key, $parser);
-        Excepts::noThrow(fn () => $onValue($value));
+        $this->safeOnValue($onValue, $value);
         $this->isChanged = true;
 
         return true;
+    }
+
+
+    /**
+     * Set value (with safety)
+     * @template T
+     * @param callable(T|null):void $onValue
+     * @param T|null $value
+     * @return void
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    private function safeOnValue(callable $onValue, mixed $value) : void
+    {
+        try {
+            $onValue($value);
+        } catch (SafetyCommonException|PersistenceException $ex) {
+            throw $ex;
+        } catch (Throwable $ex) {
+            throw new OperationFailedException(previous: $ex);
+        }
     }
 
 
