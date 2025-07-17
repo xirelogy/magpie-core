@@ -2,7 +2,6 @@
 
 namespace Magpie\Models\Impls;
 
-use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Models\ColumnName;
 use Magpie\Models\Concepts\QueryContextServiceable;
 use Magpie\Models\Connection;
