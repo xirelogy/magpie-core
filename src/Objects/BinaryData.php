@@ -121,7 +121,7 @@ class BinaryData implements PreferStringable
      */
     public static function fromBase64(string $data) : static
     {
-        $binData = @base64_decode($data);
+        $binData = @base64_decode($data, true);
         if ($binData === false) throw new InvalidDataException();
 
         return new static($binData);
