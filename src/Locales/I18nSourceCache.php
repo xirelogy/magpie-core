@@ -19,6 +19,19 @@ class I18nSourceCache
 
 
     /**
+     * Export to source cache (optionally)
+     * @param string|Localizable|null $target
+     * @return array|null
+     */
+    public static function exportOptional(string|Localizable|null $target) : ?array
+    {
+        if ($target === null) return null;
+
+        return static::export($target);
+    }
+
+
+    /**
      * Export to source cache
      * @param string|Localizable $target
      * @return array
@@ -42,6 +55,19 @@ class I18nSourceCache
             'type' => static::TYPE_STRING,
             'text' => $finalTarget,
         ];
+    }
+
+
+    /**
+     * Import from source cache (optionally)
+     * @param array|null $data
+     * @return string|Localizable|null
+     */
+    public static function importOptional(?array $data) : string|Localizable|null
+    {
+        if ($data === null) return null;
+
+        return static::import($data);
     }
 
 
