@@ -2,12 +2,16 @@
 
 namespace Magpie\Routes\Middlewares;
 
+use Magpie\Exceptions\NullException;
+use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Names\CommonHttpHeader;
 use Magpie\General\Names\CommonHttpMethod;
 use Magpie\General\Names\CommonHttpStatusCode;
+use Magpie\General\Sugars\Excepts;
 use Magpie\HttpServer\Concepts\WithHeaderSpecifiable;
 use Magpie\HttpServer\Request;
 use Magpie\HttpServer\Response;
+use Magpie\Objects\Uri;
 use Magpie\Routes\Concepts\RouteHandleable;
 use Magpie\Routes\Constants\RouteMiddlewarePurposePriority;
 use Magpie\Routes\RouteMiddleware;
@@ -27,7 +31,7 @@ class CorsMiddleware extends RouteMiddleware
         // References: https://www.html5rocks.com/static/images/cors_server_flowchart.png
 
         // Check origin
-        $origin = $request->headers->optional(CommonHttpHeader::ORIGIN);
+        $origin = $this->getOrigin($request);
         if ($origin === null || !$this->isOriginAllowed($origin)) {
             return $next->route($request);
         }
@@ -60,6 +64,52 @@ class CorsMiddleware extends RouteMiddleware
         }
 
         return $response;
+    }
+
+
+    /**
+     * Try to get the CORS origin
+     * @param Request $request
+     * @return string|null
+     * @throws SafetyCommonException
+     */
+    protected function getOrigin(Request $request) : ?string
+    {
+        // Prefer from the 'Origin' header
+        $origin = $request->headers->optional(CommonHttpHeader::ORIGIN);
+        if ($origin !== null) return $origin;
+
+        // Fallback to 'Referer' header in GET request
+        if ($request->getMethod() === CommonHttpMethod::GET) {
+            $referer = $request->headers->optional(CommonHttpHeader::REFERER);
+            if ($referer !== null) {
+                /** @var Uri|null $refererUrl */
+                $refererUrl = Excepts::noThrow(fn () => Uri::parse($referer));
+                if ($refererUrl !== null) {
+                    $next = $refererUrl->build();
+                    $next->path = '';
+                    return "$next";
+                }
+            }
+        }
+
+        // Fallback to default origin
+        return $this->getDefaultOrigin($request);
+    }
+
+
+    /**
+     * Default origin when none was discovered
+     * @param Request $request
+     * @return string|null
+     * @throws SafetyCommonException
+     */
+    protected function getDefaultOrigin(Request $request) : ?string
+    {
+        _used($request);
+        _throwable() ?? throw new NullException();
+
+        return null;
     }
 
 
