@@ -178,6 +178,7 @@ abstract class CommonUri implements PreferStringable
         $target->username = $source->username;
         $target->password = $source->password;
         $target->host = $source->host;
+        $target->port = $source->port;
         $target->path = $source->path;
         $target->setQueryString($source->getQueryString());
         $target->fragment = $source->fragment;
