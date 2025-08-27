@@ -12,6 +12,7 @@ use Magpie\Consoles\Inputs\PromptWithOption;
 use Magpie\Exceptions\ArgumentException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
+use Magpie\General\Concepts\StreamWriteable;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Logs\Concepts\Loggable;
 use Magpie\Logs\Concepts\LogRelayable;
@@ -291,6 +292,80 @@ class Console
         $relay = static::asLogRelay($logFormatter, $logConfig);
 
         return new DefaultLogger($relay);
+    }
+
+
+    /**
+     * Create a stream to write to console output
+     * @return StreamWriteable
+     */
+    public static function asWriteStream() : StreamWriteable
+    {
+        return new class(static::output(...)) implements StreamWriteable {
+            /**
+             * @var Closure(Stringable|string|null,DisplayStyle|null):void Output function
+             */
+            private readonly Closure $outputFn;
+            /**
+             * @var string Output buffer
+             */
+            private string $buffer;
+
+
+            /**
+             * Constructor
+             * @param callable(Stringable|string|null,DisplayStyle|null):void $outputFn
+             */
+            public function __construct(callable $outputFn)
+            {
+                $this->outputFn = $outputFn;
+                $this->buffer = '';
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function write(string $data) : int
+            {
+                $this->buffer .= $data;
+                $this->processBuffer();
+                return strlen($data);
+            }
+
+
+            /**
+             * @inheritDoc
+             */
+            public function close() : void
+            {
+                $this->processBuffer();
+                if (strlen($this->buffer) <= 0) return;
+
+                // Dump remaining in a line, and return
+                ($this->outputFn)($this->buffer);
+                $this->buffer = '';
+            }
+
+
+            /**
+             * Process the buffer, output any pending lines
+             * @return void
+             */
+            private function processBuffer() : void
+            {
+                $this->buffer = str_replace("\r", '', $this->buffer);
+
+                for (;;) {
+                    $nPos = strpos($this->buffer, "\n");
+                    if ($nPos === false) return;
+
+                    $line = substr($this->buffer, 0, $nPos);
+                    ($this->outputFn)($line);
+                    $this->buffer = substr($this->buffer, $nPos + 1);
+                }
+            }
+        };
     }
 
 
