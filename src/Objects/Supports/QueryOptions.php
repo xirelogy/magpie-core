@@ -155,6 +155,16 @@ class QueryOptions implements QueryApplicable
 
 
     /**
+     * Obtain the paginator currently used
+     * @return Paginator|null
+     */
+    public final function getUsePaginator() : ?Paginator
+    {
+        return $this->usePaginator;
+    }
+
+
+    /**
      * @inheritDoc
      */
     public final function applyOnQuery(BaseQueryConditionable $query) : void
