@@ -223,6 +223,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
             static::_onCreate($connectionInstance, $this->_storage->getTableSchema(), $changes);
 
             $this->_storage->resetChanges($changes);
+            PatchHost::notifySave($this->_storage->getTableSchema()->getModelClassName());
         } else {
             // Existing model, invoke corresponding 'UPDATE'
             if (count($changes) <= 0) return;
@@ -244,6 +245,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
             $query->update($changes);
 
             $this->_storage->resetChanges($savedAttributes);
+            PatchHost::notifySave($this->_storage->getTableSchema()->getModelClassName());
         }
     }
 

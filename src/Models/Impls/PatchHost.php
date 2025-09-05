@@ -5,6 +5,7 @@ namespace Magpie\Models\Impls;
 use Carbon\CarbonInterface;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Models\Concepts\ModelInitializePatchable;
+use Magpie\Models\Concepts\ModelSavePatchable;
 use Magpie\Models\Concepts\ModelTimestampPatchable;
 
 /**
@@ -23,6 +24,10 @@ class PatchHost
      * @var ModelTimestampPatchable|null Current patch to creation/update timestamp
      */
     protected static ?ModelTimestampPatchable $patchTimestamp = null;
+    /**
+     * @var ModelSavePatchable|null Current patch to get notified on model save
+     */
+    protected static ?ModelSavePatchable $patchSave = null;
 
 
     /**
@@ -81,5 +86,27 @@ class PatchHost
     public static function tryUpdateTimestamp(string $tableModelClass) : ?CarbonInterface
     {
         return static::$patchTimestamp?->tryUpdateTimestamp($tableModelClass);
+    }
+
+
+    /**
+     * Start listening for model save patch
+     * @param ModelSavePatchable $patch
+     * @return void
+     */
+    public static function listenSave(ModelSavePatchable $patch) : void
+    {
+        static::$patchSave = $patch;
+    }
+
+
+    /**
+     * Notify that a model save had happened
+     * @param string $tableModelClass
+     * @return void
+     */
+    public static function notifySave(string $tableModelClass) : void
+    {
+        static::$patchSave?->notifySave($tableModelClass);
     }
 }
