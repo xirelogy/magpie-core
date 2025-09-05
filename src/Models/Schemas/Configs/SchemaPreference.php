@@ -2,6 +2,7 @@
 
 namespace Magpie\Models\Schemas\Configs;
 
+use Magpie\Models\Schemas\DataType;
 use Magpie\Models\Schemas\IdModelDefinitionAlias;
 use Magpie\Models\Schemas\ModelDefinition;
 use Magpie\Models\Schemas\ModelDefinitionAlias;
@@ -42,6 +43,19 @@ abstract class SchemaPreference
     protected function getAliasDefinitions() : iterable
     {
         yield new IdModelDefinitionAlias('int');
+    }
+
+
+    /**
+     * Overridden default data type
+     * @param ModelDefinition $definition
+     * @return DataType|null
+     */
+    public function getOverriddenDefaultDataType(ModelDefinition $definition) : ?DataType
+    {
+        _used($definition);
+
+        return null;
     }
 
 

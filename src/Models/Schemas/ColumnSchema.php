@@ -77,7 +77,9 @@ abstract class ColumnSchema implements Packable
         }
 
         $rawModelDef = DefaultDataTypes::resolveAlias($rawModelDef);
-        $this->dataType = DefaultDataTypes::resolve($rawModelDef) ?? throw new UnsupportedValueException($this->attributeInstance->def, _l('schema definition'));
+        $this->dataType = $this->preference->getOverriddenDefaultDataType($rawModelDef)
+            ?? DefaultDataTypes::resolve($rawModelDef)
+            ?? throw new UnsupportedValueException($this->attributeInstance->def, _l('schema definition'));
 
         if ($lastAliasedDef !== null) {
             $this->dataType->nativeType = $lastAliasedDef->nativeType;
