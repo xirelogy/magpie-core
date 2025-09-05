@@ -6,6 +6,7 @@ use Throwable;
 
 /**
  * Exception due to query selection had been reset and the hydration result cannot be guaranteed
+ * @note Solution: use listUsing()/firstUsing() instead of list()/first()
  */
 class QuerySelectResetException extends ModelSafetyException
 {
