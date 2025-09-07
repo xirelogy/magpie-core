@@ -6,6 +6,7 @@ use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Facades\Redis\RedisClient;
 use Magpie\General\Factories\Annotations\FactoryTypeClass;
 use Magpie\General\Factories\ClassFactory;
+use Magpie\Logs\Concepts\Loggable;
 use Magpie\Queues\Providers\Queue;
 use Magpie\Queues\Providers\QueueCreator;
 use Magpie\Queues\QueueConfig;
@@ -64,6 +65,17 @@ class RedisQueueCreator extends QueueCreator
         }
 
         return $this->queues[$key];
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(Loggable $logger = null) : void
+    {
+        $logger?->info(_l('Clearing all values in Redis queue...'));
+        $this->redis->clear();
+        $logger?->info(_l('Redis queue cleared'));
     }
 
 
