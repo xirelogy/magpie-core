@@ -24,7 +24,7 @@ trait CommonRouteOfCallable
 
             $methodName = $reflection->name;
             if (str_contains($methodName, '{closure}')) return null;
-            $className = $reflection->getClosureScopeClass()?->name;
+            $className = $reflection->getClosureCalledClass()?->name;
             if ($className === null) return null;
 
             return $this->routeOf($className, $methodName);
