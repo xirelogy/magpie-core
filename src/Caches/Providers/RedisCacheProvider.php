@@ -107,6 +107,15 @@ class RedisCacheProvider implements CacheProvidable
     /**
      * @inheritDoc
      */
+    public function clear() : void
+    {
+        $this->redis->clear();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function registerAsDefaultProvider() : void
     {
         Kernel::current()->registerProvider(CacheProvidable::class, $this);

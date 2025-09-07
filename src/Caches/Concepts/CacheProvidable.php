@@ -58,4 +58,13 @@ interface CacheProvidable extends DefaultProviderRegistrable
      * @throws PersistenceException
      */
     public function updateExpiry(string $namespace, string $key, int|Duration $ttl) : void;
+
+
+    /**
+     * Clear all values stored
+     * @return void
+     * @throws SafetyCommonException
+     * @throws PersistenceException
+     */
+    public function clear() : void;
 }
