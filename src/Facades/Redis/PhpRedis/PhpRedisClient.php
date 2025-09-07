@@ -227,7 +227,7 @@ class PhpRedisClient extends RedisClient
     public function clear() : bool
     {
         $redis = $this->ensureRedis();
-        return static::safeExecute('flushAll', fn() => $redis->flushAll());
+        return static::safeExecute('flushDB', fn() => $redis->flushDB());
     }
 
 
