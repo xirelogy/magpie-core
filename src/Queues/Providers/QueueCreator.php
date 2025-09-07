@@ -8,6 +8,7 @@ use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\NotOfTypeException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Factories\ClassFactory;
+use Magpie\Logs\Concepts\Loggable;
 use Magpie\Queues\QueueConfig;
 use Magpie\System\Concepts\DefaultProviderRegistrable;
 use Magpie\System\Concepts\SystemBootable;
@@ -25,6 +26,18 @@ abstract class QueueCreator implements DefaultProviderRegistrable, SystemBootabl
      * @return Queue
      */
     public abstract function getQueue(?string $name) : Queue;
+
+
+    /**
+     * Initialize the queue system
+     * @param Loggable|null $logger
+     * @return void
+     * @throws Exception
+     */
+    public function initialize(Loggable $logger = null) : void
+    {
+        // Default NOP
+    }
 
 
     /**
