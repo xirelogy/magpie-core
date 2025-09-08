@@ -3,6 +3,7 @@
 namespace Magpie\Routes\Concepts;
 
 use Closure;
+use Magpie\Controllers\Controller;
 use Magpie\Routes\RouteDiscovered;
 
 /**
@@ -12,7 +13,7 @@ interface RouteDiscoverable
 {
     /**
      * Get the route for given class-method combination
-     * @param string $className
+     * @param class-string<Controller> $className
      * @param string $methodName
      * @return RouteDiscovered|null
      */
