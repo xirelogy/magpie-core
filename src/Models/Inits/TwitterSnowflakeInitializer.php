@@ -2,6 +2,7 @@
 
 namespace Magpie\Models\Inits;
 
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Magpie\Exceptions\OutOfRangeSubjectException;
 use Magpie\Exceptions\SafetyCommonException;
@@ -64,6 +65,23 @@ abstract class TwitterSnowflakeInitializer implements AttributeInitializable
     public final static function generateSpecific(CarbonInterface $specificTime) : int
     {
         return static::onGenerate($specificTime);
+    }
+
+
+    /**
+     * Try to decode for associated time value from specific generated value
+     * @param int|null $value
+     * @return CarbonImmutable|null
+     */
+    public final static function decodeTime(?int $value) : ?CarbonImmutable
+    {
+        if ($value === null) return null;
+
+        $diffMilliTimestamp = $value >> (static::NODE_BITS + static::SEQUENCE_BITS);
+        $timestamp = $diffMilliTimestamp + static::getEpochMilliTimestamp();
+        $timestamp = $timestamp & ((1 << static::TIMESTAMP_BITS) - 1);
+
+        return CarbonImmutable::createFromTimestampMs($timestamp);
     }
 
 
