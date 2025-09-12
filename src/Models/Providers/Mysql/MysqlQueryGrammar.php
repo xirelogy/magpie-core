@@ -2,6 +2,8 @@
 
 namespace Magpie\Models\Providers\Mysql;
 
+use Magpie\Models\Concepts\QueryIdentifierQuotable;
+use Magpie\Models\Providers\Mysql\Impls\BacktickQueryIdentifierQuote;
 use Magpie\Models\Providers\Pdo\PdoQueryGrammar;
 
 /**
@@ -9,6 +11,15 @@ use Magpie\Models\Providers\Pdo\PdoQueryGrammar;
  */
 class MysqlQueryGrammar extends PdoQueryGrammar
 {
+    /**
+     * @inheritDoc
+     */
+    public function getIdentifierQuote() : QueryIdentifierQuotable
+    {
+        return BacktickQueryIdentifierQuote::instance();
+    }
+
+
     /**
      * @inheritDoc
      */

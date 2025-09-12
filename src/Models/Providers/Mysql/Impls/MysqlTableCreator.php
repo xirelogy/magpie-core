@@ -5,8 +5,9 @@ namespace Magpie\Models\Providers\Mysql\Impls;
 use Magpie\General\Sugars\Excepts;
 use Magpie\General\Sugars\Quote;
 use Magpie\Models\Concepts\ColumnDatabaseSpecifiable;
-use Magpie\Models\Impls\SqlFormat;
+use Magpie\Models\Concepts\QueryIdentifierQuotable;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
+use Magpie\Models\Providers\QueryGrammar;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
 use Magpie\Objects\NumericVersion;
 
@@ -65,13 +66,14 @@ class MysqlTableCreator extends TableCreator
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
      */
-    public function compile() : iterable
+    public function compile(QueryGrammar $grammar) : iterable
     {
         $database = $this->connection->getDatabase();
+        $q = $grammar->getIdentifierQuote();
 
         $sql = 'CREATE TABLE ';
-        if ($database !== null) $sql .= SqlFormat::backTick($database) . '.';
-        $sql .= SqlFormat::backTick($this->tableName);
+        if ($database !== null) $sql .= $q->quote($database) . '.';
+        $sql .= $q->quote($this->tableName);
 
         // Setup declarations
         $primaryKeys = [];
@@ -88,14 +90,14 @@ class MysqlTableCreator extends TableCreator
 
         // Handle primary keys
         if (count($primaryKeys) > 0) {
-            $outPrimaryKeys = iter_flatten(static::applyBackTicks($primaryKeys));
+            $outPrimaryKeys = iter_flatten(static::applyQuotes($q, $primaryKeys));
             $declarations[] = 'PRIMARY KEY ' . Quote::bracket(implode(', ', $outPrimaryKeys));
         }
 
         // Handle unique key indices
         foreach ($uniqueKeys as $uniqueKey) {
             $indexKey = $uniqueKey . '_UNIQUE';
-            $declarations[] = 'UNIQUE INDEX ' . SqlFormat::backTick($indexKey) . ' ' . Quote::bracket(SqlFormat::backTick($uniqueKey) . ' ASC') . ' ' . $this->getUniqueIndexVisibleSuffix();
+            $declarations[] = 'UNIQUE INDEX ' . $q->quote($indexKey) . ' ' . Quote::bracket($q->quote($uniqueKey) . ' ASC') . ' ' . $this->getUniqueIndexVisibleSuffix();
         }
 
         // Finalize
@@ -120,14 +122,15 @@ class MysqlTableCreator extends TableCreator
 
 
     /**
-     * Apply back ticks
+     * Apply identifier quotes
+     * @param QueryIdentifierQuotable $q
      * @param iterable<string> $values
      * @return iterable<string>
      */
-    protected static function applyBackTicks(iterable $values) : iterable
+    protected static function applyQuotes(QueryIdentifierQuotable $q, iterable $values) : iterable
     {
         foreach ($values as $value) {
-            yield SqlFormat::backTick($value);
+            yield $q->quote($value);
         }
     }
 }

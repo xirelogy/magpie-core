@@ -3,6 +3,7 @@
 namespace Magpie\Models\Providers\Sqlite\Impls;
 
 use Magpie\Models\Concepts\ColumnDatabaseSpecifiable;
+use Magpie\Models\Providers\QueryGrammar;
 use Magpie\Models\Providers\Sqlite\Impls\Traits\SqliteTableCreatorCompiler;
 use Magpie\Models\Providers\Sqlite\SqliteConnection;
 use Magpie\Models\Schemas\DatabaseEdits\TableCreator;
@@ -64,9 +65,9 @@ class SqliteTableCreator extends TableCreator
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
      */
-    public function compile() : iterable
+    public function compile(QueryGrammar $grammar) : iterable
     {
-        $sql = static::compileCreateTableSql($this->connection, $this->tableName, $this->columns);
+        $sql = static::compileCreateTableSql($grammar, $this->connection, $this->tableName, $this->columns);
         yield $this->connection->prepare($sql);
     }
 

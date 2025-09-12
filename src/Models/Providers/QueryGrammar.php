@@ -2,11 +2,23 @@
 
 namespace Magpie\Models\Providers;
 
+use Magpie\Models\Concepts\QueryIdentifierQuotable;
+
 /**
  * Implementation specific query grammar
  */
 abstract class QueryGrammar
 {
+    /**
+     * Instance to quote identifier
+     * @return QueryIdentifierQuotable
+     */
+    public function getIdentifierQuote() : QueryIdentifierQuotable
+    {
+        return DefaultQueryIdentifierQuote::instance();
+    }
+
+
     /**
      * Apply 'LIMIT' to given SQL query
      * @param string $sql

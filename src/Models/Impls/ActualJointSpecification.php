@@ -37,7 +37,9 @@ class ActualJointSpecification extends BaseJointSpecifiable implements QueryArgu
      */
     public function _finalize(QueryContext $context) : QueryStatement
     {
-        $ret = new QueryStatement(strtoupper($this->type->value) . ' JOIN ' . SqlFormat::backTick($this->jointSchema->getName()));
+        $q = $context->grammar?->getIdentifierQuote();
+
+        $ret = new QueryStatement(strtoupper($this->type->value) . ' JOIN ' . $q->quote($this->jointSchema->getName()));
 
         $ret->appendJoinIfNotEmpty(' ON ', $this->clause->_finalize($context));
 

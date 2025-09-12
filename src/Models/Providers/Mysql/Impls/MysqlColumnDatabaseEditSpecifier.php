@@ -6,7 +6,7 @@ use Magpie\Exceptions\MissingArgumentException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\Models\Concepts\ColumnDatabaseEditSpecifiable;
-use Magpie\Models\Impls\SqlFormat;
+use Magpie\Models\Concepts\QueryIdentifierQuotable;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
 use Magpie\Models\Schemas\DatabaseEdits\AddColumnDatabaseEditAction;
 use Magpie\Models\Schemas\DatabaseEdits\ChangeColumnDatabaseEditAction;
@@ -58,12 +58,14 @@ class MysqlColumnDatabaseEditSpecifier extends MysqlColumnDatabaseSpecifier impl
      */
     public function _compile(MysqlConnection $connection) : string
     {
-        $ret = $this->compileEditAction();
+        $q = $connection->getQueryGrammar()->getIdentifierQuote();
+
+        $ret = $this->compileEditAction($q);
         $ret .= ' ' . parent::_compile($connection);
 
         if ($this->hasRelativePosition) {
             if ($this->columnPositionAfter !== null) {
-                $ret .= ' AFTER ' . SqlFormat::backTick($this->columnPositionAfter);
+                $ret .= ' AFTER ' . $q->quote($this->columnPositionAfter);
             } else {
                 $ret .= ' FIRST';
             }
@@ -75,10 +77,11 @@ class MysqlColumnDatabaseEditSpecifier extends MysqlColumnDatabaseSpecifier impl
 
     /**
      * Compile the edit action of column specifier
+     * @param QueryIdentifierQuotable $q
      * @return string
      * @throws SafetyCommonException
      */
-    protected function compileEditAction() : string
+    protected function compileEditAction(QueryIdentifierQuotable $q) : string
     {
         if ($this->editAction === null) throw new MissingArgumentException('editAction');
 
@@ -87,7 +90,7 @@ class MysqlColumnDatabaseEditSpecifier extends MysqlColumnDatabaseSpecifier impl
         }
 
         if ($this->editAction instanceof ChangeColumnDatabaseEditAction) {
-            return 'CHANGE COLUMN ' . SqlFormat::backTick($this->editAction->columnName);
+            return 'CHANGE COLUMN ' . $q->quote($this->editAction->columnName);
         }
 
         throw new UnsupportedValueException($this->editAction, 'edit action');

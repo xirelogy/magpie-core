@@ -37,11 +37,13 @@ class SqliteColumnDatabaseSpecifier extends ColumnDatabaseSpecifier
      */
     public function _compile(SqliteConnection $connection) : string
     {
-        $ret = SqliteGrammar::escapeName($this->name) . ' ' . static::exportDefinitionType($this->defType);
+        $q = $connection->getQueryGrammar()->getIdentifierQuote();
+
+        $ret = $q->quote($this->name) . ' ' . static::exportDefinitionType($this->defType);
         if ($this->isAutoIncrement) {
             // Force the type to become INTEGER
             if (!static::isTypeSupportsAutoIncrement($this->defType)) throw new UnsupportedValueException($this->defType, _l('auto increment'));
-            $ret = SqliteGrammar::escapeName($this->name) . ' INTEGER';
+            $ret = $q->quote($this->name) . ' INTEGER';
         }
 
         if ($this->isNonNull) $ret .= ' NOT NULL';

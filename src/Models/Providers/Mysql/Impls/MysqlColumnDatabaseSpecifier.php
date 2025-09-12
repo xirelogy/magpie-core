@@ -7,7 +7,6 @@ use Magpie\Exceptions\UnexpectedException;
 use Magpie\Exceptions\UnsupportedException;
 use Magpie\Models\ColumnExpression;
 use Magpie\Models\Impls\QueryContext;
-use Magpie\Models\Impls\SqlFormat;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
 use Magpie\Models\Schemas\DatabaseEdits\ColumnDatabaseSpecifier;
 use Magpie\Models\Schemas\ModelDefinition;
@@ -45,7 +44,9 @@ class MysqlColumnDatabaseSpecifier extends ColumnDatabaseSpecifier
      */
     public function _compile(MysqlConnection $connection) : string
     {
-        $ret = SqlFormat::backTick($this->name) . ' ' . static::exportDefinitionType($this->defType);
+        $q = $connection->getQueryGrammar()->getIdentifierQuote();
+
+        $ret = $q->quote($this->name) . ' ' . static::exportDefinitionType($this->defType);
         if ($this->isNonNull) {
             $ret .= ' NOT NULL';
         } else {

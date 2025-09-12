@@ -203,9 +203,9 @@ class ActualModelQuery extends ModelQuery
      */
     private function formatTable(Connection $connection) : string
     {
-        _used($connection);
+        $q = $connection->getQueryGrammar()->getIdentifierQuote();
 
-        return SqlFormat::backTick($this->tableSchema->getName());
+        return $q->quote($this->tableSchema->getName());
     }
 
 

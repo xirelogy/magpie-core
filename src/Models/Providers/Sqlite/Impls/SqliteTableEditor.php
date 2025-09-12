@@ -6,6 +6,7 @@ use Exception;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Sugars\Quote;
 use Magpie\Models\Concepts\ColumnDatabaseEditSpecifiable;
+use Magpie\Models\Providers\QueryGrammar;
 use Magpie\Models\Providers\Sqlite\Impls\Traits\SqliteTableCreatorCompiler;
 use Magpie\Models\Providers\Sqlite\SqliteConnection;
 use Magpie\Models\Schemas\ColumnSchema;
@@ -84,9 +85,9 @@ class SqliteTableEditor extends TableEditor
     /**
      * @inheritDoc
      */
-    public function compile() : iterable
+    public function compile(QueryGrammar $grammar) : iterable
     {
-        foreach ($this->onCompile() as $sql) {
+        foreach ($this->onCompile($grammar) as $sql) {
             yield $this->connection->prepare($sql);
         }
     }
@@ -99,8 +100,10 @@ class SqliteTableEditor extends TableEditor
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
      */
-    protected function onCompile() : iterable
+    protected function onCompile(QueryGrammar $grammar) : iterable
     {
+        $q = $grammar->getIdentifierQuote();
+
         // Find out what columns are preserved and exist in the new table
         $escapedExistingColumns = [];
         foreach ($this->targetColumns as $column) {
@@ -112,7 +115,7 @@ class SqliteTableEditor extends TableEditor
                 if ($newColumn->getEditAction() instanceof AddColumnDatabaseEditAction) continue;
             }
 
-            $escapedExistingColumns[] = SqliteGrammar::escapeName($column->getName());
+            $escapedExistingColumns[] = $q->quote($column->getName());
         }
         $existingColumns = implode(', ', $escapedExistingColumns);
 
@@ -121,11 +124,11 @@ class SqliteTableEditor extends TableEditor
 
         // Rename, delete, recreate, import
         yield 'PRAGMA foreign_keys = 0';
-        yield 'CREATE TABLE ' . SqliteGrammar::escapeName($tempTableName) . ' AS SELECT * FROM ' . SqliteGrammar::escapeName($this->tableName);
-        yield 'DROP TABLE ' . SqliteGrammar::escapeName($this->tableName);
-        yield static::compileCreateTableSql($this->connection, $this->tableName, $this->targetColumns);
-        yield 'INSERT INTO ' . SqliteGrammar::escapeName($this->tableName). ' ' . Quote::bracket($existingColumns) . ' SELECT ' . $existingColumns . ' FROM ' . SqliteGrammar::escapeName($tempTableName);
-        yield 'DROP TABLE ' . SqliteGrammar::escapeName($tempTableName);
+        yield 'CREATE TABLE ' . $q->quote($tempTableName) . ' AS SELECT * FROM ' . $q->quote($this->tableName);
+        yield 'DROP TABLE ' . $q->quote($this->tableName);
+        yield static::compileCreateTableSql($grammar, $this->connection, $this->tableName, $this->targetColumns);
+        yield 'INSERT INTO ' . $q->quote($this->tableName). ' ' . Quote::bracket($existingColumns) . ' SELECT ' . $existingColumns . ' FROM ' . $q->quote($tempTableName);
+        yield 'DROP TABLE ' . $q->quote($tempTableName);
         yield 'PRAGMA foreign_keys = 1';
     }
 

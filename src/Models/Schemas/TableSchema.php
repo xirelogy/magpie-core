@@ -221,6 +221,7 @@ class TableSchema implements Packable
      */
     public function compileStatementsAtDatabase(Connection $connection, bool &$isUseTransaction, ?ModelCheckListenable $listener = null) : iterable
     {
+        $grammar = $connection->getQueryGrammar();
         $schemaAtDb = $this->getSchemaAtDatabase($connection);
 
         $modelClassName = $this->getModelClassName();
@@ -237,7 +238,7 @@ class TableSchema implements Packable
                 $creator->addColumnFromSchema($column);
             }
             $isUseTransaction = $creator->isUseTransaction();
-            return $creator->compile();
+            return $creator->compile($grammar);
         } else {
             // Alter table
             $editor = $connection->prepareTableEditor($tableName, $this->getColumns());
@@ -251,7 +252,7 @@ class TableSchema implements Packable
             }
             if ($editor->hasColumn()) {
                 $isUseTransaction = $editor->isUseTransaction();
-                return $editor->compile();
+                return $editor->compile($grammar);
             }
         }
 

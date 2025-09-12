@@ -11,6 +11,7 @@ use Magpie\Models\Concepts\JointSpecifiable;
 use Magpie\Models\Connection;
 use Magpie\Models\Impls\Traits\CommonActualModelQuery;
 use Magpie\Models\Impls\Traits\WithQueryFilterService;
+use Magpie\Models\Providers\DefaultQueryIdentifierQuote;
 use Magpie\Models\Query;
 use Magpie\Models\Schemas\TableSchema;
 use Magpie\Models\Statement;
@@ -130,10 +131,12 @@ class ActualJointModelQuery extends Query
      */
     private function finalizeJoints(QueryContext $context) : QueryStatement
     {
+        $q = $context->grammar?->getIdentifierQuote() ?? DefaultQueryIdentifierQuote::instance();
+
         /** @var TableSchema $baseTableSchema */
         $baseTableSchema = iter_first($this->tableSchemas);
 
-        $ret = new QueryStatement(SqlFormat::backTick($baseTableSchema->getName()));
+        $ret = new QueryStatement($q->quote($baseTableSchema->getName()));
         foreach ($this->jointSpecs as $jointSpec) {
             $ret->appendJoinIfNotEmpty(' ', $jointSpec->_finalize($context));
         }

@@ -7,7 +7,7 @@ use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Models\Concepts\QuerySelectable;
 use Magpie\Models\Impls\QueryContext;
 use Magpie\Models\Impls\QueryStatement;
-use Magpie\Models\Impls\SqlFormat;
+use Magpie\Models\Providers\DefaultQueryIdentifierQuote;
 use Magpie\Models\Schemas\ColumnSchema;
 use Magpie\Models\Schemas\TableSchema;
 
@@ -77,30 +77,33 @@ class ColumnName implements QuerySelectable, PreferStringable
             }
         }
 
-        $sql = $this->toSql($context->tableSchema);
+        $sql = $this->toSql($context);
         return new QueryStatement($sql);
     }
 
 
     /**
      * Expressed in SQL
-     * @param TableSchema|null $refSchema
+     * @param QueryContext $context
      * @return string
      */
-    public function toSql(?TableSchema $refSchema) : string
+    public function toSql(QueryContext $context) : string
     {
+        $q = $context->grammar?->getIdentifierQuote() ?? DefaultQueryIdentifierQuote::instance();
+        $refSchema = $context->tableSchema;
+
         if ($this->table === null || $refSchema === null) {
             // No specific model, or no reference model, always assume fallback
-            return SqlFormat::backTick($this->name);
+            return $q->quote($this->name);
         }
 
         if ($this->table->getName() === $refSchema->getName()) {
             // The specific model is the same as the reference, no need for table specification
-            return SqlFormat::backTick($this->name);
+            return $q->quote($this->name);
         }
 
         // Qualified column name with table name
-        return SqlFormat::backTick($this->table->getName()) . '.' . SqlFormat::backTick($this->name);
+        return $q->quote($this->table->getName()) . '.' . $q->quote($this->name);
     }
 
 

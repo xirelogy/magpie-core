@@ -4,8 +4,8 @@ namespace Magpie\Models\Providers\Mysql\Impls;
 
 use Magpie\Exceptions\MissingArgumentException;
 use Magpie\Models\Concepts\ColumnDatabaseEditSpecifiable;
-use Magpie\Models\Impls\SqlFormat;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
+use Magpie\Models\Providers\QueryGrammar;
 use Magpie\Models\Schemas\DatabaseEdits\TableEditor;
 
 /**
@@ -63,13 +63,14 @@ class MysqlTableEditor extends TableEditor
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
      */
-    public function compile() : iterable
+    public function compile(QueryGrammar $grammar) : iterable
     {
         $database = $this->connection->getDatabase();
+        $q = $grammar->getIdentifierQuote();
 
         $sql = 'ALTER TABLE ';
-        if ($database !== null) $sql .= SqlFormat::backTick($database) . '.';
-        $sql .= SqlFormat::backTick($this->tableName);
+        if ($database !== null) $sql .= $q->quote($database) . '.';
+        $sql .= $q->quote($this->tableName);
 
         $declarations = [];
         foreach ($this->columns as $column) {

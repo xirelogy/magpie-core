@@ -35,7 +35,7 @@ class AllColumns implements QuerySelectable
      */
     public function _finalize(QueryContext $context) : QueryStatement
     {
-        $sql = ColumnName::fromTable($this->table, '*')->toSql($context->tableSchema);
+        $sql = ColumnName::fromTable($this->table, '*')->toSql($context);
 
         if ($this->table->getName() === ($context->tableSchema?->getName() ?? '')) {
             $context->modelFinalizer?->markAllColumnsSelected();

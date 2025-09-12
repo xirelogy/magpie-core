@@ -5,6 +5,7 @@ namespace Magpie\Models\Impls;
 use Magpie\Models\ColumnName;
 use Magpie\Models\Concepts\QueryContextServiceable;
 use Magpie\Models\Connection;
+use Magpie\Models\Providers\DefaultQueryIdentifierQuote;
 use Magpie\Models\Providers\QueryGrammar;
 use Magpie\Models\Schemas\ColumnSchema;
 use Magpie\Models\Schemas\TableSchema;
@@ -51,15 +52,17 @@ class QueryContext implements QueryContextServiceable
      */
     public function getColumnNameSql(string|ColumnName $columnName) : string
     {
+        $q = $this->grammar?->getIdentifierQuote() ?? DefaultQueryIdentifierQuote::instance();
+
         if (is_string($columnName)) {
-            return SqlFormat::backTick($columnName);
+            return $q->quote($columnName);
         }
 
         if ($columnName instanceof ColumnName) {
-            return $columnName->toSql($this->tableSchema);
+            return $columnName->toSql($this);
         }
 
-        return SqlFormat::backTick('');    // Should not reach here!
+        return $q->quote('');    // Should not reach here!
     }
 
 

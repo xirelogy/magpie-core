@@ -32,7 +32,6 @@ use Magpie\Models\Impls\ActualModelQuery;
 use Magpie\Models\Impls\PatchHost;
 use Magpie\Models\Impls\QueryContext;
 use Magpie\Models\Impls\QuerySetupListener;
-use Magpie\Models\Impls\SqlFormat;
 use Magpie\Models\Schemas\ColumnSchema;
 use Magpie\Models\Schemas\TableSchema;
 use Stringable;
@@ -384,6 +383,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
     private static function _onCreate(Connection $connection, TableSchema $tableSchema, array &$assignments) : void
     {
         $tableName = $tableSchema->getName();
+        $q = $connection->getQueryGrammar()->getIdentifierQuote();
 
         $context = new QueryContext($connection, $tableSchema);
 
@@ -426,7 +426,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
             $assignmentValues[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue, $connection) : $assignValue;
         }
 
-        $sql = 'INSERT INTO ' . SqlFormat::backTick($tableName) . ' ' . Quote::bracket($keysSql) . ' VALUES ' . Quote::bracket($valuesSql);
+        $sql = 'INSERT INTO ' . $q->quote($tableName) . ' ' . Quote::bracket($keysSql) . ' VALUES ' . Quote::bracket($valuesSql);
 
         // Prepare statement and execute
         $statement = $connection->prepare($sql);
@@ -455,8 +455,9 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
 
         $deferStorage = new ClosureDeferringModelStorageProvider($tableSchema, function(Model $instance, string $connection) use($tableSchema) {
             $connectionInstance = Connection::from($connection);
+            $q = $connectionInstance->getQueryGrammar()->getIdentifierQuote();
 
-            $sql = 'TRUNCATE TABLE ' . SqlFormat::backTick($tableSchema->getName());
+            $sql = 'TRUNCATE TABLE ' . $q->quote($tableSchema->getName());
 
             $statement = $connectionInstance->prepare($sql);
             $statement->execute();
