@@ -423,7 +423,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
             $valuesSql .= '?';
 
             $assignColumnSchema = $context->getColumnSchema($assignKey);
-            $assignmentValues[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue) : $assignValue;
+            $assignmentValues[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue, $connection) : $assignValue;
         }
 
         $sql = 'INSERT INTO ' . SqlFormat::backTick($tableName) . ' ' . Quote::bracket($keysSql) . ' VALUES ' . Quote::bracket($valuesSql);

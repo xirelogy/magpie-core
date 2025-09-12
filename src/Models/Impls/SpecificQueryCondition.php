@@ -8,6 +8,7 @@ use Magpie\Exceptions\UnsupportedValueException;
 use Magpie\General\Sugars\Quote;
 use Magpie\Models\ColumnName;
 use Magpie\Models\Concepts\QueryArgumentable;
+use Magpie\Models\Connection;
 use Magpie\Models\Enums\CommonOperator;
 use Magpie\Models\Enums\WhereJoinType;
 use Magpie\Models\Query;
@@ -102,7 +103,7 @@ class SpecificQueryCondition extends QueryCondition
                 return $ret->append($subFinalized);
             } else if (is_array($this->value)) {
                 // Expecting array of values
-                $values = static::finalizeValues($this->value, $columnSchema);
+                $values = static::finalizeValues($this->value, $columnSchema, $context->connection);
                 $placeholders = str_repeat('?, ', count($values));
                 $sql = ' ' . Quote::bracket(substr($placeholders, 0, -2));
                 return $ret->append(new QueryStatement($sql, $values));
@@ -113,7 +114,7 @@ class SpecificQueryCondition extends QueryCondition
         }
 
         // Single value expected
-        return $ret->append(new QueryStatement(' ?', [static::finalizeValue($this->value, $columnSchema)]));
+        return $ret->append(new QueryStatement(' ?', [static::finalizeValue($this->value, $columnSchema, $context->connection)]));
     }
 
 
@@ -121,14 +122,15 @@ class SpecificQueryCondition extends QueryCondition
      * Finalize the values
      * @param array $values
      * @param ColumnSchema|null $columnSchema
+     * @param Connection|null $connection
      * @return array
      * @throws SafetyCommonException
      */
-    protected static function finalizeValues(array $values, ?ColumnSchema $columnSchema) : array
+    protected static function finalizeValues(array $values, ?ColumnSchema $columnSchema, ?Connection $connection) : array
     {
         $ret = [];
         foreach ($values as $value) {
-            $ret[] = static::finalizeValue($value, $columnSchema);
+            $ret[] = static::finalizeValue($value, $columnSchema, $connection);
         }
 
         return $ret;
@@ -139,13 +141,14 @@ class SpecificQueryCondition extends QueryCondition
      * Finalize value
      * @param mixed $value
      * @param ColumnSchema|null $columnSchema
+     * @param Connection|null $connection
      * @return mixed
      * @throws SafetyCommonException
      */
-    protected static function finalizeValue(mixed $value, ?ColumnSchema $columnSchema) : mixed
+    protected static function finalizeValue(mixed $value, ?ColumnSchema $columnSchema, ?Connection $connection) : mixed
     {
         if ($columnSchema !== null) {
-            return $columnSchema->toDb($value);
+            return $columnSchema->toDb($value, $connection);
         } else {
             return $value;
         }

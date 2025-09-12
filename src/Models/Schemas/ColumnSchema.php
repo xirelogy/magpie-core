@@ -13,6 +13,7 @@ use Magpie\Models\Annotations\Column as ColumnAttribute;
 use Magpie\Models\ColumnExpression;
 use Magpie\Models\Concepts\AttributeCastable;
 use Magpie\Models\Concepts\AttributeInitializable;
+use Magpie\Models\Connection;
 use Magpie\Models\Impls\DefaultDataTypes;
 use Magpie\Models\Impls\PatchHost;
 use Magpie\Models\Schemas\Configs\SchemaPreference;
@@ -242,17 +243,16 @@ abstract class ColumnSchema implements Packable
     /**
      * Accept value from database
      * @param mixed $value
+     * @param Connection|null $connection
      * @return mixed
      * @throws SafetyCommonException
      */
-    public function fromDb(mixed $value) : mixed
+    public function fromDb(mixed $value, ?Connection $connection = null) : mixed
     {
         if ($value === null) return null;
 
         $columnName = $this->attributeInstance->name;
-
-        $castClassName = $this->dataType->castClass;
-        if (!is_subclass_of($castClassName, AttributeCastable::class)) throw new ClassNotOfTypeException($castClassName, AttributeCastable::class);
+        $castClassName = $this->getCastClass($connection);
 
         return $castClassName::fromDb($columnName, $value);
     }
@@ -261,19 +261,35 @@ abstract class ColumnSchema implements Packable
     /**
      * Convert value to database
      * @param mixed $value
+     * @param Connection|null $connection
      * @return mixed
      * @throws SafetyCommonException
      */
-    public function toDb(mixed $value) : mixed
+    public function toDb(mixed $value, ?Connection $connection = null) : mixed
     {
         if ($value === null) return null;
 
         $columnName = $this->attributeInstance->name;
-
-        $castClassName = $this->dataType->castClass;
-        if (!is_subclass_of($castClassName, AttributeCastable::class)) throw new ClassNotOfTypeException($castClassName, AttributeCastable::class);
+        $castClassName = $this->getCastClass($connection);
 
         return $castClassName::toDb($columnName, $value);
+    }
+
+
+    /**
+     * Get cast class name
+     * @param Connection|null $connection
+     * @return class-string<AttributeCastable>
+     * @throws ClassNotOfTypeException
+     */
+    protected final function getCastClass(?Connection $connection = null) : string
+    {
+        $castClassName = $this->dataType->castClass;
+        if ($connection !== null) $castClassName = $connection->getActualCastClass($castClassName);
+
+        if (!is_subclass_of($castClassName, AttributeCastable::class)) throw new ClassNotOfTypeException($castClassName, AttributeCastable::class);
+
+        return $castClassName;
     }
 
 

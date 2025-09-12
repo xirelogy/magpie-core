@@ -161,7 +161,7 @@ class ActualModelQuery extends ModelQuery
                 // Handle like a value
                 $assignColumnSchema = $context->getColumnSchema($assignKey);
                 $query->sql .= '?';
-                $query->values[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue) : $assignValue;
+                $query->values[] = $assignColumnSchema !== null ? $assignColumnSchema->toDb($assignValue, $connection) : $assignValue;
             }
         }
 

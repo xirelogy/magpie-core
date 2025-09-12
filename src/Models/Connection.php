@@ -12,6 +12,7 @@ use Magpie\General\Concepts\Identifiable;
 use Magpie\General\Concepts\TypeClassable;
 use Magpie\General\Factories\ClassFactory;
 use Magpie\General\Randoms\RandomCharset;
+use Magpie\Models\Concepts\AttributeCastable;
 use Magpie\Models\Concepts\ConnectionResolvable;
 use Magpie\Models\Concepts\DirectTransactionable;
 use Magpie\Models\Concepts\StatementLogListenable;
@@ -167,6 +168,17 @@ abstract class Connection implements Identifiable, TypeClassable, SystemBootable
      * @return QueryGrammar
      */
     public abstract function getQueryGrammar() : QueryGrammar;
+
+
+    /**
+     * Get the actual cast class given the currently select cast class
+     * @param class-string<AttributeCastable> $castClassName
+     * @return class-string<AttributeCastable>
+     */
+    public function getActualCastClass(string $castClassName) : string
+    {
+        return $castClassName;
+    }
 
 
     /**
