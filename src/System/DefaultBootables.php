@@ -10,6 +10,7 @@ use Magpie\Facades\Mutex\Providers\RedisMutexConfig;
 use Magpie\Facades\Redis\PhpRedis\PhpRedisClient;
 use Magpie\General\Traits\StaticClass;
 use Magpie\Models\Providers\Mysql\MysqlConnection;
+use Magpie\Models\Providers\Pgsql\PgsqlConnection;
 use Magpie\Models\Providers\Sqlite\SqliteConnection;
 use Magpie\Queues\Providers\Redis\RedisQueueCreator;
 use Magpie\Schedules\Impls\ScheduleRegistry;
@@ -35,6 +36,7 @@ class DefaultBootables
         yield ScheduleRegistry::class;
         yield OpenSslSpecContext::class;
         yield MysqlConnection::class;
+        yield PgsqlConnection::class;
         yield SqliteConnection::class;
         yield CurlHttpClient::class;
         yield PhpRedisClient::class;
