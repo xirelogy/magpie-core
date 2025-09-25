@@ -48,10 +48,10 @@ class LogicalQueryCondition extends QueryCondition
 
         foreach ($this->conditions as $condition) {
             $conditionStatement = $condition->_finalize($context);
+            if ($condition->isCompound()) $conditionStatement->sql = Quote::bracket($conditionStatement->sql);
             if ($ret->isEmpty()) {
                 $ret = $conditionStatement;
             } else {
-                if ($condition->isCompound()) $conditionStatement->sql = Quote::bracket($conditionStatement->sql);
                 $ret->appendJoinIfNotEmpty(' ' . strtoupper($condition->joinPrevious->value) . ' ', $conditionStatement);
             }
         }
