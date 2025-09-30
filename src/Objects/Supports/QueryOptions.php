@@ -34,6 +34,22 @@ class QueryOptions implements QueryApplicable
 
 
     /**
+     * Create a clone
+     * @return QueryOptions
+     */
+    public final function clone() : QueryOptions
+    {
+        $ret = new static();
+        $ret->isSoftDeletesIncluded = $this->isSoftDeletesIncluded;
+        $ret->usePaginator = $this->usePaginator;
+        $ret->useConditions = [...$this->useConditions];
+        $ret->useOrderCondition = $this->useOrderCondition;
+
+        return $ret;
+    }
+
+
+    /**
      * Specify that soft deleted items are to be included (or not)
      * @param bool $isIncluded
      * @return $this
