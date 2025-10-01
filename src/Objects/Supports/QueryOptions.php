@@ -28,9 +28,17 @@ class QueryOptions implements QueryApplicable
      */
     protected array $useConditions = [];
     /**
-     * @var QueryOrderCondition|null Specific query condition to be applied
+     * @var QueryOrderCondition|null Specific order condition to be applied
      */
     protected ?QueryOrderCondition $useOrderCondition = null;
+    /**
+     * @var QueryOrderCondition|null Specific default order condition to be applied
+     */
+    protected ?QueryOrderCondition $defaultOrderCondition = null;
+    /**
+     * @var bool If the default order condition is suppressed
+     */
+    protected bool $suppressDefaultOrderCondition = false;
 
 
     /**
@@ -44,6 +52,8 @@ class QueryOptions implements QueryApplicable
         $ret->usePaginator = $this->usePaginator;
         $ret->useConditions = [...$this->useConditions];
         $ret->useOrderCondition = $this->useOrderCondition;
+        $ret->defaultOrderCondition = $this->defaultOrderCondition;
+        $ret->suppressDefaultOrderCondition = $this->suppressDefaultOrderCondition;
 
         return $ret;
     }
@@ -144,16 +154,26 @@ class QueryOptions implements QueryApplicable
 
 
     /**
-     * Specify the order condition to be used if not yet specified
+     * Specify the order condition to be used if specif order not specified;
+     * or secondary order condition to be used if specific order specified
      * @param QueryOrderCondition|null $useOrderCondition
      * @return $this
      */
     public final function withDefaultOrderCondition(?QueryOrderCondition $useOrderCondition) : static
     {
-        if ($useOrderCondition !== null && $this->useOrderCondition === null) {
-            $this->useOrderCondition = $useOrderCondition;
-        }
+        $this->defaultOrderCondition = $useOrderCondition;
+        return $this;
+    }
 
+
+    /**
+     * Specify if the default order condition is to be suppressed when order condition specified
+     * @param bool $isSuppress
+     * @return $this
+     */
+    public final function withDefaultOrderConditionSuppressed(bool $isSuppress = true) : static
+    {
+        $this->suppressDefaultOrderCondition = $isSuppress;
         return $this;
     }
 
@@ -192,6 +212,13 @@ class QueryOptions implements QueryApplicable
         }
 
         $this->useOrderCondition?->applyOnQuery($query);
+
+        // Default order condition use when either:
+        // - no specific order specified
+        // - default order not suppressed
+        if ($this->useOrderCondition === null || !$this->suppressDefaultOrderCondition) {
+            $this->defaultOrderCondition?->applyOnQuery($query);
+        }
 
         if ($query instanceof Query && $this->usePaginator !== null) {
             $query->filterWith($this->usePaginator);
