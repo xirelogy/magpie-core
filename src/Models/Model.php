@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Error;
 use Exception;
 use Magpie\Exceptions\InvalidDataException;
-use Magpie\Exceptions\NullException;
+use Magpie\Exceptions\ObjectNotFoundException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\Exceptions\UnsupportedException;
@@ -132,7 +132,7 @@ abstract class Model implements Modelable, Savable, Deletable, Stringable
             $query->where($key, $value);
         }
 
-        $db = $query->first() ?? throw new NullException();
+        $db = $query->first() ?? throw new ObjectNotFoundException();
 
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $this->_storage = $db->_storage;
