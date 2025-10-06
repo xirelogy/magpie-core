@@ -8,6 +8,7 @@ use Exception;
 use Magpie\Exceptions\ClassNotOfTypeException;
 use Magpie\Exceptions\GeneralPersistenceException;
 use Magpie\Exceptions\NullException;
+use Magpie\Exceptions\ObjectNotFoundException;
 use Magpie\Exceptions\PersistenceException;
 use Magpie\Exceptions\SafetyCommonException;
 use Magpie\General\Concepts\Identifiable;
@@ -135,7 +136,7 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
         $options = $options ?? QueryOptions::default();
         $options->withSoftDeletesIncluded();
 
-        return static::find($id, $options) ?? throw new NullException();
+        return static::find($id, $options) ?? throw new ObjectNotFoundException();
     }
 
 
