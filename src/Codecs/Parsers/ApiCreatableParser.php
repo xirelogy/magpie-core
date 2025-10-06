@@ -16,18 +16,19 @@ class ApiCreatableParser implements Parser
     use CommonParser;
 
     /**
-     * @var class-string The base class name that the ApiCreatable should be based upon
+     * @var class-string<ApiCreatable> The base class name that the ApiCreatable should be based upon
      */
     protected readonly string $baseClassName;
     /**
-     * @var string|null The specific base class name that the ApiCreatable should be further checked upon
+     * @var class-string<ApiCreatable>|null The specific base class name that the ApiCreatable should be further checked upon
      */
     protected readonly ?string $specificBaseClassName;
 
 
     /**
      * Constructor
-     * @param class-string $baseClassName
+     * @param class-string<ApiCreatable> $baseClassName
+     * @param class-string<ApiCreatable>|null $specificBaseClassName
      */
     protected function __construct(string $baseClassName, ?string $specificBaseClassName)
     {
@@ -56,8 +57,8 @@ class ApiCreatableParser implements Parser
 
     /**
      * Create an instance
-     * @param string $baseClassName
-     * @param string|null $specificBaseClassName
+     * @param class-string<ApiCreatable> $baseClassName
+     * @param class-string<ApiCreatable>|null $specificBaseClassName
      * @return static
      */
     public static function create(string $baseClassName, ?string $specificBaseClassName = null) : static
