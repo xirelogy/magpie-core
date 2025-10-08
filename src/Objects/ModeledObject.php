@@ -134,7 +134,6 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
     public static function findRequired(Identifier|string|int|null $id, ?QueryOptions $options = null) : static
     {
         $options = $options ?? QueryOptions::default();
-        $options->withSoftDeletesIncluded();
 
         return static::find($id, $options) ?? throw new ObjectNotFoundException();
     }
@@ -154,6 +153,41 @@ abstract class ModeledObject extends CommonObject implements Identifiable, Savab
         if ($id === null) return null;
 
         return static::findRequired($id, $options);
+    }
+
+
+    /**
+     * Find instance greedily with given ID, with compulsory return expected
+     * @param Identifier|string|int|null $id
+     * @param QueryOptions|null $options
+     * @return static
+     * @throws SafetyCommonException
+     * @throws ModelReadException
+     * @throws ModelWriteException
+     */
+    public static function findRequiredGreedy(Identifier|string|int|null $id, ?QueryOptions $options = null) : static
+    {
+        $options = $options ?? QueryOptions::default();
+        $options->withSoftDeletesIncluded();
+
+        return static::find($id, $options) ?? throw new ObjectNotFoundException();
+    }
+
+
+    /**
+     * Find instance greedily with given ID, with compulsory return expected, only when ID is valid
+     * @param Identifier|string|int|null $id
+     * @param QueryOptions|null $options
+     * @return static|null
+     * @throws SafetyCommonException
+     * @throws ModelReadException
+     * @throws ModelWriteException
+     */
+    public static function findRequiredGreedyWhenIdValid(Identifier|string|int|null $id, ?QueryOptions $options = null) : ?static
+    {
+        if ($id === null) return null;
+
+        return static::findRequiredGreedy($id, $options);
     }
 
 
